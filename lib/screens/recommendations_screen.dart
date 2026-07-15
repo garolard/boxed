@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 
 import '../models/game.dart';
 import '../providers/collection_provider.dart';
+import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/neon_button.dart';
+import '../widgets/section_header.dart';
 
 class RecommendationsScreen extends StatefulWidget {
   const RecommendationsScreen({super.key});
@@ -33,23 +35,18 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: ShaderMask(
-          shaderCallback: (rect) => const LinearGradient(
-            colors: [Color(0xFF7C4DFF), Color(0xFF00E5FF)],
-          ).createShader(rect),
-          child: const Text(
-            'FOR YOU',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.0,
-            ),
+        title: const Text(
+          'For you',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.4,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+            icon: const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
             onPressed: () => provider.loadRecommendations(force: true),
           ),
         ],
@@ -82,13 +79,14 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.cloud_off, color: Colors.white, size: 48),
+                const Icon(Icons.cloud_off,
+                    color: AppColors.textMuted, size: 40),
                 const SizedBox(height: 12),
                 Text(
                   provider.recsError!,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -99,7 +97,6 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                     label: 'Retry',
                     icon: Icons.refresh_rounded,
                     onPressed: () => provider.loadRecommendations(force: true),
-                    colors: const [Color(0xFF7C4DFF), Color(0xFF00E5FF)],
                   ),
                 ),
               ],
@@ -112,7 +109,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       return const Center(
         child: Text(
           'No recommendations yet — try adding more games.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
       );
     }
@@ -121,70 +118,18 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 16, 12),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF7C4DFF), Color(0xFF00E5FF)],
-                  ),
-                  borderRadius: BorderRadius.circular(99),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF7C4DFF).withValues(alpha: 0.5),
-                      blurRadius: 14,
-                    ),
-                  ],
-                ),
-                child: Text(
-                  '${recs.length} PICKS',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.4,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Based on your shelf',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.6,
-                ),
-              ),
-            ],
-          ),
+        const SectionHeader(
+          title: 'Featured',
+          subtitle: 'Based on what you own',
+          icon: Icons.auto_awesome_rounded,
         ),
         SizedBox(
           height: 320,
           child: _Carousel(games: recs),
         ),
-        const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 16, 8),
-          child: Row(
-            children: [
-              const Icon(Icons.grid_view_rounded,
-                  color: Colors.white70, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                'ALL RECOMMENDATIONS',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.4,
-                ),
-              ),
-            ],
-          ),
+        const SectionHeader(
+          title: 'All picks',
+          icon: Icons.grid_view_rounded,
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -266,15 +211,13 @@ class _CarouselState extends State<_Carousel> {
       itemBuilder: (_, i) {
         final game = widget.games[i];
         final diff = (i - _page).abs().clamp(0, 1);
-        final scale = 1 - diff * 0.08;
+        final scale = 1 - diff * 0.06;
         return Transform.scale(
           scale: scale,
           child: GameCoverCard(
             game: game,
             onAddPressed: () => _toggle(context, game),
-          )
-              .animate(target: i == _page.round() ? 1 : 0)
-              .scaleXY(end: 1.0, begin: 0.95, duration: 300.ms),
+          ),
         );
       },
     );

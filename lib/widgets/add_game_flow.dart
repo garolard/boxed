@@ -4,11 +4,11 @@ import 'package:provider/provider.dart';
 
 import '../models/game.dart';
 import '../providers/collection_provider.dart';
+import '../theme/app_theme.dart';
 import 'platform_badge.dart';
 
 /// Asks which platform the owned copy is for (when the game exists on
-/// several), then adds the game to the collection. Uses a colorful sheet
-/// with a hero cover, platform picker chips and a glowing CTA.
+/// several), then adds the game to the collection.
 Future<void> addGameFlow(BuildContext context, Game game) async {
   final provider = context.read<CollectionProvider>();
   int? platformId;
@@ -18,7 +18,10 @@ Future<void> addGameFlow(BuildContext context, Game game) async {
     final choice = await showModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => _PlatformPickerSheet(game: game),
     );
     if (choice == null) return;
@@ -35,7 +38,7 @@ Future<void> addGameFlow(BuildContext context, Game game) async {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle, color: Color(0xFF00E676)),
+            const Icon(Icons.check_circle, color: AppColors.success),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -65,15 +68,8 @@ class _PlatformPickerSheet extends StatelessWidget {
       builder: (_, controller) {
         return Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF221A45),
-                Color(0xFF0E0B1F),
-              ],
-            ),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: ListView(
             controller: controller,
@@ -81,52 +77,52 @@ class _PlatformPickerSheet extends StatelessWidget {
             children: [
               Center(
                 child: Container(
-                  width: 48,
+                  width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: AppColors.surfaceHi2,
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
               ),
               const Text(
-                'WHICH VERSION DO YOU OWN?',
+                'Which version do you own?',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.4,
+                  color: AppColors.textPrimary,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.3,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 game.name,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 14,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               for (var i = 0; i < game.platformNames.length; i++)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       onTap: () => Navigator.pop(context, i),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
-                          vertical: 14,
+                          vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(16),
+                          color: AppColors.surfaceHi,
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.08),
+                            color: Colors.white.withValues(alpha: 0.04),
                           ),
                         ),
                         child: Row(
@@ -137,7 +133,7 @@ class _PlatformPickerSheet extends StatelessWidget {
                               child: Text(
                                 game.platformNames[i],
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 14,
                                 ),
@@ -145,7 +141,7 @@ class _PlatformPickerSheet extends StatelessWidget {
                             ),
                             const Icon(
                               Icons.chevron_right_rounded,
-                              color: Colors.white54,
+                              color: AppColors.textMuted,
                             ),
                           ],
                         ),

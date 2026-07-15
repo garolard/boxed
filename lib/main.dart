@@ -28,7 +28,7 @@ class VgCollectionApp extends StatelessWidget {
       child: MaterialApp(
         title: 'VG Collection',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.light(),
+        theme: AppTheme.dark(),
         darkTheme: AppTheme.dark(),
         themeMode: ThemeMode.dark,
         builder: (context, child) {

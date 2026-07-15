@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../theme/app_theme.dart';
 import 'neon_button.dart';
 
-/// A friendly empty state with animated floating controller icons and a CTA.
+/// A friendly empty state with subtle floating controller icons and a CTA.
 class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -11,7 +12,6 @@ class EmptyState extends StatelessWidget {
   final String? actionLabel;
   final IconData? actionIcon;
   final VoidCallback? onAction;
-  final List<Color> actionColors;
 
   const EmptyState({
     super.key,
@@ -21,7 +21,6 @@ class EmptyState extends StatelessWidget {
     this.actionLabel,
     this.actionIcon,
     this.onAction,
-    this.actionColors = const [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
   });
 
   @override
@@ -39,48 +38,42 @@ class EmptyState extends StatelessWidget {
                 children: [
                   _floating(
                     Icons.sports_esports_rounded,
-                    const Color(0xFFFF2E93),
-                    0,
+                    const Offset(-50, -20),
                     Alignment.topLeft,
-                    offset: const Offset(-50, -20),
+                    0,
                   ),
                   _floating(
                     Icons.casino_rounded,
-                    const Color(0xFF00E5FF),
-                    200,
+                    const Offset(60, -10),
                     Alignment.topRight,
-                    offset: const Offset(60, -10),
+                    200,
                   ),
                   _floating(
                     Icons.rocket_launch_rounded,
-                    const Color(0xFFFFD600),
-                    400,
+                    const Offset(-60, 25),
                     Alignment.bottomLeft,
-                    offset: const Offset(-60, 25),
+                    400,
                   ),
                   _floating(
                     Icons.star_rounded,
-                    const Color(0xFF7C4DFF),
-                    600,
+                    const Offset(50, 30),
                     Alignment.bottomRight,
-                    offset: const Offset(50, 30),
+                    600,
                   ),
                   Container(
-                    width: 110,
-                    height: 110,
+                    width: 96,
+                    height: 96,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
-                      ),
+                      color: AppColors.accent,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFF2E93).withValues(alpha: 0.5),
-                          blurRadius: 30,
+                          color: AppColors.accent.withValues(alpha: 0.4),
+                          blurRadius: 28,
                         ),
                       ],
                     ),
-                    child: Icon(icon, color: Colors.white, size: 56),
+                    child: Icon(icon, color: Colors.white, size: 48),
                   ).animate().scale(
                         duration: 600.ms,
                         curve: Curves.elasticOut,
@@ -93,21 +86,21 @@ class EmptyState extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
+                color: AppColors.textPrimary,
+                fontSize: 20,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 0.6,
+                letterSpacing: 0.4,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                height: 1.4,
+                height: 1.45,
               ),
             ),
             if (actionLabel != null && onAction != null) ...[
@@ -118,7 +111,6 @@ class EmptyState extends StatelessWidget {
                   label: actionLabel!,
                   icon: actionIcon,
                   expand: true,
-                  colors: actionColors,
                   onPressed: onAction,
                 ),
               ),
@@ -131,29 +123,26 @@ class EmptyState extends StatelessWidget {
 
   Widget _floating(
     IconData icon,
-    Color color,
+    Offset offset,
+    Alignment alignment,
     int delay,
-    Alignment alignment, {
-    required Offset offset,
-  }) {
+  ) {
     return Align(
       alignment: alignment,
       child: Transform.translate(
         offset: offset,
         child: Container(
-          width: 40,
-          height: 40,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
-            color: color,
+            color: AppColors.surfaceHi,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.6),
-                blurRadius: 18,
-              ),
-            ],
+            border: Border.all(
+              color: AppColors.accent.withValues(alpha: 0.3),
+              width: 1,
+            ),
           ),
-          child: Icon(icon, color: Colors.white, size: 22),
+          child: Icon(icon, color: AppColors.accent, size: 20),
         ).animate(delay: delay.ms, onPlay: (c) => c.repeat(reverse: true))
             .moveY(begin: 0, end: -8, duration: 1600.ms)
             .then()

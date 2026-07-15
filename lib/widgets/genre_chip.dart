@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import '../theme/platform_palette.dart';
 
-/// Small colored chip showing a game genre. Each genre gets a stable color
-/// derived from its name, so the same genre always uses the same hue.
+/// Genre chip with a dark body, colored border and white text. Selected
+/// state fills with the accent color for emphasis. Always readable, even
+/// on the dark background.
 class GenreChip extends StatelessWidget {
   final String name;
   final bool selected;
   final VoidCallback? onTap;
   final double fontSize;
+  final Color? color;
 
   const GenreChip({
     super.key,
@@ -16,48 +19,37 @@ class GenreChip extends StatelessWidget {
     this.selected = false,
     this.onTap,
     this.fontSize = 11,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = GenrePalette.of(name);
+    final color = this.color ?? GenrePalette.of(name);
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(99),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            gradient: selected
-                ? LinearGradient(colors: [color, color.withValues(alpha: 0.7)])
-                : null,
-            color: selected ? null : color.withValues(alpha: 0.15),
+            color: selected ? color : AppColors.surface,
             borderRadius: BorderRadius.circular(99),
             border: Border.all(
               color: selected
                   ? color
                   : color.withValues(alpha: 0.4),
-              width: 1.2,
+              width: 1,
             ),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.45),
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                    ),
-                  ]
-                : null,
           ),
           child: Text(
             name.toUpperCase(),
             style: TextStyle(
-              color: selected ? Colors.white : color,
-              fontWeight: FontWeight.w800,
+              color: selected ? Colors.white : AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
               fontSize: fontSize,
-              letterSpacing: 1.0,
+              letterSpacing: 0.8,
             ),
           ),
         ),

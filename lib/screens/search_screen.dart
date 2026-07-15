@@ -8,6 +8,7 @@ import '../models/game.dart';
 import '../models/platforms.dart';
 import '../providers/collection_provider.dart';
 import '../services/igdb_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
@@ -106,18 +107,13 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: ShaderMask(
-          shaderCallback: (rect) => const LinearGradient(
-            colors: [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
-          ).createShader(rect),
-          child: const Text(
-            'SEARCH',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.0,
-            ),
+        title: const Text(
+          'Search',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.4,
           ),
         ),
       ),
@@ -126,7 +122,7 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-              child: _ArcadeSearchBar(
+              child: _SearchField(
                 controller: _controller,
                 focusNode: _focusNode,
                 onChanged: _onQueryChanged,
@@ -158,7 +154,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(99)),
-                  child: LinearProgressIndicator(minHeight: 3),
+                  child: LinearProgressIndicator(minHeight: 2),
                 ),
               ),
             const SizedBox(height: 4),
@@ -178,13 +174,13 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.cloud_off, size: 48, color: Colors.white),
+                const Icon(Icons.cloud_off, size: 40, color: AppColors.textMuted),
                 const SizedBox(height: 12),
                 Text(
                   _error!,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -195,7 +191,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     label: 'Try again',
                     icon: Icons.refresh_rounded,
                     onPressed: _search,
-                    colors: const [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
                   ),
                 ),
               ],
@@ -220,7 +215,6 @@ class _SearchScreenState extends State<SearchScreen> {
               'Try a different title, pick a different system, or clear the genre filter.',
           actionLabel: 'Clear filters',
           actionIcon: Icons.refresh_rounded,
-          actionColors: const [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
           onAction: () {
             setState(() {
               _platformId = null;
@@ -263,9 +257,7 @@ class _SearchScreenState extends State<SearchScreen> {
       await provider.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('"${game.name}" removed'),
-          ),
+          SnackBar(content: Text('"${game.name}" removed')),
         );
       }
     } else {
@@ -274,14 +266,14 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-class _ArcadeSearchBar extends StatelessWidget {
+class _SearchField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final ValueChanged<String> onChanged;
   final ValueChanged<String> onSubmitted;
   final VoidCallback onClear;
 
-  const _ArcadeSearchBar({
+  const _SearchField({
     required this.controller,
     required this.focusNode,
     required this.onChanged,
@@ -295,56 +287,43 @@ class _ArcadeSearchBar extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: focused
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF00E5FF).withValues(alpha: 0.5),
-                  blurRadius: 22,
-                ),
-              ]
-            : null,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: focused
-                ? const Color(0xFF00E5FF)
-                : Colors.white.withValues(alpha: 0.15),
-            width: focused ? 1.5 : 1,
-          ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: focused
+              ? AppColors.accent
+              : Colors.white.withValues(alpha: 0.06),
+          width: focused ? 1.4 : 1,
         ),
-        child: TextField(
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: TextInputAction.search,
-          onChanged: onChanged,
-          onSubmitted: onSubmitted,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
+      ),
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        textInputAction: TextInputAction.search,
+        onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        style: const TextStyle(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Game title…',
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: AppColors.textMuted,
           ),
-          decoration: InputDecoration(
-            hintText: 'Game title…',
-            prefixIcon: const Icon(
-              Icons.search_rounded,
-              color: Color(0xFF00E5FF),
-            ),
-            suffixIcon: controller.text.isEmpty
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                    onPressed: onClear,
-                  ),
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
-            fillColor: Colors.transparent,
-          ),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.close_rounded,
+                      color: AppColors.textMuted),
+                  onPressed: onClear,
+                ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+          fillColor: AppColors.surface,
         ),
       ),
     );
@@ -372,37 +351,16 @@ class _Filters extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'SYSTEM',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(child: Container(height: 1, color: Colors.white10)),
-            ],
-          ),
+          const _Label('SYSTEM'),
           const SizedBox(height: 8),
           SizedBox(
-            height: 36,
+            height: 32,
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
                 _PlatformPill(
                   label: 'All',
-                  color: const Color(0xFFFF2E93),
+                  color: AppColors.accent,
                   selected: platformId == null,
                   onTap: () => onPlatformChanged(null),
                 ),
@@ -420,37 +378,16 @@ class _Filters extends StatelessWidget {
           ),
           if (genres.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'GENRE',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(child: Container(height: 1, color: Colors.white10)),
-              ],
-            ),
+            const _Label('GENRE'),
             const SizedBox(height: 8),
             SizedBox(
-              height: 36,
+              height: 32,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
                   GenreChip(
                     name: 'All',
+                    color: AppColors.accent,
                     selected: genreId == null,
                     onTap: () => onGenreChanged(null),
                   ),
@@ -467,6 +404,24 @@ class _Filters extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _Label extends StatelessWidget {
+  final String text;
+  const _Label(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
       ),
     );
   }
@@ -492,32 +447,27 @@ class _PlatformPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            gradient: selected ? LinearGradient(colors: [color, color.withValues(alpha: 0.7)]) : null,
-            color: selected ? null : color.withValues(alpha: 0.15),
+            color: selected
+                ? color.withValues(alpha: 0.18)
+                : AppColors.surface,
             border: Border.all(
-              color: selected ? color : color.withValues(alpha: 0.4),
-              width: 1.2,
+              color: selected
+                  ? color
+                  : color.withValues(alpha: 0.4),
+              width: 1,
             ),
             borderRadius: BorderRadius.circular(99),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.55),
-                      blurRadius: 14,
-                    ),
-                  ]
-                : null,
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.white : color,
-              fontWeight: FontWeight.w800,
+              color: selected ? color : AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
               fontSize: 12,
-              letterSpacing: 0.6,
+              letterSpacing: 0.4,
             ),
           ),
         ),
@@ -539,49 +489,44 @@ class _SearchHint extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 96,
-              height: 96,
+              width: 88,
+              height: 88,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
+                color: AppColors.accent.withValues(alpha: 0.15),
+                border: Border.all(
+                  color: AppColors.accent.withValues(alpha: 0.3),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF00E5FF).withValues(alpha: 0.5),
-                    blurRadius: 30,
-                  ),
-                ],
               ),
               child: const Icon(Icons.travel_explore_rounded,
-                  color: Colors.white, size: 48),
-            ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
+                  color: AppColors.accent, size: 40),
+            ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(
                   duration: 1800.ms,
-                  begin: const Offset(1, 1),
-                  end: const Offset(1.08, 1.08),
+                  begin: 1.0,
+                  end: 1.06,
                   curve: Curves.easeInOut,
                 ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             const Text(
-              'DISCOVER GAMES',
+              'Discover games',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 18,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.6,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
               ),
             ),
             const SizedBox(height: 6),
-            Text(
+            const Text(
               'Search the IGDB catalog. Filter by system or genre to drill down.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.75),
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -617,15 +562,15 @@ class _Suggestion extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.10),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            color: AppColors.surface,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
             borderRadius: BorderRadius.circular(99),
           ),
           child: Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
               fontSize: 12,
             ),
           ),

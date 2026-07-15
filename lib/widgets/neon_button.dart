@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-/// Filled button with a gradient, colored glow, and a subtle press
-/// animation. Used as the primary CTA across the app.
+import '../theme/app_theme.dart';
+
+/// Filled button with a single solid accent color, subtle glow and a press
+/// animation. Used as the primary CTA.
 class NeonButton extends StatefulWidget {
   final String label;
   final IconData? icon;
   final VoidCallback? onPressed;
-  final List<Color> colors;
+  final Color? color;
   final bool expand;
   final bool pulsing;
 
@@ -16,7 +18,7 @@ class NeonButton extends StatefulWidget {
     required this.label,
     this.icon,
     this.onPressed,
-    this.colors = const [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
+    this.color,
     this.expand = true,
     this.pulsing = false,
   });
@@ -31,27 +33,23 @@ class _NeonButtonState extends State<NeonButton> {
   @override
   Widget build(BuildContext context) {
     final disabled = widget.onPressed == null;
-    final child = AnimatedScale(
-      scale: _pressed ? 0.96 : 1.0,
+    final color = widget.color ?? AppColors.accent;
+    final body = AnimatedScale(
+      scale: _pressed ? 0.97 : 1.0,
       duration: const Duration(milliseconds: 120),
       child: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: disabled
-                ? [Colors.grey.shade600, Colors.grey.shade700]
-                : widget.colors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: disabled
+              ? AppColors.surfaceHi
+              : color,
           borderRadius: BorderRadius.circular(99),
           boxShadow: disabled
               ? null
               : [
                   BoxShadow(
-                    color: widget.colors.first.withValues(alpha: 0.55),
-                    blurRadius: 24,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 8),
+                    color: color.withValues(alpha: 0.35),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
                   ),
                 ],
         ),
@@ -60,27 +58,32 @@ class _NeonButtonState extends State<NeonButton> {
           child: InkWell(
             borderRadius: BorderRadius.circular(99),
             onTap: widget.onPressed,
-            onHighlightChanged: (v) => setState(() => _pressed = v),
             onTapDown: (_) => setState(() => _pressed = true),
             onTapUp: (_) => setState(() => _pressed = false),
             onTapCancel: () => setState(() => _pressed = false),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (widget.icon != null) ...[
-                    Icon(widget.icon, color: Colors.white, size: 20),
-                    const SizedBox(width: 10),
+                    Icon(widget.icon,
+                        color: disabled
+                            ? AppColors.textMuted
+                            : Colors.white,
+                        size: 18),
+                    const SizedBox(width: 8),
                   ],
                   Text(
                     widget.label.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: disabled
+                          ? AppColors.textMuted
+                          : Colors.white,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.4,
-                      fontSize: 14,
+                      letterSpacing: 1.2,
+                      fontSize: 13,
                     ),
                   ),
                 ],
@@ -93,16 +96,16 @@ class _NeonButtonState extends State<NeonButton> {
 
     final wrapped = SizedBox(
       width: widget.expand ? double.infinity : null,
-      child: child,
+      child: body,
     );
 
     if (widget.pulsing && !disabled) {
       return wrapped
           .animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(
-            duration: 1200.ms,
-            begin: const Offset(1, 1),
-            end: const Offset(1.02, 1.02),
+          .scaleXY(
+            duration: 1400.ms,
+            begin: 1.0,
+            end: 1.02,
             curve: Curves.easeInOut,
           );
     }
@@ -110,12 +113,12 @@ class _NeonButtonState extends State<NeonButton> {
   }
 }
 
-/// Outlined neon-style button: gradient border with translucent fill.
+/// Outlined button — thin border in the accent color, transparent fill.
 class NeonOutlineButton extends StatelessWidget {
   final String label;
   final IconData? icon;
   final VoidCallback? onPressed;
-  final List<Color> colors;
+  final Color? color;
   final bool expand;
 
   const NeonOutlineButton({
@@ -123,69 +126,54 @@ class NeonOutlineButton extends StatelessWidget {
     required this.label,
     this.icon,
     this.onPressed,
-    this.colors = const [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
+    this.color,
     this.expand = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final disabled = onPressed == null;
+    final color = this.color ?? AppColors.accent;
     return SizedBox(
       width: expand ? double.infinity : null,
       child: Opacity(
         opacity: disabled ? 0.5 : 1,
-        child: Container(
-          decoration: BoxDecoration(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(99),
-            gradient: LinearGradient(colors: colors),
-            boxShadow: disabled
-                ? null
-                : [
-                    BoxShadow(
-                      color: colors.first.withValues(alpha: 0.35),
-                      blurRadius: 18,
-                    ),
-                  ],
-          ),
-          padding: const EdgeInsets.all(2),
-          child: Material(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(99),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(99),
-              onTap: onPressed,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (icon != null) ...[
-                      ShaderMask(
-                        shaderCallback: (rect) => LinearGradient(
-                          colors: colors,
-                        ).createShader(rect),
-                        child: Icon(icon, color: Colors.white, size: 18),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                    ShaderMask(
-                      shaderCallback: (rect) => LinearGradient(
-                        colors: colors,
-                      ).createShader(rect),
-                      child: Text(
-                        label.toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ],
+            onTap: onPressed,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(
+                  color: color.withValues(alpha: disabled ? 0.4 : 0.9),
+                  width: 1.2,
                 ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, color: color, size: 18),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    label.toUpperCase(),
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -1,129 +1,119 @@
 import 'package:flutter/material.dart';
 
-/// Brand colors per platform — used for badges, gradients and accents so each
-/// owned game visually nods at the console it belongs to.
+import 'app_theme.dart';
+
+/// Brand colors per platform — used as solid pill fills so each owned game
+/// still nods at its console, without turning the UI into a rainbow.
 class PlatformPalette {
-  /// Primary color for a given platform short name (case-insensitive).
-  /// Falls back to a neutral magenta when unknown.
+  /// Saturated brand color (good for icons, borders, accents).
   static Color of(String? shortName) {
-    if (shortName == null) return const Color(0xFFFF2E93);
-    final key = shortName.toUpperCase().trim();
-    return _map[key] ?? const Color(0xFFFF2E93);
+    if (shortName == null) return AppColors.accent;
+    return _map[shortName.toUpperCase().trim()] ?? AppColors.accent;
   }
 
-  /// Soft complementary color used for gradient ends.
-  static Color accentOf(String? shortName) {
-    if (shortName == null) return const Color(0xFF00E5FF);
-    final key = shortName.toUpperCase().trim();
-    return _accentMap[key] ?? const Color(0xFF00E5FF);
-  }
-
-  /// Returns a horizontal gradient for the given platform.
-  static LinearGradient gradientOf(String? shortName) {
-    return LinearGradient(
-      colors: [of(shortName), accentOf(shortName)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    );
+  /// Darker body color used as the solid fill of pills/badges. Pairs with
+  /// the brand color as a thin top-border/accent and white text.
+  static Color bodyOf(String? shortName) {
+    if (shortName == null) return AppColors.surfaceHi;
+    return _bodyMap[shortName.toUpperCase().trim()] ?? AppColors.surfaceHi;
   }
 
   static const Map<String, Color> _map = {
-    // Nintendo — red/grey/blue family
-    'NES': Color(0xFFE60012),
-    'SNES': Color(0xFF7A4FB3),
-    'N64': Color(0xFF1A8B4E),
-    'NGC': Color(0xFF5A2D81),
-    'WII': Color(0xFF009AC7),
-    'WII U': Color(0xFF009AC7),
-    'SWITCH': Color(0xFFE60012),
-    'GB': Color(0xFF8FAB33),
-    'GBC': Color(0xFF8FAB33),
-    'GBA': Color(0xFF6B2BA1),
-    'NDS': Color(0xFFB3003B),
-    '3DS': Color(0xFFD62828),
-
-    // Sony — blue family
-    'PS1': Color(0xFF2D6CDF),
-    'PS2': Color(0xFF1B4FB0),
-    'PS3': Color(0xFF1B1B3A),
-    'PS4': Color(0xFF003791),
-    'PS5': Color(0xFF0070D1),
-    'PSP': Color(0xFF1B1B3A),
-    'VITA': Color(0xFF1B1B3A),
-
-    // Microsoft — green family
-    'XBOX': Color(0xFF4CAF50),
-    'X360': Color(0xFF107C10),
-    'XONE': Color(0xFF107C10),
-    'XSX': Color(0xFF107C10),
-
-    // Sega — teal/blue family
-    'SMS': Color(0xFF1F8A70),
-    'MD': Color(0xFF1F8A70),
-    'SATURN': Color(0xFF26396F),
-    'DC': Color(0xFFFF7F00),
-    'GG': Color(0xFF26396F),
-
+    // Nintendo
+    'NES': Color(0xFFE57373),
+    'SNES': Color(0xFFB39DDB),
+    'N64': Color(0xFF81C784),
+    'NGC': Color(0xFF9575CD),
+    'WII': Color(0xFF64B5F6),
+    'WII U': Color(0xFF4FC3F7),
+    'SWITCH': Color(0xFFE57373),
+    'GB': Color(0xFFAED581),
+    'GBC': Color(0xFFAED581),
+    'GBA': Color(0xFFB39DDB),
+    'NDS': Color(0xFFF06292),
+    '3DS': Color(0xFFE57373),
+    // Sony
+    'PS1': Color(0xFF64B5F6),
+    'PS2': Color(0xFF42A5F5),
+    'PS3': Color(0xFF7E57C2),
+    'PS4': Color(0xFF3F51B5),
+    'PS5': Color(0xFF5C6BC0),
+    'PSP': Color(0xFF7E57C2),
+    'VITA': Color(0xFF7E57C2),
+    // Microsoft
+    'XBOX': Color(0xFF81C784),
+    'X360': Color(0xFF66BB6A),
+    'XONE': Color(0xFF66BB6A),
+    'XSX': Color(0xFF66BB6A),
+    // Sega
+    'SMS': Color(0xFF4DB6AC),
+    'MD': Color(0xFF4DB6AC),
+    'SATURN': Color(0xFF7986CB),
+    'DC': Color(0xFFFFB74D),
+    'GG': Color(0xFF7986CB),
     // Misc
-    '2600': Color(0xFFCC5500),
-    'NG': Color(0xFFCC0000),
-    'PC': Color(0xFF4F6D8F),
+    '2600': Color(0xFFFFB74D),
+    'NG': Color(0xFFE57373),
+    'PC': Color(0xFF90A4AE),
   };
 
-  static const Map<String, Color> _accentMap = {
-    'NES': Color(0xFFFFC233),
-    'SNES': Color(0xFFFF6FB5),
-    'N64': Color(0xFF4DE694),
-    'NGC': Color(0xFFB17CFF),
-    'WII': Color(0xFF7FE0FF),
-    'WII U': Color(0xFF7FE0FF),
-    'SWITCH': Color(0xFFFF4D6D),
-    'GB': Color(0xFFC7E26B),
-    'GBC': Color(0xFFB6FFB6),
-    'GBA': Color(0xFFB17CFF),
-    'NDS': Color(0xFFFF7F8A),
-    '3DS': Color(0xFFFF8C8C),
-    'PS1': Color(0xFF7FB7FF),
-    'PS2': Color(0xFF7FB7FF),
-    'PS3': Color(0xFF5C5CC2),
-    'PS4': Color(0xFF5BA0FF),
-    'PS5': Color(0xFF7FB7FF),
-    'PSP': Color(0xFF5C5CC2),
-    'VITA': Color(0xFF5C5CC2),
-    'XBOX': Color(0xFF7DDB7D),
-    'X360': Color(0xFF4DE694),
-    'XONE': Color(0xFF4DE694),
-    'XSX': Color(0xFF4DE694),
-    'SMS': Color(0xFF7DDBB6),
-    'MD': Color(0xFF7DDBB6),
-    'SATURN': Color(0xFF7FB7FF),
-    'DC': Color(0xFFFFC233),
-    'GG': Color(0xFF7FB7FF),
-    '2600': Color(0xFFFFC233),
-    'NG': Color(0xFFFF6B6B),
-    'PC': Color(0xFF9FC3E8),
+  // Dark, slightly-tinted body for the pill background.
+  static const Map<String, Color> _bodyMap = {
+    'NES': Color(0xFF3A1F1F),
+    'SNES': Color(0xFF2A2235),
+    'N64': Color(0xFF1F3022),
+    'NGC': Color(0xFF26223A),
+    'WII': Color(0xFF1F2A38),
+    'WII U': Color(0xFF1F2A38),
+    'SWITCH': Color(0xFF3A1F1F),
+    'GB': Color(0xFF25331F),
+    'GBC': Color(0xFF25331F),
+    'GBA': Color(0xFF2A2235),
+    'NDS': Color(0xFF3A1F2A),
+    '3DS': Color(0xFF3A1F1F),
+    'PS1': Color(0xFF1F2A38),
+    'PS2': Color(0xFF1F2A38),
+    'PS3': Color(0xFF221F38),
+    'PS4': Color(0xFF1F2238),
+    'PS5': Color(0xFF1F2238),
+    'PSP': Color(0xFF221F38),
+    'VITA': Color(0xFF221F38),
+    'XBOX': Color(0xFF1F3022),
+    'X360': Color(0xFF1F3022),
+    'XONE': Color(0xFF1F3022),
+    'XSX': Color(0xFF1F3022),
+    'SMS': Color(0xFF1F302E),
+    'MD': Color(0xFF1F302E),
+    'SATURN': Color(0xFF222538),
+    'DC': Color(0xFF3A2F1F),
+    'GG': Color(0xFF222538),
+    '2600': Color(0xFF3A2F1F),
+    'NG': Color(0xFF3A1F1F),
+    'PC': Color(0xFF1F2A30),
   };
 }
 
-/// Vivid colors for genre chips, so lists feel varied and rich.
+/// A single accent color for genre chips, picked deterministically per
+/// genre name. Each chip is rendered with a dark base, a colored border and
+/// white text so it stays readable on any background.
 class GenrePalette {
-  static const _colors = <Color>[
-    Color(0xFFFF2E93), // magenta
-    Color(0xFF00E5FF), // cyan
-    Color(0xFFFFD600), // yellow
-    Color(0xFF7C4DFF), // purple
-    Color(0xFF00E676), // green
-    Color(0xFFFF6E40), // orange
-    Color(0xFF448AFF), // blue
-    Color(0xFFFF1744), // red
-    Color(0xFF1DE9B6), // teal
-    Color(0xFFD500F9), // violet
-    Color(0xFFFF4081), // pink
-    Color(0xFF18FFFF), // aqua
+  static const List<Color> _accents = [
+    Color(0xFFE57373), // soft red
+    Color(0xFFFFB74D), // soft amber
+    Color(0xFFFFD54F), // soft yellow
+    Color(0xFFAED581), // soft green
+    Color(0xFF4DD0E1), // soft cyan
+    Color(0xFF64B5F6), // soft blue
+    Color(0xFF9575CD), // soft purple
+    Color(0xFFF06292), // soft pink
+    Color(0xFFBA68C8), // soft magenta
+    Color(0xFF4DB6AC), // soft teal
+    Color(0xFFFF8A65), // soft orange
+    Color(0xFFA1887F), // soft brown
   ];
 
   static Color of(String? name) {
-    if (name == null) return _colors[0];
-    return _colors[name.hashCode.abs() % _colors.length];
+    if (name == null) return _accents[0];
+    return _accents[name.hashCode.abs() % _accents.length];
   }
 }

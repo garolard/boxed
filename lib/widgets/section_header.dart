@@ -3,14 +3,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/app_theme.dart';
 
-/// Bold section header with optional action trailing widget. Used to break
-/// up the dashboard, search and recommendations into named chunks.
+/// Section header with an optional leading icon in a small filled badge.
+/// Used to break the dashboard, search and recommendations into chunks.
 class SectionHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget? trailing;
   final IconData? icon;
-  final List<Color>? gradient;
+  final Color? iconColor;
 
   const SectionHeader({
     super.key,
@@ -18,11 +18,12 @@ class SectionHeader extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.icon,
-    this.gradient,
+    this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final color = iconColor ?? AppColors.accent;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 18, 16, 10),
       child: Row(
@@ -31,20 +32,14 @@ class SectionHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: gradient ??
-                      const [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
-                ),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: (gradient?.first ?? AppColors.brandMagenta)
-                        .withValues(alpha: 0.45),
-                    blurRadius: 14,
-                  ),
-                ],
+                border: Border.all(
+                  color: color.withValues(alpha: 0.4),
+                  width: 1,
+                ),
               ),
-              child: Icon(icon, color: Colors.white, size: 18),
+              child: Icon(icon, color: color, size: 18),
             ),
             const SizedBox(width: 10),
           ],
@@ -56,19 +51,19 @@ class SectionHeader extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
+                    color: AppColors.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 1.4,
                   ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
               ],

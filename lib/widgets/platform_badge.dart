@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme/platform_palette.dart';
 
-/// Compact pill that shows a platform short name with its brand color and
-/// a subtle glow. Use for owned-platform labels on game cards and details.
+/// Compact pill that shows a platform short name. Uses a dark tinted body
+/// and a thin brand-color border, with white text — readable on any
+/// background, with a hint of the platform's brand color.
 class PlatformBadge extends StatelessWidget {
   final String shortName;
   final double fontSize;
@@ -22,35 +23,25 @@ class PlatformBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = PlatformPalette.of(shortName);
-    final accent = PlatformPalette.accentOf(shortName);
+    final body = PlatformPalette.bodyOf(shortName);
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color, accent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: body,
         borderRadius: BorderRadius.circular(99),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.5),
-            blurRadius: 12,
-            spreadRadius: 0,
-          ),
-        ],
+        border: Border.all(color: color.withValues(alpha: 0.55), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (!compact)
             Padding(
-              padding: const EdgeInsets.only(right: 4),
+              padding: const EdgeInsets.only(right: 5),
               child: Container(
                 width: 6,
                 height: 6,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: color,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -61,7 +52,7 @@ class PlatformBadge extends StatelessWidget {
               color: Colors.white,
               fontWeight: FontWeight.w800,
               fontSize: fontSize,
-              letterSpacing: 0.6,
+              letterSpacing: 0.4,
             ),
           ),
         ],

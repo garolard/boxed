@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../providers/collection_provider.dart';
+import '../theme/app_theme.dart';
 import 'animated_count.dart';
 import 'glass_card.dart';
 
-/// Dashboard header that shows total games, top platforms (mini bar chart)
-/// and a colorful "achievement-style" stat per top platform.
+/// Dashboard header showing total games and a top-systems bar chart.
+/// Uses a single accent color for the chart so it doesn't compete with
+/// the platform badges elsewhere.
 class StatsDashboard extends StatelessWidget {
   final CollectionProvider provider;
   const StatsDashboard({super.key, required this.provider});
@@ -23,59 +25,49 @@ class StatsDashboard extends StatelessWidget {
 
     return GlassCard(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-      tint: Colors.white.withValues(alpha: 0.18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              ShaderMask(
-                shaderCallback: (rect) => const LinearGradient(
-                  colors: [
-                    Color(0xFFFF2E93),
-                    Color(0xFF00E5FF),
-                    Color(0xFFFFD600),
-                  ],
-                ).createShader(rect),
-                child: AnimatedCount(
-                  value: total,
-                  style: const TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    height: 1,
-                    letterSpacing: -1,
-                  ),
+              AnimatedCount(
+                value: total,
+                style: const TextStyle(
+                  fontSize: 56,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  height: 1,
+                  letterSpacing: -1,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                  total == 1 ? 'game\nin your shelf' : 'games\nin your shelf',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
+                  total == 1 ? 'game in your shelf' : 'games in your shelf',
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
                   ),
                 ),
               ),
             ],
           ),
           if (topPlatforms.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'TOP SYSTEMS',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: AppColors.textSecondary,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             for (var i = 0; i < topPlatforms.length; i++)
               _BarRow(
                 label: topPlatforms[i].key,
@@ -116,43 +108,31 @@ class _BarRow extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
                 fontSize: 12,
                 letterSpacing: 0.4,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Stack(
               children: [
                 Container(
-                  height: 10,
+                  height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
+                    color: AppColors.surfaceHi,
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
                 FractionallySizedBox(
                   widthFactor: fraction,
                   child: Container(
-                    height: 10,
+                    height: 8,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF00E5FF),
-                          Color(0xFF7C4DFF),
-                          Color(0xFFFF2E93),
-                        ],
-                      ),
+                      color: AppColors.accent,
                       borderRadius: BorderRadius.circular(99),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0xFFFF2E93),
-                          blurRadius: 8,
-                        ),
-                      ],
                     ),
                   ),
                 )
@@ -167,15 +147,15 @@ class _BarRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           SizedBox(
             width: 24,
             child: Text(
               '$value',
               textAlign: TextAlign.end,
               style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../models/game.dart';
 import '../providers/collection_provider.dart';
+import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/genre_chip.dart';
 import '../widgets/glass_card.dart';
@@ -27,27 +28,24 @@ class GameDetailScreen extends StatelessWidget {
           _CoverAppBar(game: game),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     game.name,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      height: 1.15,
-                      letterSpacing: -0.5,
-                      shadows: [
-                        Shadow(blurRadius: 12, color: Colors.black54),
-                      ],
+                      color: AppColors.textPrimary,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      height: 1.18,
+                      letterSpacing: -0.3,
                     ),
                   )
                       .animate()
                       .fadeIn(duration: 400.ms, delay: 100.ms)
                       .slideY(begin: 0.2, end: 0, duration: 500.ms, delay: 100.ms),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
@@ -56,12 +54,12 @@ class GameDetailScreen extends StatelessWidget {
                       if (game.releaseYear != null) _MetaPill(
                         icon: Icons.calendar_today_rounded,
                         label: '${game.releaseYear}',
-                        color: const Color(0xFF00E5FF),
+                        color: AppColors.accent,
                       ),
                       if (game.rating != null) _MetaPill(
                         icon: Icons.star_rounded,
                         label: game.rating!.toStringAsFixed(0),
-                        color: const Color(0xFFFFD600),
+                        color: AppColors.warning,
                       ),
                       for (final genre in game.genres.take(4))
                         GenreChip(name: genre),
@@ -69,22 +67,22 @@ class GameDetailScreen extends StatelessWidget {
                   ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
                   if (game.platformNames.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    _SectionLabel(text: 'AVAILABLE ON'),
-                    const SizedBox(height: 8),
+                    const _SectionLabel(text: 'Available on'),
+                    const SizedBox(height: 10),
                     PlatformBadgeRow(names: game.platformNames)
                         .animate()
                         .fadeIn(duration: 400.ms, delay: 300.ms),
                   ],
                   if (game.summary != null) ...[
                     const SizedBox(height: 24),
-                    _SectionLabel(text: 'ABOUT'),
-                    const SizedBox(height: 8),
+                    const _SectionLabel(text: 'About'),
+                    const SizedBox(height: 10),
                     GlassCard(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(16),
                       child: Text(
                         game.summary!,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 14,
                           height: 1.55,
                           fontWeight: FontWeight.w500,
@@ -111,11 +109,11 @@ class _CoverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 360,
+      expandedHeight: 320,
       pinned: true,
       stretch: true,
       backgroundColor: Colors.transparent,
-      iconTheme: const IconThemeData(color: Colors.white),
+      iconTheme: const IconThemeData(color: AppColors.textPrimary),
       flexibleSpace: FlexibleSpaceBar(
         stretchModes: const [
           StretchMode.zoomBackground,
@@ -134,11 +132,7 @@ class _CoverAppBar extends StatelessWidget {
               )
             else
               Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
-                  ),
-                ),
+                color: AppColors.surface,
               ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -182,29 +176,23 @@ class _MetaPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.55),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(99),
         border: Border.all(
-          color: color.withValues(alpha: 0.6),
-          width: 1.2,
+          color: color.withValues(alpha: 0.4),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.3),
-            blurRadius: 10,
-          ),
-        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: color, size: 14),
-          const SizedBox(width: 4),
+          const SizedBox(width: 5),
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
               fontSize: 12,
             ),
           ),
@@ -220,31 +208,14 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 16,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF00E5FF), Color(0xFFFF2E93)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.4,
-          ),
-        ),
-      ],
+    return Text(
+      text,
+      style: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.4,
+      ),
     );
   }
 }
@@ -262,15 +233,14 @@ class _PrimaryAction extends StatelessWidget {
           NeonButton(
             label: 'In your shelf',
             icon: Icons.check_circle_rounded,
-            colors: const [Color(0xFF00E676), Color(0xFF00B0FF)],
-            pulsing: true,
+            color: AppColors.success,
             onPressed: null,
           ),
           const SizedBox(height: 10),
           NeonOutlineButton(
             label: 'Remove from collection',
             icon: Icons.delete_outline_rounded,
-            colors: const [Color(0xFFFF1744), Color(0xFFFF6E40)],
+            color: AppColors.danger,
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               final navigator = Navigator.of(context);
@@ -280,7 +250,7 @@ class _PrimaryAction extends StatelessWidget {
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.remove_circle, color: Color(0xFFFF6E40)),
+                      const Icon(Icons.remove_circle, color: AppColors.danger),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(

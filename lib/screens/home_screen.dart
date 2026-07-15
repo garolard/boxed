@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../models/game.dart';
 import '../providers/collection_provider.dart';
+import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           RecommendationsScreen(),
         ],
       ),
-      bottomNavigationBar: _NeonNavBar(
+      bottomNavigationBar: _BottomNav(
         index: _tab,
         onChanged: _setTab,
       ),
@@ -57,10 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _NeonNavBar extends StatelessWidget {
+class _BottomNav extends StatelessWidget {
   final int index;
   final ValueChanged<int> onChanged;
-  const _NeonNavBar({required this.index, required this.onChanged});
+  const _BottomNav({required this.index, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -75,26 +76,28 @@ class _NeonNavBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
             child: Container(
-              height: 80,
+              height: 72,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(28),
+                color: AppColors.surface.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: Colors.white.withValues(alpha: 0.06),
                 ),
               ),
               child: Row(
                 children: [
                   for (var i = 0; i < items.length; i++)
-                    Expanded(child: _NavItem(
-                      spec: items[i],
-                      selected: i == index,
-                      onTap: () => onChanged(i),
-                    )),
+                    Expanded(
+                      child: _NavItem(
+                        spec: items[i],
+                        selected: i == index,
+                        onTap: () => onChanged(i),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -123,67 +126,39 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  gradient: selected
-                      ? const LinearGradient(
-                          colors: [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
-                        )
-                      : null,
-                  borderRadius: BorderRadius.circular(99),
-                  boxShadow: selected
-                      ? [
-                          BoxShadow(
-                            color: const Color(0xFFFF2E93)
-                                .withValues(alpha: 0.55),
-                            blurRadius: 16,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Icon(
-                  spec.icon,
-                  color: selected ? Colors.white : Colors.white70,
-                  size: 20,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              spec.icon,
+              color: selected
+                  ? AppColors.accent
+                  : AppColors.textMuted,
+              size: 22,
+            ),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                spec.label,
+                maxLines: 1,
+                style: TextStyle(
+                  color: selected
+                      ? AppColors.textPrimary
+                      : AppColors.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.4,
                 ),
               ),
-              const SizedBox(height: 3),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    spec.label,
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: selected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.6),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -236,27 +211,19 @@ class _SummaryTab extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
-          title: ShaderMask(
-            shaderCallback: (rect) => const LinearGradient(
-              colors: [
-                Color(0xFFFF2E93),
-                Color(0xFF00E5FF),
-                Color(0xFFFFD600),
-              ],
-            ).createShader(rect),
-            child: const Text(
-              'MY SHELF',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2.0,
-              ),
+          title: const Text(
+            'My Shelf',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
             ),
           ),
           actions: [
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
+              icon: const Icon(Icons.more_vert_rounded,
+                  color: AppColors.textPrimary),
               onSelected: (v) =>
                   v == 'export' ? _export(context) : _import(context),
               itemBuilder: (_) => const [
@@ -322,8 +289,8 @@ class _SummaryTab extends StatelessWidget {
                   return GameCoverCard(
                     game: game,
                     dense: true,
-                    onAddPressed: () =>
-                        _toggleOwnership(context, game, !provider.contains(game.id)),
+                    onAddPressed: () => _toggleOwnership(
+                        context, game, !provider.contains(game.id)),
                   )
                       .animate()
                       .fadeIn(
@@ -360,7 +327,7 @@ class _SummaryTab extends StatelessWidget {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.remove_circle, color: Color(0xFFFF6E40)),
+              const Icon(Icons.remove_circle, color: AppColors.danger),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -388,11 +355,11 @@ class _StatsSkeleton extends StatelessWidget {
         children: [
           ShimmerBox(width: 140, height: 56),
           SizedBox(height: 14),
-          ShimmerBox(height: 10, borderRadius: BorderRadius.all(Radius.circular(99))),
+          ShimmerBox(height: 8, borderRadius: BorderRadius.all(Radius.circular(99))),
           SizedBox(height: 8),
-          ShimmerBox(height: 10, borderRadius: BorderRadius.all(Radius.circular(99))),
+          ShimmerBox(height: 8, borderRadius: BorderRadius.all(Radius.circular(99))),
           SizedBox(height: 8),
-          ShimmerBox(height: 10, borderRadius: BorderRadius.all(Radius.circular(99))),
+          ShimmerBox(height: 8, borderRadius: BorderRadius.all(Radius.circular(99))),
         ],
       ),
     );
@@ -409,7 +376,7 @@ class _TopGenresRow extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = byGenre.take(8).toList();
     return SizedBox(
-      height: 36,
+      height: 32,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -435,7 +402,7 @@ class _EmptyCollection extends StatelessWidget {
       child: EmptyState(
         title: 'Your shelf is empty',
         message:
-            'Pop in the games you own physically. Search by title or scan a cover with your camera — we\'ll handle the rest.',
+            'Add the games you own physically. Search by title or scan a cover with your camera — we\'ll handle the rest.',
         actionLabel: 'Search a game',
         actionIcon: Icons.search_rounded,
         onAction: onSearch,

@@ -5,12 +5,13 @@ import 'package:provider/provider.dart';
 import '../models/game.dart';
 import '../providers/collection_provider.dart';
 import '../screens/game_detail_screen.dart';
+import '../theme/app_theme.dart';
 import 'platform_badge.dart';
 import 'shimmer_box.dart';
 
 /// The primary rich card used across the home grid, search results and
-/// recommendations carousel. Designed to put the cover front and centre
-/// with a colored overlay, owned indicator, and quick-add action.
+/// recommendations. Cover-focused with a dark gradient overlay,
+/// rating/owned pills and a quick add/remove action.
 class GameCoverCard extends StatelessWidget {
   final Game game;
   final String? subtitle;
@@ -34,7 +35,7 @@ class GameCoverCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -43,20 +44,22 @@ class GameCoverCard extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
+            color: AppColors.surface,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             child: Stack(
               children: [
-                _CoverLayer(game: game, owned: owned),
+                _CoverLayer(game: game),
                 Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
@@ -65,10 +68,10 @@ class GameCoverCard extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withValues(alpha: 0.15),
-                          Colors.black.withValues(alpha: 0.85),
+                          Colors.black.withValues(alpha: 0.55),
+                          Colors.black.withValues(alpha: 0.92),
                         ],
-                        stops: const [0.0, 0.4, 1.0],
+                        stops: const [0.0, 0.55, 1.0],
                       ),
                     ),
                   ),
@@ -110,18 +113,17 @@ class GameCoverCard extends StatelessWidget {
 
 class _CoverLayer extends StatelessWidget {
   final Game game;
-  final bool owned;
-  const _CoverLayer({required this.game, required this.owned});
+  const _CoverLayer({required this.game});
 
   @override
   Widget build(BuildContext context) {
     final url = game.coverUrl;
     if (url == null) {
       return Container(
-        color: Colors.black,
+        color: AppColors.surfaceHi,
         child: const Center(
           child: Icon(Icons.videogame_asset,
-              color: Colors.white24, size: 64),
+              color: AppColors.textMuted, size: 64),
         ),
       );
     }
@@ -132,9 +134,9 @@ class _CoverLayer extends StatelessWidget {
         fit: BoxFit.cover,
         placeholder: (_, _) => const ShimmerBox(),
         errorWidget: (_, _, _) => Container(
-          color: Colors.black,
+          color: AppColors.surfaceHi,
           child: const Center(
-            child: Icon(Icons.broken_image, color: Colors.white24),
+            child: Icon(Icons.broken_image, color: AppColors.textMuted),
           ),
         ),
       ),
@@ -149,24 +151,20 @@ class _RatingPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.55),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(99),
-        border: Border.all(
-          color: Colors.amberAccent.withValues(alpha: 0.6),
-          width: 1,
-        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.star_rounded, color: Colors.amberAccent, size: 14),
+          const Icon(Icons.star_rounded, color: AppColors.warning, size: 13),
           const SizedBox(width: 3),
           Text(
             rating.toStringAsFixed(0),
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w800,
               fontSize: 11,
             ),
@@ -183,23 +181,15 @@ class _OwnedPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF00E676), Color(0xFF00B0FF)],
-        ),
+        color: AppColors.success,
         borderRadius: BorderRadius.circular(99),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00E676).withValues(alpha: 0.6),
-            blurRadius: 10,
-          ),
-        ],
       ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_rounded, color: Colors.white, size: 14),
+          Icon(Icons.check_rounded, color: Colors.white, size: 13),
           SizedBox(width: 2),
           Text(
             'OWNED',
@@ -247,13 +237,13 @@ class _Info extends StatelessWidget {
           game.name,
           maxLines: dense ? 1 : 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: Colors.white,
+          style: const TextStyle(
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w800,
-            fontSize: dense ? 13 : 15,
-            height: 1.15,
-            shadows: const [
-              Shadow(blurRadius: 4, color: Colors.black54),
+            fontSize: 14,
+            height: 1.2,
+            shadows: [
+              Shadow(blurRadius: 6, color: Colors.black87),
             ],
           ),
         ),
@@ -270,9 +260,12 @@ class _Info extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: AppColors.textSecondary,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
+                  shadows: [
+                    Shadow(blurRadius: 4, color: Colors.black87),
+                  ],
                 ),
               ),
             ),
@@ -294,52 +287,37 @@ class _QuickAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 28,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(99),
-          onTap: onPressed,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: owned
-                    ? const [Color(0xFFFF1744), Color(0xFFFF6E40)]
-                    : const [Color(0xFFFF2E93), Color(0xFF7C4DFF)],
+    final color = owned ? AppColors.danger : AppColors.accent;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(99),
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                owned ? Icons.remove_rounded : Icons.add_rounded,
+                color: Colors.white,
+                size: 14,
               ),
-              borderRadius: BorderRadius.circular(99),
-              boxShadow: [
-                BoxShadow(
-                  color: (owned
-                          ? const Color(0xFFFF1744)
-                          : const Color(0xFFFF2E93))
-                      .withValues(alpha: 0.55),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  owned ? Icons.remove_rounded : Icons.add_rounded,
+              const SizedBox(width: 4),
+              Text(
+                owned ? 'Remove' : 'Add to shelf',
+                style: const TextStyle(
                   color: Colors.white,
-                  size: 16,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 11,
+                  letterSpacing: 0.4,
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  owned ? 'Remove' : 'Add to shelf',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 11,
-                    letterSpacing: 0.6,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
