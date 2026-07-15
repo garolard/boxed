@@ -27,9 +27,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Take a photo of a game cover to search for it by its title.</string>
+	<string>Take a photo of a game cover to search for it, or scan a friend&apos;s collection QR code.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Pick a photo of a game cover to search for it by its title.</string>
+	<string>Pick a photo of a game cover to search for it, or of a friend&apos;s collection QR code.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

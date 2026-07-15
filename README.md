@@ -19,6 +19,11 @@ for game metadata. No login, no backend.
   IGDB — no typing.
 - **Export / import** the collection as a JSON file (share sheet to export,
   file picker to import; imports merge and skip games you already own).
+- **Share via QR code**: show your shelf as a QR code (up to 150 games —
+  the code carries only compact game/platform ids, the receiver re-fetches
+  metadata from IGDB). Scanned collections are saved under a name in a
+  separate "Shared collections" area — they never touch your own shelf,
+  but you can add individual games from them.
 
 ## Setup
 

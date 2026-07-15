@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+import '../providers/collection_provider.dart';
+import '../services/qr_payload_codec.dart';
+import '../theme/app_theme.dart';
+
+/// Bottom sheet that renders the user's collection as a QR code another
+/// device can scan. Capped at [QrPayloadCodec.maxGames] games (QR capacity);
+/// larger shelves share the most recently added ones.
+Future<void> showShareQrSheet(BuildContext context) {
+  return showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (_) => const _ShareQrSheet(),
+  );
+}
+
+class _ShareQrSheet extends StatefulWidget {
+  const _ShareQrSheet();
+
+  @override
+  State<_ShareQrSheet> createState() => _ShareQrSheetState();
+}
+
+class _ShareQrSheetState extends State<_ShareQrSheet> {
+  final _nameController = TextEditingController(text: 'My shelf');
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final games = context.watch<CollectionProvider>().games;
+    final capped = games.take(QrPayloadCodec.maxGames).toList();
+    final data = QrPayloadCodec.encode(QrPayload(
+      name: _nameController.text,
+      entries: [
+        for (final g in capped) QrEntry(g.id, g.ownedPlatformId),
+      ],
+    ));
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceHi2,
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+            ),
+            const Text(
+              'Share as QR code',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Sharing ${capped.length} games. A friend scans this from the '
+              'Shared collections screen.',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            if (games.length > QrPayloadCodec.maxGames) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.info_outline_rounded,
+                      color: AppColors.warning, size: 16),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Your shelf has ${games.length} games — a QR code fits '
+                      '${QrPayloadCodec.maxGames}, so the most recently '
+                      'added ones are included.',
+                      style: const TextStyle(
+                        color: AppColors.warning,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 16),
+            TextField(
+              controller: _nameController,
+              maxLength: QrPayloadCodec.maxNameChars,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Collection name',
+                counterText: '',
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                // Black-on-white on purpose: the QR needs contrast, not theme.
+                child: QrImageView(
+                  data: data,
+                  version: QrVersions.auto,
+                  errorCorrectionLevel: QrErrorCorrectLevel.M,
+                  size: 260,
+                  gapless: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/game.dart';
+import '../models/shared_collection.dart';
 
 class ImportResult {
   final int imported;
@@ -23,18 +24,33 @@ class CollectionRepository {
     final dir = await getDatabasesPath();
     _db = await openDatabase(
       p.join(dir, 'vgcollection.db'),
-      version: 1,
-      onCreate: (db, version) => db.execute('''
-        CREATE TABLE collection (
-          id INTEGER PRIMARY KEY,
-          name TEXT NOT NULL,
-          data TEXT NOT NULL,
-          added_at INTEGER NOT NULL
-        )
-      '''),
+      version: 2,
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE collection (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            data TEXT NOT NULL,
+            added_at INTEGER NOT NULL
+          )
+        ''');
+        await _createSharedTable(db);
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) await _createSharedTable(db);
+      },
     );
     return _db!;
   }
+
+  static Future<void> _createSharedTable(Database db) => db.execute('''
+        CREATE TABLE shared_collections (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          created_at INTEGER NOT NULL,
+          data TEXT NOT NULL
+        )
+      ''');
 
   Future<List<Game>> getAll() async {
     final db = await _database;
@@ -63,6 +79,42 @@ class CollectionRepository {
   Future<void> remove(int gameId) async {
     final db = await _database;
     await db.delete('collection', where: 'id = ?', whereArgs: [gameId]);
+  }
+
+  Future<List<SharedCollection>> getSharedCollections() async {
+    final db = await _database;
+    final rows =
+        await db.query('shared_collections', orderBy: 'created_at DESC');
+    return [
+      for (final row in rows)
+        SharedCollection(
+          id: row['id'] as int,
+          name: row['name'] as String,
+          createdAt:
+              DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
+          games: [
+            for (final g in jsonDecode(row['data'] as String) as List)
+              Game.fromJson(g as Map<String, dynamic>),
+          ],
+        ),
+    ];
+  }
+
+  Future<SharedCollection> addSharedCollection(
+      String name, List<Game> games) async {
+    final db = await _database;
+    final now = DateTime.now();
+    final id = await db.insert('shared_collections', {
+      'name': name,
+      'created_at': now.millisecondsSinceEpoch,
+      'data': jsonEncode([for (final g in games) g.toJson()]),
+    });
+    return SharedCollection(id: id, name: name, createdAt: now, games: games);
+  }
+
+  Future<void> deleteSharedCollection(int id) async {
+    final db = await _database;
+    await db.delete('shared_collections', where: 'id = ?', whereArgs: [id]);
   }
 
   /// Writes the collection to a JSON file and returns its path.

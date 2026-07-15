@@ -17,9 +17,11 @@ import '../widgets/glass_card.dart';
 import '../widgets/section_header.dart';
 import '../widgets/shimmer_box.dart';
 import '../widgets/stats_dashboard.dart';
+import '../widgets/share_qr_sheet.dart';
 import 'recommendations_screen.dart';
 import 'scan_screen.dart';
 import 'search_screen.dart';
+import 'shared_collections_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -221,12 +223,30 @@ class _SummaryTab extends StatelessWidget {
             ),
           ),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.qr_code_scanner_rounded,
+                  color: AppColors.textPrimary),
+              tooltip: 'Shared collections',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const SharedCollectionsScreen()),
+              ),
+            ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert_rounded,
                   color: AppColors.textPrimary),
-              onSelected: (v) =>
-                  v == 'export' ? _export(context) : _import(context),
+              onSelected: (v) => switch (v) {
+                'export' => _export(context),
+                'import' => _import(context),
+                _ => showShareQrSheet(context),
+              },
               itemBuilder: (_) => const [
+                PopupMenuItem(
+                    value: 'share_qr',
+                    child: ListTile(
+                        leading: Icon(Icons.qr_code_rounded),
+                        title: Text('Share as QR code'))),
                 PopupMenuItem(
                     value: 'export',
                     child: ListTile(

@@ -4,7 +4,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/collection_provider.dart';
+import 'providers/shared_collections_provider.dart';
 import 'screens/home_screen.dart';
+import 'services/collection_repository.dart';
+import 'services/igdb_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
 
@@ -23,8 +26,18 @@ class VgCollectionApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CollectionProvider()..load(),
+    final repo = CollectionRepository();
+    final igdb = IgdbService();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CollectionProvider(repo: repo, igdb: igdb)..load(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              SharedCollectionsProvider(repo: repo, igdb: igdb)..load(),
+        ),
+      ],
       child: MaterialApp(
         title: 'VG Collection',
         debugShowCheckedModeBanner: false,
