@@ -35,7 +35,6 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = context.l10n.defaultShelfName;
   }
 
   @override
@@ -49,12 +48,14 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
     final l10n = context.l10n;
     final games = context.watch<CollectionProvider>().games;
     final capped = games.take(QrPayloadCodec.maxGames).toList();
-    final data = QrPayloadCodec.encode(QrPayload(
-      name: _nameController.text,
-      entries: [
-        for (final g in capped) QrEntry(g.id, g.ownedPlatformId),
-      ],
-    ));
+    final data = QrPayloadCodec.encode(
+      QrPayload(
+        name: _nameController.text,
+        entries: [for (final g in capped) QrEntry(g.id, g.ownedPlatformId)],
+      ),
+    );
+
+    _nameController.text = l10n.defaultShelfName;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -99,8 +100,11 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded,
-                      color: AppColors.warning, size: 16),
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    color: AppColors.warning,
+                    size: 16,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
