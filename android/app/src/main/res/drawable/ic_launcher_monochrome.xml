@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Bottom spine -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M33.83,41.16 h40.34 a2.85,2.85 0,0 1,2.85 2.85 v40.4 a2.85,2.85 0,0 1,-2.85 2.85 h-40.34 a2.85,2.85 0,0 1,-2.85 -2.85 v-40.4 a2.85,2.85 0,0 1,2.85 -2.85 z" />
+    <!-- Middle spine -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M36.59,35.41 h34.82 a2.71,2.71 0,0 1,2.71 2.71 v40.4 a2.71,2.71 0,0 1,-2.71 2.71 h-34.82 a2.71,2.71 0,0 1,-2.71 -2.71 v-40.4 a2.71,2.71 0,0 1,2.71 -2.71 z" />
+    <!-- Top spine -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M39.36,29.66 h29.28 a2.57,2.57 0,0 1,2.57 2.57 v40.4 a2.57,2.57 0,0 1,-2.57 2.57 h-29.28 a2.57,2.57 0,0 1,-2.57 -2.57 v-40.4 a2.57,2.57 0,0 1,2.57 -2.57 z" />
+    <!-- Cartridge notch -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M49.16,32.32 h9.68 a0.94,0.94 0,0 1,0.94 0.94 v1.1 a0.94,0.94 0,0 1,-0.94 0.94 h-9.68 a0.94,0.94 0,0 1,-0.94 -0.94 v-1.1 a0.94,0.94 0,0 1,0.94 -0.94 z" />
+</vector>

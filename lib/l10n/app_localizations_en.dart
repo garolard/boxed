@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'VG Collection';
+  String get appTitle => 'Boxed';
 
   @override
   String get navShelf => 'Shelf';
@@ -194,7 +194,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanNoQr => 'No QR code found — try a sharper photo.';
 
   @override
-  String get notVgcQr => 'That QR code is not a VG Collection share.';
+  String get notVgcQr => 'That QR code is not a Boxed share.';
 
   @override
   String get sharedEmpty => 'The shared collection is empty.';

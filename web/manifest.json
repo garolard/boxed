@@ -1,11 +1,11 @@
 {
-    "name": "vgcollection",
-    "short_name": "vgcollection",
+    "name": "Boxed",
+    "short_name": "Boxed",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0E0E16",
+    "theme_color": "#A78BFA",
+    "description": "Track your physical video game collection. Scan covers, no typing. 100% private.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

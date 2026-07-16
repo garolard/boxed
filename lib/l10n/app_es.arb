@@ -1,6 +1,6 @@
 {
   "@@locale": "es",
-  "appTitle": "VG Collection",
+  "appTitle": "Boxed",
 
   "navShelf": "Estantería",
   "navSearch": "Buscar",
@@ -69,7 +69,7 @@
   "sharedDetailCount": "{total} juegos · tienes {owned}",
 
   "scanNoQr": "No se encontró ningún código QR — prueba con una foto más nítida.",
-  "notVgcQr": "Ese código QR no es un enlace compartido de VG Collection.",
+  "notVgcQr": "Ese código QR no es un enlace compartido de Boxed.",
   "sharedEmpty": "La colección compartida está vacía.",
   "qrDamaged": "Ese código QR está dañado o no es compatible.",
   "deleteSharedTitle": "¿Eliminar la colección compartida?",

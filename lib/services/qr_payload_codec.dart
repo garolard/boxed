@@ -59,7 +59,7 @@ class QrPayloadCodec {
         : _rawPrefix + base64UrlEncode(raw);
   }
 
-  /// Returns null when [text] is not a vgcollection payload at all;
+  /// Returns null when [text] is not a Boxed payload at all;
   /// throws [FormatException] when it is one but corrupt.
   static QrPayload? decode(String text) {
     final Uint8List bytes;

@@ -1,4 +1,4 @@
-# VG Collection
+# Boxed
 
 Manage your physical videogame collection. All data lives on the device;
 the only remote service used is the [IGDB API](https://api-docs.igdb.com/)

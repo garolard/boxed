@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Violet gradient for the spines -->
+    <linearGradient id="spineGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#6D4FE0"/>
+    </linearGradient>
+    <linearGradient id="spineGradMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B89BFF"/>
+      <stop offset="100%" stop-color="#7A5FE8"/>
+    </linearGradient>
+    <linearGradient id="spineGradTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C4AAFF"/>
+      <stop offset="100%" stop-color="#8B70F0"/>
+    </linearGradient>
+    <!-- Soft glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Squircle clip for the icon background -->
+    <clipPath id="squircle">
+      <path d="M 512,0 C 774,0 864,0 924,6 C 984,12 1005,36 1012,96 C 1018,156 1024,250 1024,512 C 1024,774 1018,864 1012,924 C 1005,984 984,1005 924,1012 C 864,1018 774,1024 512,1024 C 250,1024 156,1018 96,1012 C 36,1005 12,984 6,924 C 0,864 0,774 0,512 C 0,250 6,156 12,96 C 18,36 36,12 96,6 C 156,0 250,0 512,0 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background (full-bleed dark) -->
+  <g clip-path="url(#squircle)">
+    <rect width="1024" height="1024" fill="#0E0E16"/>
+
+    <!-- Soft accent glow behind the spines -->
+    <ellipse cx="512" cy="520" rx="300" ry="320" fill="#6D4FE0" opacity="0.18" filter="url(#glow)"/>
+    <ellipse cx="512" cy="480" rx="200" ry="220" fill="#A78BFA" opacity="0.12" filter="url(#glow)"/>
+
+    <!-- Bottom spine (widest, deepest violet) -->
+    <rect x="302" y="378" width="420" height="430" rx="28" fill="url(#spineGrad)" opacity="0.85"/>
+    <rect x="302" y="378" width="420" height="430" rx="28" fill="none" stroke="#A78BFA" stroke-width="2" opacity="0.3"/>
+
+    <!-- Middle spine (slightly narrower, shifted left) -->
+    <rect x="332" y="318" width="360" height="430" rx="26" fill="url(#spineGradMid)" opacity="0.92"/>
+    <rect x="332" y="318" width="360" height="430" rx="26" fill="none" stroke="#C4AAFF" stroke-width="2" opacity="0.25"/>
+
+    <!-- Top spine (narrowest, lightest) -->
+    <rect x="362" y="258" width="300" height="430" rx="24" fill="url(#spineGradTop)"/>
+    <rect x="362" y="258" width="300" height="430" rx="24" fill="none" stroke="#D4BCFF" stroke-width="2" opacity="0.4"/>
+
+    <!-- Cartridge notch on top spine (small white detail) -->
+    <rect x="452" y="282" width="120" height="14" rx="7" fill="#0E0E16" opacity="0.5"/>
+
+    <!-- Subtle top highlight on top spine -->
+    <rect x="362" y="258" width="300" height="60" rx="24" fill="#FFFFFF" opacity="0.08"/>
+  </g>
+</svg>

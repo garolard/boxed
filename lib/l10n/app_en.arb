@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "VG Collection",
+  "appTitle": "Boxed",
 
   "navShelf": "Shelf",
   "navSearch": "Search",
@@ -76,7 +76,7 @@
   "@sharedDetailCount": {"placeholders": {"total": {"type": "int"}, "owned": {"type": "int"}}},
 
   "scanNoQr": "No QR code found — try a sharper photo.",
-  "notVgcQr": "That QR code is not a VG Collection share.",
+  "notVgcQr": "That QR code is not a Boxed share.",
   "sharedEmpty": "The shared collection is empty.",
   "qrDamaged": "That QR code is damaged or unsupported.",
   "deleteSharedTitle": "Delete shared collection?",

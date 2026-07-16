@@ -103,7 +103,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'VG Collection'**
+  /// **'Boxed'**
   String get appTitle;
 
   /// No description provided for @navShelf.
@@ -433,7 +433,7 @@ abstract class AppLocalizations {
   /// No description provided for @notVgcQr.
   ///
   /// In en, this message translates to:
-  /// **'That QR code is not a VG Collection share.'**
+  /// **'That QR code is not a Boxed share.'**
   String get notVgcQr;
 
   /// No description provided for @sharedEmpty.

@@ -23,7 +23,7 @@ class CollectionRepository {
     if (_db != null) return _db!;
     final dir = await getDatabasesPath();
     _db = await openDatabase(
-      p.join(dir, 'vgcollection.db'),
+      p.join(dir, 'boxed.db'),
       version: 2,
       onCreate: (db, version) async {
         await db.execute('''
@@ -121,9 +121,9 @@ class CollectionRepository {
   Future<String> exportToFile(List<Game> games) async {
     final dir = await getTemporaryDirectory();
     final stamp = DateTime.now().toIso8601String().split('.').first.replaceAll(':', '-');
-    final file = File(p.join(dir.path, 'vgcollection-$stamp.json'));
+    final file = File(p.join(dir.path, 'boxed-$stamp.json'));
     await file.writeAsString(const JsonEncoder.withIndent('  ').convert({
-      'app': 'vgcollection',
+      'app': 'boxed',
       'version': 1,
       'exported_at': DateTime.now().toIso8601String(),
       'games': [for (final g in games) g.toJson()],
@@ -135,7 +135,7 @@ class CollectionRepository {
   Future<ImportResult> importFromFile(String path) async {
     final raw = jsonDecode(await File(path).readAsString());
     if (raw is! Map<String, dynamic> || raw['games'] is! List) {
-      throw const FormatException('Not a vgcollection export file');
+      throw const FormatException('Not a Boxed export file');
     }
     final existing = {for (final g in await getAll()) g.id};
     var imported = 0, skipped = 0;
