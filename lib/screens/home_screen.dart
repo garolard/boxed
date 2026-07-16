@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/game.dart';
@@ -169,21 +169,19 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-class _SummaryTab extends StatelessWidget {
+class _SummaryTab extends ConsumerWidget {
   final VoidCallback onJumpToSearch;
   const _SummaryTab({required this.onJumpToSearch});
 
-  Future<void> _export(BuildContext context) async {
-    final provider = context.read<CollectionProvider>();
+  Future<void> _export(BuildContext context, WidgetRef ref) async {
     final subject = context.l10n.shareSubject;
-    final path = await provider.exportCollection();
+    final path = await ref.read(collectionProvider.notifier).exportCollection();
     await SharePlus.instance.share(
       ShareParams(files: [XFile(path)], subject: subject),
     );
   }
 
-  Future<void> _import(BuildContext context) async {
-    final provider = context.read<CollectionProvider>();
+  Future<void> _import(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final jsonGroup = XTypeGroup(
@@ -196,7 +194,8 @@ class _SummaryTab extends StatelessWidget {
     if (picked == null) return;
     final path = picked.path;
     try {
-      final result = await provider.importCollection(path);
+      final result =
+          await ref.read(collectionProvider.notifier).importCollection(path);
       messenger.showSnackBar(SnackBar(
           content: Text(
               l10n.importResult(result.imported, result.skipped))));
@@ -206,10 +205,10 @@ class _SummaryTab extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<CollectionProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(collectionProvider);
     final l10n = context.l10n;
-    final games = provider.games;
+    final games = state.games;
 
     return CustomScrollView(
       slivers: [
@@ -242,8 +241,8 @@ class _SummaryTab extends StatelessWidget {
               icon: const Icon(Icons.more_vert_rounded,
                   color: AppColors.textPrimary),
               onSelected: (v) => switch (v) {
-                'export' => _export(context),
-                'import' => _import(context),
+                'export' => _export(context, ref),
+                'import' => _import(context, ref),
                 _ => showShareQrSheet(context),
               },
               itemBuilder: (_) => [
@@ -269,7 +268,7 @@ class _SummaryTab extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           sliver: SliverToBoxAdapter(
-            child: !provider.loaded
+            child: !state.loaded
                 ? const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: _StatsSkeleton(),
@@ -278,16 +277,16 @@ class _SummaryTab extends StatelessWidget {
                     ? _EmptyCollection(onSearch: onJumpToSearch)
                     : Column(
                         children: [
-                          StatsDashboard(provider: provider),
-                          if (provider.countByGenre.isNotEmpty) ...[
+                          StatsDashboard(state: state),
+                          if (state.countByGenre.isNotEmpty) ...[
                             const SizedBox(height: 8),
-                            _TopGenresRow(provider: provider),
+                            _TopGenresRow(state: state),
                           ],
                         ],
                       ),
           ),
         ),
-        if (!provider.loaded)
+        if (!state.loaded)
           const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
           )
@@ -315,7 +314,7 @@ class _SummaryTab extends StatelessWidget {
                     game: game,
                     dense: true,
                     onAddPressed: () => _toggleOwnership(
-                        context, game, !provider.contains(game.id)),
+                        context, ref, game, !state.contains(game.id)),
                   )
                       .animate()
                       .fadeIn(
@@ -341,14 +340,13 @@ class _SummaryTab extends StatelessWidget {
   }
 
   Future<void> _toggleOwnership(
-      BuildContext context, Game game, bool add) async {
-    final provider = context.read<CollectionProvider>();
+      BuildContext context, WidgetRef ref, Game game, bool add) async {
     final messenger = ScaffoldMessenger.of(context);
     final removedMessage = context.l10n.gameRemoved(game.name);
     if (add) {
-      await addGameFlow(context, game);
+      await addGameFlow(context, ref, game);
     } else {
-      await provider.remove(game.id);
+      await ref.read(collectionProvider.notifier).remove(game.id);
       messenger.showSnackBar(
         SnackBar(
           content: Row(
@@ -393,12 +391,12 @@ class _StatsSkeleton extends StatelessWidget {
 }
 
 class _TopGenresRow extends StatelessWidget {
-  final CollectionProvider provider;
-  const _TopGenresRow({required this.provider});
+  final CollectionState state;
+  const _TopGenresRow({required this.state});
 
   @override
   Widget build(BuildContext context) {
-    final byGenre = provider.countByGenre.entries.toList()
+    final byGenre = state.countByGenre.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = byGenre.take(8).toList();
     return SizedBox(

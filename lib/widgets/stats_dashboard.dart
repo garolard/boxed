@@ -11,19 +11,19 @@ import 'glass_card.dart';
 /// Uses a single accent color for the chart so it doesn't compete with
 /// the platform badges elsewhere.
 class StatsDashboard extends StatelessWidget {
-  final CollectionProvider provider;
-  const StatsDashboard({super.key, required this.provider});
+  final CollectionState state;
+  const StatsDashboard({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final byPlatform = provider.countByPlatform.entries.toList()
+    final byPlatform = state.countByPlatform.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final topPlatforms = byPlatform.take(4).toList();
     final maxCount = topPlatforms.isEmpty
         ? 1
         : topPlatforms.map((e) => e.value).reduce((a, b) => a > b ? a : b);
-    final total = provider.games.length;
+    final total = state.games.length;
 
     return GlassCard(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),

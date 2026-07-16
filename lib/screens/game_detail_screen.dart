@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
 import '../l10n/l10n.dart';
@@ -13,14 +13,15 @@ import '../widgets/glass_card.dart';
 import '../widgets/neon_button.dart';
 import '../widgets/platform_badge.dart';
 
-class GameDetailScreen extends StatelessWidget {
+class GameDetailScreen extends ConsumerWidget {
   final Game game;
 
   const GameDetailScreen({super.key, required this.game});
 
   @override
-  Widget build(BuildContext context) {
-    final owned = context.watch<CollectionProvider>().contains(game.id);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final owned = ref.watch(
+        collectionProvider.select((s) => s.contains(game.id)));
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
@@ -221,13 +222,13 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _PrimaryAction extends StatelessWidget {
+class _PrimaryAction extends ConsumerWidget {
   final bool owned;
   final Game game;
   const _PrimaryAction({required this.owned, required this.game});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     if (owned) {
       return Column(
@@ -246,7 +247,7 @@ class _PrimaryAction extends StatelessWidget {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               final navigator = Navigator.of(context);
-              await context.read<CollectionProvider>().remove(game.id);
+              await ref.read(collectionProvider.notifier).remove(game.id);
               navigator.pop();
               messenger.showSnackBar(
                 SnackBar(
@@ -275,7 +276,7 @@ class _PrimaryAction extends StatelessWidget {
     return NeonButton(
       label: l10n.addToShelf,
       icon: Icons.add_rounded,
-      onPressed: () => addGameFlow(context, game),
+      onPressed: () => addGameFlow(context, ref, game),
     )
         .animate()
         .fadeIn(duration: 400.ms, delay: 500.ms)

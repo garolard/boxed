@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/shared_collection.dart';
 import '../l10n/l10n.dart';
@@ -11,14 +11,14 @@ import '../widgets/game_cover_card.dart';
 
 /// Browse a friend's shared collection. Games can be added to the
 /// user's own shelf from here; the shared list itself never changes it.
-class SharedCollectionDetailScreen extends StatelessWidget {
+class SharedCollectionDetailScreen extends ConsumerWidget {
   final SharedCollection collection;
 
   const SharedCollectionDetailScreen({super.key, required this.collection});
 
   @override
-  Widget build(BuildContext context) {
-    final own = context.watch<CollectionProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final own = ref.watch(collectionProvider);
     final l10n = context.l10n;
     final ownedCount =
         collection.games.where((g) => own.contains(g.id)).length;
@@ -72,7 +72,7 @@ class SharedCollectionDetailScreen extends StatelessWidget {
                     game: game,
                     dense: true,
                     onAddPressed:
-                        owned ? null : () => addGameFlow(context, game),
+                        owned ? null : () => addGameFlow(context, ref, game),
                   )
                       .animate()
                       .fadeIn(duration: 400.ms, delay: (30 * i).ms)

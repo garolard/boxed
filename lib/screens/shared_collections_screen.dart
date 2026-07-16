@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../models/shared_collection.dart';
 import '../l10n/l10n.dart';
@@ -16,20 +16,21 @@ import 'shared_collection_detail_screen.dart';
 
 /// Collections received from friends via QR codes: scan a new one,
 /// browse or delete the saved ones.
-class SharedCollectionsScreen extends StatefulWidget {
+class SharedCollectionsScreen extends ConsumerStatefulWidget {
   const SharedCollectionsScreen({super.key});
 
   @override
-  State<SharedCollectionsScreen> createState() =>
+  ConsumerState<SharedCollectionsScreen> createState() =>
       _SharedCollectionsScreenState();
 }
 
-class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
+class _SharedCollectionsScreenState
+    extends ConsumerState<SharedCollectionsScreen> {
   final _scanner = QrScanService();
   bool _busy = false;
 
   Future<void> _scan({required bool fromCamera}) async {
-    final provider = context.read<SharedCollectionsProvider>();
+    final notifier = ref.read(sharedCollectionsProvider.notifier);
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
@@ -55,7 +56,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
         _toast(messenger, l10n.sharedEmpty);
         return;
       }
-      final saved = await provider.importFromPayload(payload);
+      final saved = await notifier.importFromPayload(payload);
       if (!mounted) return;
       navigator.push(MaterialPageRoute(
         builder: (_) => SharedCollectionDetailScreen(collection: saved),
@@ -77,7 +78,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
   }
 
   Future<void> _confirmDelete(SharedCollection c) async {
-    final provider = context.read<SharedCollectionsProvider>();
+    final notifier = ref.read(sharedCollectionsProvider.notifier);
     final l10n = context.l10n;
     final ok = await showDialog<bool>(
       context: context,
@@ -98,14 +99,14 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
         ],
       ),
     );
-    if (ok == true) await provider.delete(c.id);
+    if (ok == true) await notifier.delete(c.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<SharedCollectionsProvider>();
+    final state = ref.watch(sharedCollectionsProvider);
     final l10n = context.l10n;
-    final collections = provider.collections;
+    final collections = state.collections;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -151,7 +152,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
             ),
           ],
           const SizedBox(height: 20),
-          if (provider.loaded && collections.isEmpty)
+          if (state.loaded && collections.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 24),
               child: EmptyState(

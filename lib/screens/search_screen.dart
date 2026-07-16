@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
 import '../models/platforms.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
+import '../providers/services.dart';
 import '../services/igdb_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
@@ -19,16 +20,16 @@ import '../widgets/glass_card.dart';
 import '../widgets/neon_button.dart';
 import '../theme/platform_palette.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   final String? initialQuery;
 
   const SearchScreen({super.key, this.initialQuery});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   Timer? _debounce;
@@ -56,7 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _loadGenres() async {
     try {
-      final genres = await context.read<CollectionProvider>().igdb.genres();
+      final genres = await ref.read(igdbServiceProvider).genres();
       if (mounted) setState(() => _genres = genres);
     } catch (_) {
       // Genre filter stays hidden; search still works.
@@ -77,7 +78,7 @@ class _SearchScreenState extends State<SearchScreen> {
       _error = null;
     });
     try {
-      final results = await context.read<CollectionProvider>().igdb.searchGames(
+      final results = await ref.read(igdbServiceProvider).searchGames(
             query,
             platformId: _platformId,
             genreId: _genreId,
@@ -254,16 +255,16 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> _onAdd(BuildContext context, Game game) async {
-    final provider = context.read<CollectionProvider>();
-    if (provider.contains(game.id)) {
-      await provider.remove(game.id);
+    final notifier = ref.read(collectionProvider.notifier);
+    if (ref.read(collectionProvider).contains(game.id)) {
+      await notifier.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
         );
       }
     } else {
-      await addGameFlow(context, game);
+      await addGameFlow(context, ref, game);
     }
   }
 }

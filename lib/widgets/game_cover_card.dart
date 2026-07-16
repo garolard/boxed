@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
 import '../l10n/l10n.dart';
@@ -13,7 +13,7 @@ import 'shimmer_box.dart';
 /// The primary rich card used across the home grid, search results and
 /// recommendations. Cover-focused with a dark gradient overlay,
 /// rating/owned pills and a quick add/remove action.
-class GameCoverCard extends StatelessWidget {
+class GameCoverCard extends ConsumerWidget {
   final Game game;
   final String? subtitle;
   final bool dense;
@@ -28,8 +28,9 @@ class GameCoverCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final owned = context.watch<CollectionProvider>().contains(game.id);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final owned = ref.watch(
+        collectionProvider.select((s) => s.contains(game.id)));
     final platformKey = game.ownedPlatformName ??
         (game.platformNames.isNotEmpty ? game.platformNames.first : null);
 

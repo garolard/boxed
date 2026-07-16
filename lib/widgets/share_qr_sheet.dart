@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../l10n/l10n.dart';
@@ -22,14 +22,14 @@ Future<void> showShareQrSheet(BuildContext context) {
   );
 }
 
-class _ShareQrSheet extends StatefulWidget {
+class _ShareQrSheet extends ConsumerStatefulWidget {
   const _ShareQrSheet();
 
   @override
-  State<_ShareQrSheet> createState() => _ShareQrSheetState();
+  ConsumerState<_ShareQrSheet> createState() => _ShareQrSheetState();
 }
 
-class _ShareQrSheetState extends State<_ShareQrSheet> {
+class _ShareQrSheetState extends ConsumerState<_ShareQrSheet> {
   late final _nameController = TextEditingController();
 
   @override
@@ -46,7 +46,7 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final games = context.watch<CollectionProvider>().games;
+    final games = ref.watch(collectionProvider).games;
     final capped = games.take(QrPayloadCodec.maxGames).toList();
     final data = QrPayloadCodec.encode(
       QrPayload(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
 import '../l10n/app_localizations.dart';
@@ -14,24 +14,26 @@ import '../widgets/glass_card.dart';
 import '../widgets/neon_button.dart';
 import '../widgets/section_header.dart';
 
-class RecommendationsScreen extends StatefulWidget {
+class RecommendationsScreen extends ConsumerStatefulWidget {
   const RecommendationsScreen({super.key});
 
   @override
-  State<RecommendationsScreen> createState() => _RecommendationsScreenState();
+  ConsumerState<RecommendationsScreen> createState() =>
+      _RecommendationsScreenState();
 }
 
-class _RecommendationsScreenState extends State<RecommendationsScreen> {
+class _RecommendationsScreenState
+    extends ConsumerState<RecommendationsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-        (_) => context.read<CollectionProvider>().loadRecommendations());
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        ref.read(collectionProvider.notifier).loadRecommendations());
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<CollectionProvider>();
+    final state = ref.watch(collectionProvider);
     final l10n = context.l10n;
 
     return Scaffold(
@@ -50,18 +52,20 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
-            onPressed: () => provider.loadRecommendations(force: true),
+            onPressed: () => ref
+                .read(collectionProvider.notifier)
+                .loadRecommendations(force: true),
           ),
         ],
       ),
       body: SafeArea(
-        child: _body(provider, l10n),
+        child: _body(state, l10n),
       ),
     );
   }
 
-  Widget _body(CollectionProvider provider, AppLocalizations l10n) {
-    if (provider.games.isEmpty) {
+  Widget _body(CollectionState state, AppLocalizations l10n) {
+    if (state.games.isEmpty) {
       return EmptyState(
         icon: Icons.auto_awesome_rounded,
         title: l10n.recsEmptyTitle,
@@ -70,10 +74,10 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
         actionIcon: Icons.search_rounded,
       );
     }
-    if (provider.recsLoading) {
+    if (state.recsLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (provider.recsError != null) {
+    if (state.recsError != null) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -85,7 +89,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                     color: AppColors.textMuted, size: 40),
                 const SizedBox(height: 12),
                 Text(
-                  provider.recsError!,
+                  state.recsError!,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: AppColors.textPrimary,
@@ -98,7 +102,9 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                   child: NeonButton(
                     label: l10n.retry,
                     icon: Icons.refresh_rounded,
-                    onPressed: () => provider.loadRecommendations(force: true),
+                    onPressed: () => ref
+                        .read(collectionProvider.notifier)
+                        .loadRecommendations(force: true),
                   ),
                 ),
               ],
@@ -107,7 +113,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
         ),
       );
     }
-    if (provider.recommendations.isEmpty) {
+    if (state.recommendations.isEmpty) {
       return Center(
         child: Text(
           l10n.recsTryAddingMore,
@@ -116,7 +122,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       );
     }
 
-    final recs = provider.recommendations;
+    final recs = state.recommendations;
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
       children: [
@@ -163,29 +169,29 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   }
 
   Future<void> _toggle(BuildContext context, Game game) async {
-    final provider = context.read<CollectionProvider>();
-    if (provider.contains(game.id)) {
-      await provider.remove(game.id);
+    final notifier = ref.read(collectionProvider.notifier);
+    if (ref.read(collectionProvider).contains(game.id)) {
+      await notifier.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
         );
       }
     } else {
-      await addGameFlow(context, game);
+      await addGameFlow(context, ref, game);
     }
   }
 }
 
-class _Carousel extends StatefulWidget {
+class _Carousel extends ConsumerStatefulWidget {
   final List<Game> games;
   const _Carousel({required this.games});
 
   @override
-  State<_Carousel> createState() => _CarouselState();
+  ConsumerState<_Carousel> createState() => _CarouselState();
 }
 
-class _CarouselState extends State<_Carousel> {
+class _CarouselState extends ConsumerState<_Carousel> {
   late final PageController _controller;
   double _page = 0;
 
@@ -226,16 +232,16 @@ class _CarouselState extends State<_Carousel> {
   }
 
   Future<void> _toggle(BuildContext context, Game game) async {
-    final provider = context.read<CollectionProvider>();
-    if (provider.contains(game.id)) {
-      await provider.remove(game.id);
+    final notifier = ref.read(collectionProvider.notifier);
+    if (ref.read(collectionProvider).contains(game.id)) {
+      await notifier.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
         );
       }
     } else {
-      await addGameFlow(context, game);
+      await addGameFlow(context, ref, game);
     }
   }
 }

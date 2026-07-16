@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
 import '../l10n/l10n.dart';
@@ -10,8 +10,8 @@ import 'platform_badge.dart';
 
 /// Asks which platform the owned copy is for (when the game exists on
 /// several), then adds the game to the collection.
-Future<void> addGameFlow(BuildContext context, Game game) async {
-  final provider = context.read<CollectionProvider>();
+Future<void> addGameFlow(
+    BuildContext context, WidgetRef ref, Game game) async {
   int? platformId;
   String? platformName;
 
@@ -33,7 +33,9 @@ Future<void> addGameFlow(BuildContext context, Game game) async {
     platformName = game.platformNames.first;
   }
 
-  await provider.add(game, platformId: platformId, platformName: platformName);
+  await ref
+      .read(collectionProvider.notifier)
+      .add(game, platformId: platformId, platformName: platformName);
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
