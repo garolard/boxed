@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../models/game.dart';
+import '../l10n/app_localizations.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
@@ -30,14 +32,15 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CollectionProvider>();
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'For you',
-          style: TextStyle(
+        title: Text(
+          l10n.navForYou,
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 22,
             fontWeight: FontWeight.w800,
@@ -52,19 +55,18 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
         ],
       ),
       body: SafeArea(
-        child: _body(provider),
+        child: _body(provider, l10n),
       ),
     );
   }
 
-  Widget _body(CollectionProvider provider) {
+  Widget _body(CollectionProvider provider, AppLocalizations l10n) {
     if (provider.games.isEmpty) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.auto_awesome_rounded,
-        title: 'No recommendations yet',
-        message:
-            'Add a few games to your shelf and we\'ll suggest titles based on what you already love.',
-        actionLabel: 'Search a game',
+        title: l10n.recsEmptyTitle,
+        message: l10n.recsEmptyMessage,
+        actionLabel: l10n.emptyShelfAction,
         actionIcon: Icons.search_rounded,
       );
     }
@@ -94,7 +96,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                 SizedBox(
                   width: 200,
                   child: NeonButton(
-                    label: 'Retry',
+                    label: l10n.retry,
                     icon: Icons.refresh_rounded,
                     onPressed: () => provider.loadRecommendations(force: true),
                   ),
@@ -106,10 +108,10 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       );
     }
     if (provider.recommendations.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No recommendations yet — try adding more games.',
-          style: TextStyle(color: AppColors.textSecondary),
+          l10n.recsTryAddingMore,
+          style: const TextStyle(color: AppColors.textSecondary),
         ),
       );
     }
@@ -118,17 +120,17 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
       children: [
-        const SectionHeader(
-          title: 'Featured',
-          subtitle: 'Based on what you own',
+        SectionHeader(
+          title: l10n.featuredTitle,
+          subtitle: l10n.featuredSubtitle,
           icon: Icons.auto_awesome_rounded,
         ),
         SizedBox(
           height: 320,
           child: _Carousel(games: recs),
         ),
-        const SectionHeader(
-          title: 'All picks',
+        SectionHeader(
+          title: l10n.allPicks,
           icon: Icons.grid_view_rounded,
         ),
         Padding(
@@ -166,7 +168,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       await provider.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${game.name}" removed')),
+          SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
         );
       }
     } else {
@@ -229,7 +231,7 @@ class _CarouselState extends State<_Carousel> {
       await provider.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${game.name}" removed')),
+          SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
         );
       }
     } else {

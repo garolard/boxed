@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
+import 'l10n/app_localizations.dart';
+import 'l10n/l10n.dart';
 import 'providers/collection_provider.dart';
 import 'providers/shared_collections_provider.dart';
 import 'screens/home_screen.dart';
@@ -39,11 +41,13 @@ class VgCollectionApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'VG Collection',
+        onGenerateTitle: (context) => context.l10n.appTitle,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark(),
         darkTheme: AppTheme.dark(),
         themeMode: ThemeMode.dark,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         builder: (context, child) {
           return GradientBackground(child: child ?? const SizedBox());
         },

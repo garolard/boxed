@@ -1,0 +1,101 @@
+{
+  "@@locale": "fr",
+  "appTitle": "VG Collection",
+
+  "navShelf": "Étagère",
+  "navSearch": "Rechercher",
+  "navScan": "Scanner",
+  "navForYou": "Pour vous",
+
+  "shareSubject": "Ma collection de jeux",
+
+  "fileLabelJson": "JSON",
+
+  "importResult": "{imported} jeux importés ({skipped} déjà possédés)",
+  "importFailed": "Échec de l'importation : {error}",
+
+  "shelfTitle": "Mon étagère",
+  "sharedCollectionsTooltip": "Collections partagées",
+  "menuShareQr": "Partager en code QR",
+  "menuExport": "Exporter la collection",
+  "menuImport": "Importer la collection",
+
+  "yourGames": "Vos jeux",
+  "yourGamesSubtitle": "Touchez une pochette pour voir les détails",
+
+  "emptyShelfTitle": "Votre étagère est vide",
+  "emptyShelfMessage": "Ajoutez les jeux que vous possédez physiquement. Recherchez par titre ou scannez une pochette avec votre appareil photo — on s'occupe du reste.",
+  "emptyShelfAction": "Rechercher un jeu",
+
+  "gameRemoved": "« {name} » retiré",
+  "gameAdded": "« {name} » ajouté à la collection",
+
+  "availableOn": "Disponible sur",
+  "about": "À propos",
+  "inYourShelf": "Dans votre étagère",
+  "removeFromCollection": "Retirer de la collection",
+  "addToShelf": "Ajouter à l'étagère",
+
+  "recsEmptyTitle": "Pas encore de recommandations",
+  "recsEmptyMessage": "Ajoutez quelques jeux à votre étagère et nous vous suggérerons des titres basés sur ce que vous aimez déjà.",
+  "retry": "Réessayer",
+  "recsTryAddingMore": "Pas encore de recommandations — essayez d'ajouter plus de jeux.",
+  "featuredTitle": "En vedette",
+  "featuredSubtitle": "Basé sur ce que vous possédez",
+  "allPicks": "Toutes les suggestions",
+
+  "scanTitle": "Scanner la pochette",
+  "scanFailed": "Échec du scan : {error}",
+  "camera": "Caméra",
+  "gallery": "Galerie",
+  "noReadableText": "Aucun texte lisible trouvé — essayez une photo plus nette, un meilleur éclairage ou gardez la pochette bien à plat.",
+  "candidatesFound": "{count} TROUVÉS",
+  "detectedText": "Texte détecté — touchez pour rechercher",
+  "scanIntroTitle": "Lisez une pochette, recherchez sur IGDB",
+  "scanIntro": "Le texte est lu sur l'appareil — aucune saisie requise.",
+
+  "searchTitle": "Rechercher",
+  "tryAgain": "Réessayer",
+  "noMatches": "Aucun résultat",
+  "noMatchesMessage": "Essayez un autre titre, choisissez un autre système ou effacez le filtre de genre.",
+  "clearFilters": "Effacer les filtres",
+  "searchHint": "Titre du jeu…",
+  "filterSystem": "SYSTÈME",
+  "filterGenre": "GENRE",
+  "filterAll": "Tous",
+  "discoverGames": "Découvrir des jeux",
+  "discoverGamesMessage": "Recherchez dans le catalogue IGDB. Filtrez par système ou genre pour affiner.",
+
+  "sharedDetailCount": "{total} jeux · vous en avez {owned}",
+
+  "scanNoQr": "Aucun code QR trouvé — essayez une photo plus nette.",
+  "notVgcQr": "Ce code QR n'est pas un partage VG Collection.",
+  "sharedEmpty": "La collection partagée est vide.",
+  "qrDamaged": "Ce code QR est endommagé ou non pris en charge.",
+  "deleteSharedTitle": "Supprimer la collection partagée ?",
+  "deleteSharedMessage": "« {name} » ({count} jeux) sera supprimée. Votre propre étagère n'est pas affectée.",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "sharedCollectionsTitle": "Collections partagées",
+  "scanACode": "Scanner un code",
+  "fromGallery": "Depuis la galerie",
+  "nothingSharedTitle": "Rien de partagé pour l'instant",
+  "nothingSharedMessage": "Demandez à un ami d'ouvrir « Partager en code QR » sur son étagère, puis scannez-le ici pour parcourir sa collection.",
+  "sharedRowMeta": "{count} jeux · {date}",
+
+  "whichVersion": "Quelle version possédez-vous ?",
+
+  "shareQrTitle": "Partager en code QR",
+  "shareQrSummary": "Partage de {count} jeux. Un ami le scanne depuis l'écran Collections partagées.",
+  "shareQrCapped": "Votre étagère contient {total} jeux — un code QR en accepte {max}, les plus récemment ajoutés sont donc inclus.",
+  "collectionName": "Nom de la collection",
+  "defaultShelfName": "Mon étagère",
+
+  "gamesInShelf": "{count, plural, =1{jeu dans votre étagère} other{jeux dans votre étagère}}",
+  "topSystems": "SYSTÈMES TOP",
+  "unknownPlatform": "Inconnu",
+
+  "owned": "À VOUS",
+  "addToShelfShort": "Ajouter",
+  "removeShort": "Retirer"
+}

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../models/game.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
 import 'platform_badge.dart';
@@ -42,7 +43,7 @@ Future<void> addGameFlow(BuildContext context, Game game) async {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                '"${game.name}" added to collection',
+                context.l10n.gameAdded(game.name),
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
@@ -60,6 +61,7 @@ class _PlatformPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
       minChildSize: 0.3,
@@ -86,9 +88,9 @@ class _PlatformPickerSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              const Text(
-                'Which version do you own?',
-                style: TextStyle(
+              Text(
+                l10n.whichVersion,
+                style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 17,
                   fontWeight: FontWeight.w800,

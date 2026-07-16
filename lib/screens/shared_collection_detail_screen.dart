@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../models/shared_collection.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
@@ -18,6 +19,7 @@ class SharedCollectionDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final own = context.watch<CollectionProvider>();
+    final l10n = context.l10n;
     final ownedCount =
         collection.games.where((g) => own.contains(g.id)).length;
 
@@ -43,7 +45,7 @@ class SharedCollectionDetailScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${collection.games.length} games · you own $ownedCount',
+                  l10n.sharedDetailCount(collection.games.length, ownedCount),
                   style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/game.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
@@ -67,11 +68,12 @@ class _BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = const [
-      _NavSpec(Icons.collections_bookmark_rounded, 'Shelf'),
-      _NavSpec(Icons.search_rounded, 'Search'),
-      _NavSpec(Icons.camera_rounded, 'Scan'),
-      _NavSpec(Icons.auto_awesome_rounded, 'For you'),
+    final l10n = context.l10n;
+    final items = [
+      _NavSpec(Icons.collections_bookmark_rounded, l10n.navShelf),
+      _NavSpec(Icons.search_rounded, l10n.navSearch),
+      _NavSpec(Icons.camera_rounded, l10n.navScan),
+      _NavSpec(Icons.auto_awesome_rounded, l10n.navForYou),
     ];
     return SafeArea(
       top: false,
@@ -113,7 +115,7 @@ class _BottomNav extends StatelessWidget {
 class _NavSpec {
   final IconData icon;
   final String label;
-  const _NavSpec(this.icon, this.label);
+  _NavSpec(this.icon, this.label);
 }
 
 class _NavItem extends StatelessWidget {
@@ -173,37 +175,40 @@ class _SummaryTab extends StatelessWidget {
 
   Future<void> _export(BuildContext context) async {
     final provider = context.read<CollectionProvider>();
+    final subject = context.l10n.shareSubject;
     final path = await provider.exportCollection();
     await SharePlus.instance.share(
-      ShareParams(files: [XFile(path)], subject: 'My game collection'),
+      ShareParams(files: [XFile(path)], subject: subject),
     );
   }
 
   Future<void> _import(BuildContext context) async {
     final provider = context.read<CollectionProvider>();
+    final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
-    const jsonGroup = XTypeGroup(
-      label: 'JSON',
-      extensions: ['json'],
-      uniformTypeIdentifiers: ['public.json'],
-      mimeTypes: ['application/json'],
+    final jsonGroup = XTypeGroup(
+      label: l10n.fileLabelJson,
+      extensions: const ['json'],
+      uniformTypeIdentifiers: const ['public.json'],
+      mimeTypes: const ['application/json'],
     );
-    final picked = await openFile(acceptedTypeGroups: const [jsonGroup]);
+    final picked = await openFile(acceptedTypeGroups: [jsonGroup]);
     if (picked == null) return;
     final path = picked.path;
     try {
       final result = await provider.importCollection(path);
       messenger.showSnackBar(SnackBar(
           content: Text(
-              'Imported ${result.imported} games (${result.skipped} already owned)')));
+              l10n.importResult(result.imported, result.skipped))));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Import failed: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.importFailed('$e'))));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CollectionProvider>();
+    final l10n = context.l10n;
     final games = provider.games;
 
     return CustomScrollView(
@@ -213,9 +218,9 @@ class _SummaryTab extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
-          title: const Text(
-            'My Shelf',
-            style: TextStyle(
+          title: Text(
+            l10n.shelfTitle,
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -226,7 +231,7 @@ class _SummaryTab extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.qr_code_scanner_rounded,
                   color: AppColors.textPrimary),
-              tooltip: 'Shared collections',
+              tooltip: l10n.sharedCollectionsTooltip,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -241,22 +246,22 @@ class _SummaryTab extends StatelessWidget {
                 'import' => _import(context),
                 _ => showShareQrSheet(context),
               },
-              itemBuilder: (_) => const [
+              itemBuilder: (_) => [
                 PopupMenuItem(
                     value: 'share_qr',
                     child: ListTile(
-                        leading: Icon(Icons.qr_code_rounded),
-                        title: Text('Share as QR code'))),
+                        leading: const Icon(Icons.qr_code_rounded),
+                        title: Text(l10n.menuShareQr))),
                 PopupMenuItem(
                     value: 'export',
                     child: ListTile(
-                        leading: Icon(Icons.upload_file),
-                        title: Text('Export collection'))),
+                        leading: const Icon(Icons.upload_file),
+                        title: Text(l10n.menuExport))),
                 PopupMenuItem(
                     value: 'import',
                     child: ListTile(
-                        leading: Icon(Icons.download),
-                        title: Text('Import collection'))),
+                        leading: const Icon(Icons.download),
+                        title: Text(l10n.menuImport))),
               ],
             ),
           ],
@@ -287,10 +292,10 @@ class _SummaryTab extends StatelessWidget {
             child: Center(child: CircularProgressIndicator()),
           )
         else if (games.isNotEmpty) ...[
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: SectionHeader(
-              title: 'Your games',
-              subtitle: 'Tap a cover to view details',
+              title: l10n.yourGames,
+              subtitle: l10n.yourGamesSubtitle,
               icon: Icons.style_rounded,
             ),
           ),
@@ -339,6 +344,7 @@ class _SummaryTab extends StatelessWidget {
       BuildContext context, Game game, bool add) async {
     final provider = context.read<CollectionProvider>();
     final messenger = ScaffoldMessenger.of(context);
+    final removedMessage = context.l10n.gameRemoved(game.name);
     if (add) {
       await addGameFlow(context, game);
     } else {
@@ -351,7 +357,7 @@ class _SummaryTab extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '"${game.name}" removed',
+                  removedMessage,
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
@@ -417,13 +423,13 @@ class _EmptyCollection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: EmptyState(
-        title: 'Your shelf is empty',
-        message:
-            'Add the games you own physically. Search by title or scan a cover with your camera — we\'ll handle the rest.',
-        actionLabel: 'Search a game',
+        title: l10n.emptyShelfTitle,
+        message: l10n.emptyShelfMessage,
+        actionLabel: l10n.emptyShelfAction,
         actionIcon: Icons.search_rounded,
         onAction: onSearch,
       ),

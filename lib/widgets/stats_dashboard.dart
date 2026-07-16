@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
 import 'animated_count.dart';
@@ -15,6 +16,7 @@ class StatsDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final byPlatform = provider.countByPlatform.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final topPlatforms = byPlatform.take(4).toList();
@@ -45,7 +47,7 @@ class StatsDashboard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                  total == 1 ? 'game in your shelf' : 'games in your shelf',
+                  l10n.gamesInShelf(total),
                   style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13,
@@ -58,9 +60,9 @@ class StatsDashboard extends StatelessWidget {
           ),
           if (topPlatforms.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Text(
-              'TOP SYSTEMS',
-              style: TextStyle(
+            Text(
+              l10n.topSystems,
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -70,7 +72,9 @@ class StatsDashboard extends StatelessWidget {
             const SizedBox(height: 10),
             for (var i = 0; i < topPlatforms.length; i++)
               _BarRow(
-                label: topPlatforms[i].key,
+                label: topPlatforms[i].key == 'Unknown'
+                    ? l10n.unknownPlatform
+                    : topPlatforms[i].key,
                 value: topPlatforms[i].value,
                 max: maxCount,
                 delay: 80 * i,

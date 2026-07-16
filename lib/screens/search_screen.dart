@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../models/game.dart';
 import '../models/platforms.dart';
+import '../l10n/app_localizations.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../services/igdb_service.dart';
 import '../theme/app_theme.dart';
@@ -103,13 +105,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'Search',
-          style: TextStyle(
+        title: Text(
+          l10n.searchTitle,
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 22,
             fontWeight: FontWeight.w800,
@@ -158,14 +161,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
             const SizedBox(height: 4),
-            Expanded(child: _body()),
+            Expanded(child: _body(l10n)),
           ],
         ),
       ),
     );
   }
 
-  Widget _body() {
+  Widget _body(AppLocalizations l10n) {
     if (_error != null) {
       return Center(
         child: Padding(
@@ -188,7 +191,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 SizedBox(
                   width: 200,
                   child: NeonButton(
-                    label: 'Try again',
+                    label: l10n.tryAgain,
                     icon: Icons.refresh_rounded,
                     onPressed: _search,
                   ),
@@ -210,10 +213,9 @@ class _SearchScreenState extends State<SearchScreen> {
       return Center(
         child: EmptyState(
           icon: Icons.search_off_rounded,
-          title: 'No matches',
-          message:
-              'Try a different title, pick a different system, or clear the genre filter.',
-          actionLabel: 'Clear filters',
+          title: l10n.noMatches,
+          message: l10n.noMatchesMessage,
+          actionLabel: l10n.clearFilters,
           actionIcon: Icons.refresh_rounded,
           onAction: () {
             setState(() {
@@ -257,7 +259,7 @@ class _SearchScreenState extends State<SearchScreen> {
       await provider.remove(game.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${game.name}" removed')),
+          SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
         );
       }
     } else {
@@ -284,6 +286,7 @@ class _SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final focused = focusNode.hasFocus;
+    final l10n = context.l10n;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
@@ -307,7 +310,7 @@ class _SearchField extends StatelessWidget {
           fontSize: 15,
         ),
         decoration: InputDecoration(
-          hintText: 'Game title…',
+          hintText: l10n.searchHint,
           prefixIcon: const Icon(
             Icons.search_rounded,
             color: AppColors.textMuted,
@@ -346,12 +349,13 @@ class _Filters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _Label('SYSTEM'),
+          _Label(l10n.filterSystem),
           const SizedBox(height: 8),
           SizedBox(
             height: 32,
@@ -359,7 +363,7 @@ class _Filters extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               children: [
                 _PlatformPill(
-                  label: 'All',
+                  label: l10n.filterAll,
                   color: AppColors.accent,
                   selected: platformId == null,
                   onTap: () => onPlatformChanged(null),
@@ -378,7 +382,7 @@ class _Filters extends StatelessWidget {
           ),
           if (genres.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const _Label('GENRE'),
+            _Label(l10n.filterGenre),
             const SizedBox(height: 8),
             SizedBox(
               height: 32,
@@ -386,7 +390,7 @@ class _Filters extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 children: [
                   GenreChip(
-                    name: 'All',
+                    name: l10n.filterAll,
                     color: AppColors.accent,
                     selected: genreId == null,
                     onTap: () => onGenreChanged(null),
@@ -482,6 +486,7 @@ class _SearchHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -507,9 +512,9 @@ class _SearchHint extends StatelessWidget {
                   curve: Curves.easeInOut,
                 ),
             const SizedBox(height: 18),
-            const Text(
-              'Discover games',
-              style: TextStyle(
+            Text(
+              l10n.discoverGames,
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -517,10 +522,10 @@ class _SearchHint extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Search the IGDB catalog. Filter by system or genre to drill down.',
+            Text(
+              l10n.discoverGamesMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
                 height: 1.4,

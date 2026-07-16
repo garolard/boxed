@@ -1,0 +1,101 @@
+{
+  "@@locale": "es",
+  "appTitle": "VG Collection",
+
+  "navShelf": "Estantería",
+  "navSearch": "Buscar",
+  "navScan": "Escanear",
+  "navForYou": "Para ti",
+
+  "shareSubject": "Mi colección de juegos",
+
+  "fileLabelJson": "JSON",
+
+  "importResult": "Se importaron {imported} juegos ({skipped} ya los tenías)",
+  "importFailed": "Error al importar: {error}",
+
+  "shelfTitle": "Mi estantería",
+  "sharedCollectionsTooltip": "Colecciones compartidas",
+  "menuShareQr": "Compartir como código QR",
+  "menuExport": "Exportar colección",
+  "menuImport": "Importar colección",
+
+  "yourGames": "Tus juegos",
+  "yourGamesSubtitle": "Toca una portada para ver los detalles",
+
+  "emptyShelfTitle": "Tu estantería está vacía",
+  "emptyShelfMessage": "Añade los juegos que tienes físicamente. Busca por título o escanea una portada con tu cámara — nosotros nos encargamos del resto.",
+  "emptyShelfAction": "Buscar un juego",
+
+  "gameRemoved": "\"{name}\" eliminado",
+  "gameAdded": "\"{name}\" añadido a la colección",
+
+  "availableOn": "Disponible en",
+  "about": "Acerca de",
+  "inYourShelf": "En tu estantería",
+  "removeFromCollection": "Quitar de la colección",
+  "addToShelf": "Añadir a la estantería",
+
+  "recsEmptyTitle": "Aún no hay recomendaciones",
+  "recsEmptyMessage": "Añade algunos juegos a tu estantería y te sugeriremos títulos basados en lo que ya te gusta.",
+  "retry": "Reintentar",
+  "recsTryAddingMore": "Aún no hay recomendaciones — prueba a añadir más juegos.",
+  "featuredTitle": "Destacados",
+  "featuredSubtitle": "Basado en lo que tienes",
+  "allPicks": "Todas las sugerencias",
+
+  "scanTitle": "Escanear portada",
+  "scanFailed": "Error al escanear: {error}",
+  "camera": "Cámara",
+  "gallery": "Galería",
+  "noReadableText": "No se encontró texto legible — prueba con una foto más nítida, mejor luz o manteniendo la portada plana.",
+  "candidatesFound": "{count} ENCONTRADOS",
+  "detectedText": "Texto detectado — toca para buscar",
+  "scanIntroTitle": "Lee una portada, busca en IGDB",
+  "scanIntro": "El texto se lee en el dispositivo — sin necesidad de escribir.",
+
+  "searchTitle": "Buscar",
+  "tryAgain": "Reintentar",
+  "noMatches": "Sin resultados",
+  "noMatchesMessage": "Prueba con otro título, elige otro sistema o quita el filtro de género.",
+  "clearFilters": "Quitar filtros",
+  "searchHint": "Título del juego…",
+  "filterSystem": "SISTEMA",
+  "filterGenre": "GÉNERO",
+  "filterAll": "Todos",
+  "discoverGames": "Descubre juegos",
+  "discoverGamesMessage": "Busca en el catálogo de IGDB. Filtra por sistema o género para afinar.",
+
+  "sharedDetailCount": "{total} juegos · tienes {owned}",
+
+  "scanNoQr": "No se encontró ningún código QR — prueba con una foto más nítida.",
+  "notVgcQr": "Ese código QR no es un enlace compartido de VG Collection.",
+  "sharedEmpty": "La colección compartida está vacía.",
+  "qrDamaged": "Ese código QR está dañado o no es compatible.",
+  "deleteSharedTitle": "¿Eliminar la colección compartida?",
+  "deleteSharedMessage": "\"{name}\" ({count} juegos) se eliminará. Tu propia estantería no se verá afectada.",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "sharedCollectionsTitle": "Colecciones compartidas",
+  "scanACode": "Escanear un código",
+  "fromGallery": "Desde la galería",
+  "nothingSharedTitle": "Aún no hay nada compartido",
+  "nothingSharedMessage": "Pide a un amigo que abra \"Compartir como código QR\" en su estantería y luego escanéalo aquí para explorarla.",
+  "sharedRowMeta": "{count} juegos · {date}",
+
+  "whichVersion": "¿Qué versión tienes?",
+
+  "shareQrTitle": "Compartir como código QR",
+  "shareQrSummary": "Compartiendo {count} juegos. Un amigo lo escanea desde la pantalla de Colecciones compartidas.",
+  "shareQrCapped": "Tu estantería tiene {total} juegos — un código QR admite {max}, así que se incluyen los añadidos más recientemente.",
+  "collectionName": "Nombre de la colección",
+  "defaultShelfName": "Mi estantería",
+
+  "gamesInShelf": "{count, plural, =1{juego en tu estantería} other{juegos en tu estantería}}",
+  "topSystems": "SISTEMAS TOP",
+  "unknownPlatform": "Desconocido",
+
+  "owned": "TUYO",
+  "addToShelfShort": "Añadir",
+  "removeShort": "Quitar"
+}

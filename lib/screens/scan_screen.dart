@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../l10n/l10n.dart';
 import '../services/cover_scan_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
@@ -37,7 +38,7 @@ class _ScanScreenState extends State<ScanScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _error = 'Scan failed: $e');
+      if (mounted) setState(() => _error = context.l10n.scanFailed('$e'));
     } finally {
       if (mounted) setState(() => _scanning = false);
     }
@@ -52,13 +53,14 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'Scan Cover',
-          style: TextStyle(
+        title: Text(
+          l10n.scanTitle,
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 22,
             fontWeight: FontWeight.w800,
@@ -70,13 +72,13 @@ class _ScanScreenState extends State<ScanScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
           children: [
-            const _ScanIntro(),
+            _ScanIntro(),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: NeonButton(
-                    label: 'Camera',
+                    label: l10n.camera,
                     icon: Icons.photo_camera_rounded,
                     onPressed:
                         _scanning ? null : () => _scan(fromCamera: true),
@@ -85,7 +87,7 @@ class _ScanScreenState extends State<ScanScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: NeonOutlineButton(
-                    label: 'Gallery',
+                    label: l10n.gallery,
                     icon: Icons.photo_library_rounded,
                     onPressed:
                         _scanning ? null : () => _scan(fromCamera: false),
@@ -123,15 +125,15 @@ class _ScanScreenState extends State<ScanScreen> {
             ],
             if (_scanned && _candidates.isEmpty && !_scanning) ...[
               const SizedBox(height: 12),
-              const GlassCard(
+              GlassCard(
                 child: Row(
                   children: [
-                    Icon(Icons.search_off, color: AppColors.textMuted),
-                    SizedBox(width: 10),
+                    const Icon(Icons.search_off, color: AppColors.textMuted),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'No readable text found — try a sharper photo, better lighting or hold the cover flat.',
-                        style: TextStyle(
+                        l10n.noReadableText,
+                        style: const TextStyle(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -156,7 +158,7 @@ class _ScanScreenState extends State<ScanScreen> {
                       borderRadius: BorderRadius.circular(99),
                     ),
                     child: Text(
-                      '${_candidates.length} FOUND',
+                      l10n.candidatesFound(_candidates.length),
                       style: const TextStyle(
                         color: AppColors.accent,
                         fontSize: 11,
@@ -166,9 +168,9 @@ class _ScanScreenState extends State<ScanScreen> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
-                    'Detected text — tap to search',
-                    style: TextStyle(
+                  Text(
+                    l10n.detectedText,
+                    style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.4,
@@ -199,6 +201,7 @@ class _ScanIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -220,20 +223,20 @@ class _ScanIntro extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'Read a cover, search IGDB',
-                  style: TextStyle(
+                  l10n.scanIntroTitle,
+                  style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'The text is read on-device — no typing required.',
-                  style: TextStyle(
+                  l10n.scanIntro,
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,

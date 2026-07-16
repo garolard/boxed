@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../services/qr_payload_codec.dart';
 import '../theme/app_theme.dart';
@@ -29,7 +30,13 @@ class _ShareQrSheet extends StatefulWidget {
 }
 
 class _ShareQrSheetState extends State<_ShareQrSheet> {
-  final _nameController = TextEditingController(text: 'My shelf');
+  late final _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = context.l10n.defaultShelfName;
+  }
 
   @override
   void dispose() {
@@ -39,6 +46,7 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final games = context.watch<CollectionProvider>().games;
     final capped = games.take(QrPayloadCodec.maxGames).toList();
     final data = QrPayloadCodec.encode(QrPayload(
@@ -69,9 +77,9 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
                 ),
               ),
             ),
-            const Text(
-              'Share as QR code',
-              style: TextStyle(
+            Text(
+              l10n.shareQrTitle,
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
@@ -80,8 +88,7 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Sharing ${capped.length} games. A friend scans this from the '
-              'Shared collections screen.',
+              l10n.shareQrSummary(capped.length),
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
@@ -97,9 +104,7 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Your shelf has ${games.length} games — a QR code fits '
-                      '${QrPayloadCodec.maxGames}, so the most recently '
-                      'added ones are included.',
+                      l10n.shareQrCapped(games.length, QrPayloadCodec.maxGames),
                       style: const TextStyle(
                         color: AppColors.warning,
                         fontSize: 12,
@@ -118,8 +123,8 @@ class _ShareQrSheetState extends State<_ShareQrSheet> {
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
-              decoration: const InputDecoration(
-                labelText: 'Collection name',
+              decoration: InputDecoration(
+                labelText: l10n.collectionName,
                 counterText: '',
               ),
               onChanged: (_) => setState(() {}),

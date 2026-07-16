@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../models/game.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_game_flow.dart';
@@ -67,7 +68,7 @@ class GameDetailScreen extends StatelessWidget {
                   ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
                   if (game.platformNames.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    const _SectionLabel(text: 'Available on'),
+                    _SectionLabel(text: context.l10n.availableOn),
                     const SizedBox(height: 10),
                     PlatformBadgeRow(names: game.platformNames)
                         .animate()
@@ -75,7 +76,7 @@ class GameDetailScreen extends StatelessWidget {
                   ],
                   if (game.summary != null) ...[
                     const SizedBox(height: 24),
-                    const _SectionLabel(text: 'About'),
+                    _SectionLabel(text: context.l10n.about),
                     const SizedBox(height: 10),
                     GlassCard(
                       padding: const EdgeInsets.all(16),
@@ -227,18 +228,19 @@ class _PrimaryAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (owned) {
       return Column(
         children: [
           NeonButton(
-            label: 'In your shelf',
+            label: l10n.inYourShelf,
             icon: Icons.check_circle_rounded,
             color: AppColors.success,
             onPressed: null,
           ),
           const SizedBox(height: 10),
           NeonOutlineButton(
-            label: 'Remove from collection',
+            label: l10n.removeFromCollection,
             icon: Icons.delete_outline_rounded,
             color: AppColors.danger,
             onPressed: () async {
@@ -254,7 +256,7 @@ class _PrimaryAction extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '"${game.name}" removed',
+                          l10n.gameRemoved(game.name),
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
@@ -271,7 +273,7 @@ class _PrimaryAction extends StatelessWidget {
           .slideY(begin: 0.2, end: 0, duration: 500.ms, delay: 500.ms);
     }
     return NeonButton(
-      label: 'Add to shelf',
+      label: l10n.addToShelf,
       icon: Icons.add_rounded,
       onPressed: () => addGameFlow(context, game),
     )

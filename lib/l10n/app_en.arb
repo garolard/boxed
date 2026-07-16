@@ -1,0 +1,113 @@
+{
+  "@@locale": "en",
+  "appTitle": "VG Collection",
+
+  "navShelf": "Shelf",
+  "navSearch": "Search",
+  "navScan": "Scan",
+  "navForYou": "For you",
+
+  "shareSubject": "My game collection",
+
+  "fileLabelJson": "JSON",
+
+  "importResult": "Imported {imported} games ({skipped} already owned)",
+  "@importResult": {"placeholders": {"imported": {"type": "int"}, "skipped": {"type": "int"}}},
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {"placeholders": {"error": {"type": "String"}}},
+
+  "shelfTitle": "My Shelf",
+  "sharedCollectionsTooltip": "Shared collections",
+  "menuShareQr": "Share as QR code",
+  "menuExport": "Export collection",
+  "menuImport": "Import collection",
+
+  "yourGames": "Your games",
+  "yourGamesSubtitle": "Tap a cover to view details",
+
+  "emptyShelfTitle": "Your shelf is empty",
+  "emptyShelfMessage": "Add the games you own physically. Search by title or scan a cover with your camera — we'll handle the rest.",
+  "emptyShelfAction": "Search a game",
+
+  "gameRemoved": "\"{name}\" removed",
+  "@gameRemoved": {"placeholders": {"name": {"type": "String"}}},
+  "gameAdded": "\"{name}\" added to collection",
+  "@gameAdded": {"placeholders": {"name": {"type": "String"}}},
+
+  "availableOn": "Available on",
+  "about": "About",
+  "inYourShelf": "In your shelf",
+  "removeFromCollection": "Remove from collection",
+  "addToShelf": "Add to shelf",
+
+  "recsEmptyTitle": "No recommendations yet",
+  "recsEmptyMessage": "Add a few games to your shelf and we'll suggest titles based on what you already love.",
+  "retry": "Retry",
+  "recsTryAddingMore": "No recommendations yet — try adding more games.",
+  "featuredTitle": "Featured",
+  "featuredSubtitle": "Based on what you own",
+  "allPicks": "All picks",
+
+  "scanTitle": "Scan Cover",
+  "scanFailed": "Scan failed: {error}",
+  "@scanFailed": {"placeholders": {"error": {"type": "String"}}},
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "noReadableText": "No readable text found — try a sharper photo, better lighting or hold the cover flat.",
+  "candidatesFound": "{count} FOUND",
+  "@candidatesFound": {"placeholders": {"count": {"type": "int"}}},
+  "detectedText": "Detected text — tap to search",
+  "scanIntroTitle": "Read a cover, search IGDB",
+  "scanIntro": "The text is read on-device — no typing required.",
+
+  "searchTitle": "Search",
+  "tryAgain": "Try again",
+  "noMatches": "No matches",
+  "noMatchesMessage": "Try a different title, pick a different system, or clear the genre filter.",
+  "clearFilters": "Clear filters",
+  "searchHint": "Game title…",
+  "filterSystem": "SYSTEM",
+  "filterGenre": "GENRE",
+  "filterAll": "All",
+  "discoverGames": "Discover games",
+  "discoverGamesMessage": "Search the IGDB catalog. Filter by system or genre to drill down.",
+
+  "sharedDetailCount": "{total} games · you own {owned}",
+  "@sharedDetailCount": {"placeholders": {"total": {"type": "int"}, "owned": {"type": "int"}}},
+
+  "scanNoQr": "No QR code found — try a sharper photo.",
+  "notVgcQr": "That QR code is not a VG Collection share.",
+  "sharedEmpty": "The shared collection is empty.",
+  "qrDamaged": "That QR code is damaged or unsupported.",
+  "deleteSharedTitle": "Delete shared collection?",
+  "deleteSharedMessage": "\"{name}\" ({count} games) will be removed. Your own shelf is not affected.",
+  "@deleteSharedMessage": {"placeholders": {"name": {"type": "String"}, "count": {"type": "int"}}},
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "sharedCollectionsTitle": "Shared Collections",
+  "scanACode": "Scan a code",
+  "fromGallery": "From gallery",
+  "nothingSharedTitle": "Nothing shared yet",
+  "nothingSharedMessage": "Ask a friend to open \"Share as QR code\" on their shelf, then scan it here to browse their collection.",
+  "sharedRowMeta": "{count} games · {date}",
+  "@sharedRowMeta": {"placeholders": {"count": {"type": "int"}, "date": {"type": "String"}}},
+
+  "whichVersion": "Which version do you own?",
+
+  "shareQrTitle": "Share as QR code",
+  "shareQrSummary": "Sharing {count} games. A friend scans this from the Shared collections screen.",
+  "@shareQrSummary": {"placeholders": {"count": {"type": "int"}}},
+  "shareQrCapped": "Your shelf has {total} games — a QR code fits {max}, so the most recently added ones are included.",
+  "@shareQrCapped": {"placeholders": {"total": {"type": "int"}, "max": {"type": "int"}}},
+  "collectionName": "Collection name",
+  "defaultShelfName": "My shelf",
+
+  "gamesInShelf": "{count, plural, =1{game in your shelf} other{games in your shelf}}",
+  "@gamesInShelf": {"placeholders": {"count": {"type": "int"}}},
+  "topSystems": "TOP SYSTEMS",
+  "unknownPlatform": "Unknown",
+
+  "owned": "OWNED",
+  "addToShelfShort": "Add to shelf",
+  "removeShort": "Remove"
+}

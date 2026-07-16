@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/shared_collection.dart';
+import '../l10n/l10n.dart';
 import '../providers/shared_collections_provider.dart';
 import '../services/qr_payload_codec.dart';
 import '../services/qr_scan_service.dart';
@@ -29,6 +30,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
 
   Future<void> _scan({required bool fromCamera}) async {
     final provider = context.read<SharedCollectionsProvider>();
+    final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
@@ -37,7 +39,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
       final codes = await _scanner.scan(fromCamera: fromCamera);
       if (codes == null) return; // picker cancelled
       if (codes.isEmpty) {
-        _toast(messenger, 'No QR code found — try a sharper photo.');
+        _toast(messenger, l10n.scanNoQr);
         return;
       }
       QrPayload? payload;
@@ -46,11 +48,11 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
         if (payload != null) break;
       }
       if (payload == null) {
-        _toast(messenger, 'That QR code is not a VG Collection share.');
+        _toast(messenger, l10n.notVgcQr);
         return;
       }
       if (payload.entries.isEmpty) {
-        _toast(messenger, 'The shared collection is empty.');
+        _toast(messenger, l10n.sharedEmpty);
         return;
       }
       final saved = await provider.importFromPayload(payload);
@@ -59,9 +61,9 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
         builder: (_) => SharedCollectionDetailScreen(collection: saved),
       ));
     } on FormatException {
-      _toast(messenger, 'That QR code is damaged or unsupported.');
+      _toast(messenger, l10n.qrDamaged);
     } catch (e) {
-      _toast(messenger, 'Import failed: $e');
+      _toast(messenger, l10n.importFailed('$e'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -76,22 +78,22 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
 
   Future<void> _confirmDelete(SharedCollection c) async {
     final provider = context.read<SharedCollectionsProvider>();
+    final l10n = context.l10n;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surfaceHi,
-        title: const Text('Delete shared collection?'),
-        content: Text('"${c.name}" (${c.games.length} games) will be '
-            'removed. Your own shelf is not affected.'),
+        title: Text(l10n.deleteSharedTitle),
+        content: Text(l10n.deleteSharedMessage(c.name, c.games.length)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -102,15 +104,16 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SharedCollectionsProvider>();
+    final l10n = context.l10n;
     final collections = provider.collections;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text(
-          'Shared Collections',
-          style: TextStyle(
+        title: Text(
+          l10n.sharedCollectionsTitle,
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 22,
             fontWeight: FontWeight.w800,
@@ -125,7 +128,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
             children: [
               Expanded(
                 child: NeonButton(
-                  label: 'Scan a code',
+                  label: l10n.scanACode,
                   icon: Icons.qr_code_scanner_rounded,
                   onPressed: _busy ? null : () => _scan(fromCamera: true),
                 ),
@@ -133,7 +136,7 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: NeonOutlineButton(
-                  label: 'From gallery',
+                  label: l10n.fromGallery,
                   icon: Icons.photo_library_rounded,
                   onPressed: _busy ? null : () => _scan(fromCamera: false),
                 ),
@@ -149,13 +152,11 @@ class _SharedCollectionsScreenState extends State<SharedCollectionsScreen> {
           ],
           const SizedBox(height: 20),
           if (provider.loaded && collections.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 24),
+            Padding(
+              padding: const EdgeInsets.only(top: 24),
               child: EmptyState(
-                title: 'Nothing shared yet',
-                message:
-                    'Ask a friend to open "Share as QR code" on their shelf, '
-                    'then scan it here to browse their collection.',
+                title: l10n.nothingSharedTitle,
+                message: l10n.nothingSharedMessage,
               ),
             )
           else
@@ -186,6 +187,8 @@ class _SharedCollectionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final locale = Localizations.localeOf(context).toString();
     return GlassCard(
       padding: EdgeInsets.zero,
       child: ListTile(
@@ -218,8 +221,10 @@ class _SharedCollectionRow extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          '${collection.games.length} games · '
-          '${DateFormat.yMMMd().format(collection.createdAt)}',
+          l10n.sharedRowMeta(
+            collection.games.length,
+            DateFormat.yMMMd(locale).format(collection.createdAt),
+          ),
           style: const TextStyle(
             color: AppColors.textSecondary,
             fontSize: 12,

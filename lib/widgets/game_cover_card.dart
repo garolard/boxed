@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/game.dart';
+import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../screens/game_detail_screen.dart';
 import '../theme/app_theme.dart';
@@ -186,14 +187,14 @@ class _OwnedPill extends StatelessWidget {
         color: AppColors.success,
         borderRadius: BorderRadius.circular(99),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_rounded, color: Colors.white, size: 13),
-          SizedBox(width: 2),
+          const Icon(Icons.check_rounded, color: Colors.white, size: 13),
+          const SizedBox(width: 2),
           Text(
-            'OWNED',
-            style: TextStyle(
+            context.l10n.owned,
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w900,
               fontSize: 10,
@@ -287,6 +288,7 @@ class _QuickAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final color = owned ? AppColors.danger : AppColors.accent;
     return Material(
       color: Colors.transparent,
@@ -309,7 +311,7 @@ class _QuickAddButton extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                owned ? 'Remove' : 'Add to shelf',
+                owned ? l10n.removeShort : l10n.addToShelfShort,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
