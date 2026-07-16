@@ -9,6 +9,7 @@ import '../providers/shared_collections_provider.dart';
 import '../services/qr_payload_codec.dart';
 import '../services/qr_scan_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/responsive.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/neon_button.dart';
@@ -58,9 +59,11 @@ class _SharedCollectionsScreenState
       }
       final saved = await notifier.importFromPayload(payload);
       if (!mounted) return;
-      navigator.push(MaterialPageRoute(
-        builder: (_) => SharedCollectionDetailScreen(collection: saved),
-      ));
+      navigator.push(
+        MaterialPageRoute(
+          builder: (_) => SharedCollectionDetailScreen(collection: saved),
+        ),
+      );
     } on FormatException {
       _toast(messenger, l10n.qrDamaged);
     } catch (e) {
@@ -71,10 +74,14 @@ class _SharedCollectionsScreenState
   }
 
   void _toast(ScaffoldMessengerState messenger, String message) {
-    messenger.showSnackBar(SnackBar(
-      content: Text(message,
-          style: const TextStyle(fontWeight: FontWeight.w700)),
-    ));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
   }
 
   Future<void> _confirmDelete(SharedCollection c) async {
@@ -122,57 +129,61 @@ class _SharedCollectionsScreenState
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: NeonButton(
-                  label: l10n.scanACode,
-                  icon: Icons.qr_code_scanner_rounded,
-                  onPressed: _busy ? null : () => _scan(fromCamera: true),
+      body: ResponsiveCenter(
+        maxWidth: context.readableMaxWidth,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: NeonButton(
+                    label: l10n.scanACode,
+                    icon: Icons.qr_code_scanner_rounded,
+                    onPressed: _busy ? null : () => _scan(fromCamera: true),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: NeonOutlineButton(
-                  label: l10n.fromGallery,
-                  icon: Icons.photo_library_rounded,
-                  onPressed: _busy ? null : () => _scan(fromCamera: false),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: NeonOutlineButton(
+                    label: l10n.fromGallery,
+                    icon: Icons.photo_library_rounded,
+                    onPressed: _busy ? null : () => _scan(fromCamera: false),
+                  ),
                 ),
+              ],
+            ),
+            if (_busy) ...[
+              const SizedBox(height: 16),
+              const ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(99)),
+                child: LinearProgressIndicator(minHeight: 3),
               ),
             ],
-          ),
-          if (_busy) ...[
-            const SizedBox(height: 16),
-            const ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(99)),
-              child: LinearProgressIndicator(minHeight: 3),
-            ),
-          ],
-          const SizedBox(height: 20),
-          if (state.loaded && collections.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 24),
-              child: EmptyState(
-                title: l10n.nothingSharedTitle,
-                message: l10n.nothingSharedMessage,
-              ),
-            )
-          else
-            for (var i = 0; i < collections.length; i++)
+            const SizedBox(height: 20),
+            if (state.loaded && collections.isEmpty)
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _SharedCollectionRow(
-                  collection: collections[i],
-                  onDelete: () => _confirmDelete(collections[i]),
-                )
-                    .animate()
-                    .fadeIn(duration: 300.ms, delay: (40 * i).ms)
-                    .slideY(begin: 0.1, end: 0, duration: 350.ms),
-              ),
-        ],
+                padding: const EdgeInsets.only(top: 24),
+                child: EmptyState(
+                  title: l10n.nothingSharedTitle,
+                  message: l10n.nothingSharedMessage,
+                ),
+              )
+            else
+              for (var i = 0; i < collections.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child:
+                      _SharedCollectionRow(
+                            collection: collections[i],
+                            onDelete: () => _confirmDelete(collections[i]),
+                          )
+                          .animate()
+                          .fadeIn(duration: 300.ms, delay: (40 * i).ms)
+                          .slideY(begin: 0.1, end: 0, duration: 350.ms),
+                ),
+          ],
+        ),
       ),
     );
   }
@@ -207,12 +218,13 @@ class _SharedCollectionRow extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.accent.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.accent.withValues(alpha: 0.4),
-            ),
+            border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.people_alt_rounded,
-              color: AppColors.accent, size: 22),
+          child: const Icon(
+            Icons.people_alt_rounded,
+            color: AppColors.accent,
+            size: 22,
+          ),
         ),
         title: Text(
           collection.name,
@@ -233,8 +245,10 @@ class _SharedCollectionRow extends StatelessWidget {
           ),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline_rounded,
-              color: AppColors.textMuted),
+          icon: const Icon(
+            Icons.delete_outline_rounded,
+            color: AppColors.textMuted,
+          ),
           onPressed: onDelete,
         ),
       ),

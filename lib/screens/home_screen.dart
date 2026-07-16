@@ -10,6 +10,7 @@ import '../models/game.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
+import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
@@ -41,21 +42,91 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final body = IndexedStack(
+      index: _tab,
+      children: [
+        _SummaryTab(onJumpToSearch: () => _setTab(1)),
+        SearchScreen(),
+        ScanScreen(),
+        RecommendationsScreen(),
+      ],
+    );
+
+    // On a tablet (e.g. a 10" iPad) the navigation follows the orientation:
+    // a side rail in landscape (uses the extra width) and the bottom bar in
+    // portrait. Phones always use the bottom bar.
+    final landscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    if (context.isTablet && landscape) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Row(
+            children: [
+              _SideNav(index: _tab, onChanged: _setTab),
+              Expanded(child: body),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
-      body: IndexedStack(
-        index: _tab,
-        children: [
-          _SummaryTab(onJumpToSearch: () => _setTab(1)),
-          SearchScreen(),
-          ScanScreen(),
-          RecommendationsScreen(),
-        ],
-      ),
-      bottomNavigationBar: _BottomNav(
-        index: _tab,
-        onChanged: _setTab,
+      body: body,
+      bottomNavigationBar: _BottomNav(index: _tab, onChanged: _setTab),
+    );
+  }
+}
+
+/// Vertical navigation used on tablets in place of the bottom nav bar.
+class _SideNav extends StatelessWidget {
+  final int index;
+  final ValueChanged<int> onChanged;
+  const _SideNav({required this.index, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final items = [
+      _NavSpec(Icons.collections_bookmark_rounded, l10n.navShelf),
+      _NavSpec(Icons.search_rounded, l10n.navSearch),
+      _NavSpec(Icons.camera_rounded, l10n.navScan),
+      _NavSpec(Icons.auto_awesome_rounded, l10n.navForYou),
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            width: 96,
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              children: [
+                for (var i = 0; i < items.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: _NavItem(
+                      spec: items[i],
+                      selected: i == index,
+                      onTap: () => onChanged(i),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -88,9 +159,7 @@ class _BottomNav extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surface.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.06),
-                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
               ),
               child: Row(
                 children: [
@@ -141,9 +210,7 @@ class _NavItem extends StatelessWidget {
           children: [
             Icon(
               spec.icon,
-              color: selected
-                  ? AppColors.accent
-                  : AppColors.textMuted,
+              color: selected ? AppColors.accent : AppColors.textMuted,
               size: 22,
             ),
             const SizedBox(height: 4),
@@ -153,9 +220,7 @@ class _NavItem extends StatelessWidget {
                 spec.label,
                 maxLines: 1,
                 style: TextStyle(
-                  color: selected
-                      ? AppColors.textPrimary
-                      : AppColors.textMuted,
+                  color: selected ? AppColors.textPrimary : AppColors.textMuted,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.4,
@@ -194,11 +259,14 @@ class _SummaryTab extends ConsumerWidget {
     if (picked == null) return;
     final path = picked.path;
     try {
-      final result =
-          await ref.read(collectionProvider.notifier).importCollection(path);
-      messenger.showSnackBar(SnackBar(
-          content: Text(
-              l10n.importResult(result.imported, result.skipped))));
+      final result = await ref
+          .read(collectionProvider.notifier)
+          .importCollection(path);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.importResult(result.imported, result.skipped)),
+        ),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.importFailed('$e'))));
     }
@@ -210,112 +278,127 @@ class _SummaryTab extends ConsumerWidget {
     final l10n = context.l10n;
     final games = state.games;
 
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          floating: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          title: Text(
-            l10n.shelfTitle,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.4,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.qr_code_scanner_rounded,
-                  color: AppColors.textPrimary),
-              tooltip: l10n.sharedCollectionsTooltip,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const SharedCollectionsScreen()),
+    return ResponsiveCenter(
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            title: Text(
+              l10n.shelfTitle,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
               ),
             ),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert_rounded,
-                  color: AppColors.textPrimary),
-              onSelected: (v) => switch (v) {
-                'export' => _export(context, ref),
-                'import' => _import(context, ref),
-                _ => showShareQrSheet(context),
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: AppColors.textPrimary,
+                ),
+                tooltip: l10n.sharedCollectionsTooltip,
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SharedCollectionsScreen(),
+                  ),
+                ),
+              ),
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.more_vert_rounded,
+                  color: AppColors.textPrimary,
+                ),
+                onSelected: (v) => switch (v) {
+                  'export' => _export(context, ref),
+                  'import' => _import(context, ref),
+                  _ => showShareQrSheet(context),
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(
                     value: 'share_qr',
                     child: ListTile(
-                        leading: const Icon(Icons.qr_code_rounded),
-                        title: Text(l10n.menuShareQr))),
-                PopupMenuItem(
+                      leading: const Icon(Icons.qr_code_rounded),
+                      title: Text(l10n.menuShareQr),
+                    ),
+                  ),
+                  PopupMenuItem(
                     value: 'export',
                     child: ListTile(
-                        leading: const Icon(Icons.upload_file),
-                        title: Text(l10n.menuExport))),
-                PopupMenuItem(
+                      leading: const Icon(Icons.upload_file),
+                      title: Text(l10n.menuExport),
+                    ),
+                  ),
+                  PopupMenuItem(
                     value: 'import',
                     child: ListTile(
-                        leading: const Icon(Icons.download),
-                        title: Text(l10n.menuImport))),
-              ],
-            ),
-          ],
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          sliver: SliverToBoxAdapter(
-            child: !state.loaded
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: _StatsSkeleton(),
-                  )
-                : games.isEmpty
-                    ? _EmptyCollection(onSearch: onJumpToSearch)
-                    : Column(
-                        children: [
-                          StatsDashboard(state: state),
-                          if (state.countByGenre.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            _TopGenresRow(state: state),
-                          ],
-                        ],
-                      ),
-          ),
-        ),
-        if (!state.loaded)
-          const SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator()),
-          )
-        else if (games.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: SectionHeader(
-              title: l10n.yourGames,
-              subtitle: l10n.yourGamesSubtitle,
-              icon: Icons.style_rounded,
-            ),
+                      leading: const Icon(Icons.download),
+                      title: Text(l10n.menuImport),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 220,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                childAspectRatio: 0.68,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            sliver: SliverToBoxAdapter(
+              child: !state.loaded
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: _StatsSkeleton(),
+                    )
+                  : games.isEmpty
+                  ? _EmptyCollection(onSearch: onJumpToSearch)
+                  : Column(
+                      children: [
+                        StatsDashboard(state: state),
+                        if (state.countByGenre.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _TopGenresRow(state: state),
+                        ],
+                      ],
+                    ),
+            ),
+          ),
+          if (!state.loaded)
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (games.isNotEmpty) ...[
+            SliverToBoxAdapter(
+              child: SectionHeader(
+                title: l10n.yourGames,
+                subtitle: l10n.yourGamesSubtitle,
+                icon: Icons.style_rounded,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, i) {
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+              sliver: SliverGrid(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: context.coverExtent,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 0.68,
+                ),
+                delegate: SliverChildBuilderDelegate((context, i) {
                   final game = games[i];
                   return GameCoverCard(
-                    game: game,
-                    dense: true,
-                    onAddPressed: () => _toggleOwnership(
-                        context, ref, game, !state.contains(game.id)),
-                  )
+                        game: game,
+                        dense: true,
+                        onAddPressed: () => _toggleOwnership(
+                          context,
+                          ref,
+                          game,
+                          !state.contains(game.id),
+                        ),
+                      )
                       .animate()
                       .fadeIn(
                         duration: 400.ms,
@@ -329,18 +412,21 @@ class _SummaryTab extends ConsumerWidget {
                         delay: (30 * i).ms,
                         curve: Curves.easeOutCubic,
                       );
-                },
-                childCount: games.length,
+                }, childCount: games.length),
               ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
   Future<void> _toggleOwnership(
-      BuildContext context, WidgetRef ref, Game game, bool add) async {
+    BuildContext context,
+    WidgetRef ref,
+    Game game,
+    bool add,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final removedMessage = context.l10n.gameRemoved(game.name);
     if (add) {
@@ -379,11 +465,20 @@ class _StatsSkeleton extends StatelessWidget {
         children: [
           ShimmerBox(width: 140, height: 56),
           SizedBox(height: 14),
-          ShimmerBox(height: 8, borderRadius: BorderRadius.all(Radius.circular(99))),
+          ShimmerBox(
+            height: 8,
+            borderRadius: BorderRadius.all(Radius.circular(99)),
+          ),
           SizedBox(height: 8),
-          ShimmerBox(height: 8, borderRadius: BorderRadius.all(Radius.circular(99))),
+          ShimmerBox(
+            height: 8,
+            borderRadius: BorderRadius.all(Radius.circular(99)),
+          ),
           SizedBox(height: 8),
-          ShimmerBox(height: 8, borderRadius: BorderRadius.all(Radius.circular(99))),
+          ShimmerBox(
+            height: 8,
+            borderRadius: BorderRadius.all(Radius.circular(99)),
+          ),
         ],
       ),
     );
@@ -400,15 +495,15 @@ class _TopGenresRow extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = byGenre.take(8).toList();
     return SizedBox(
-      height: 32,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        itemCount: top.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, i) => GenreChip(name: top[i].key),
-      ),
-    )
+          height: 32,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            itemCount: top.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (_, i) => GenreChip(name: top[i].key),
+          ),
+        )
         .animate()
         .fadeIn(duration: 500.ms, delay: 200.ms)
         .slideY(begin: 0.2, end: 0, duration: 500.ms, delay: 200.ms);

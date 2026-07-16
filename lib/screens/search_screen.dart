@@ -12,6 +12,7 @@ import '../providers/collection_provider.dart';
 import '../providers/services.dart';
 import '../services/igdb_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
@@ -78,11 +79,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _error = null;
     });
     try {
-      final results = await ref.read(igdbServiceProvider).searchGames(
-            query,
-            platformId: _platformId,
-            genreId: _genreId,
-          );
+      final results = await ref
+          .read(igdbServiceProvider)
+          .searchGames(query, platformId: _platformId, genreId: _genreId);
       if (mounted) setState(() => _results = results);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
@@ -122,48 +121,50 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-              child: _SearchField(
-                controller: _controller,
-                focusNode: _focusNode,
-                onChanged: _onQueryChanged,
-                onSubmitted: (_) => _search(),
-                onClear: () {
-                  _controller.clear();
-                  setState(() {
-                    _results = [];
-                    _searched = false;
-                  });
-                },
-              ),
-            ),
-            _Filters(
-              platformId: _platformId,
-              genreId: _genreId,
-              genres: _genres,
-              onPlatformChanged: (v) {
-                setState(() => _platformId = v);
-                _search();
-              },
-              onGenreChanged: (v) {
-                setState(() => _genreId = v);
-                _search();
-              },
-            ),
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(99)),
-                  child: LinearProgressIndicator(minHeight: 2),
+        child: ResponsiveCenter(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                child: _SearchField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  onChanged: _onQueryChanged,
+                  onSubmitted: (_) => _search(),
+                  onClear: () {
+                    _controller.clear();
+                    setState(() {
+                      _results = [];
+                      _searched = false;
+                    });
+                  },
                 ),
               ),
-            const SizedBox(height: 4),
-            Expanded(child: _body(l10n)),
-          ],
+              _Filters(
+                platformId: _platformId,
+                genreId: _genreId,
+                genres: _genres,
+                onPlatformChanged: (v) {
+                  setState(() => _platformId = v);
+                  _search();
+                },
+                onGenreChanged: (v) {
+                  setState(() => _genreId = v);
+                  _search();
+                },
+              ),
+              if (_loading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(99)),
+                    child: LinearProgressIndicator(minHeight: 2),
+                  ),
+                ),
+              const SizedBox(height: 4),
+              Expanded(child: _body(l10n)),
+            ],
+          ),
         ),
       ),
     );
@@ -178,7 +179,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.cloud_off, size: 40, color: AppColors.textMuted),
+                const Icon(
+                  Icons.cloud_off,
+                  size: 40,
+                  color: AppColors.textMuted,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   _error!,
@@ -205,11 +210,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
     if (_results.isEmpty) {
       if (!_searched) {
-        return _SearchHint(onPick: (q) {
-          _controller.text = q;
-          _focusNode.unfocus();
-          _search();
-        });
+        return _SearchHint(
+          onPick: (q) {
+            _controller.text = q;
+            _focusNode.unfocus();
+            _search();
+          },
+        );
       }
       return Center(
         child: EmptyState(
@@ -233,8 +240,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       child: GridView.builder(
         padding: const EdgeInsets.only(bottom: 120),
         itemCount: _results.length,
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 220,
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: context.coverExtent,
           mainAxisSpacing: 14,
           crossAxisSpacing: 14,
           childAspectRatio: 0.68,
@@ -242,10 +249,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         itemBuilder: (_, i) {
           final game = _results[i];
           return GameCoverCard(
-            game: game,
-            dense: true,
-            onAddPressed: () => _onAdd(context, game),
-          )
+                game: game,
+                dense: true,
+                onAddPressed: () => _onAdd(context, game),
+              )
               .animate()
               .fadeIn(duration: 350.ms, delay: (30 * i).ms)
               .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: (30 * i).ms);
@@ -319,8 +326,10 @@ class _SearchField extends StatelessWidget {
           suffixIcon: controller.text.isEmpty
               ? null
               : IconButton(
-                  icon: const Icon(Icons.close_rounded,
-                      color: AppColors.textMuted),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textMuted,
+                  ),
                   onPressed: onClear,
                 ),
           border: InputBorder.none,
@@ -455,13 +464,9 @@ class _PlatformPill extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: selected
-                ? color.withValues(alpha: 0.18)
-                : AppColors.surface,
+            color: selected ? color.withValues(alpha: 0.18) : AppColors.surface,
             border: Border.all(
-              color: selected
-                  ? color
-                  : color.withValues(alpha: 0.4),
+              color: selected ? color : color.withValues(alpha: 0.4),
               width: 1,
             ),
             borderRadius: BorderRadius.circular(99),
@@ -495,18 +500,23 @@ class _SearchHint extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.accent.withValues(alpha: 0.15),
-                border: Border.all(
-                  color: AppColors.accent.withValues(alpha: 0.3),
-                ),
-              ),
-              child: const Icon(Icons.travel_explore_rounded,
-                  color: AppColors.accent, size: 40),
-            ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.accent.withValues(alpha: 0.15),
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.travel_explore_rounded,
+                    color: AppColors.accent,
+                    size: 40,
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .scaleXY(
                   duration: 1800.ms,
                   begin: 1.0,
                   end: 1.06,

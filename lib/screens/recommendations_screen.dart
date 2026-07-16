@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../theme/app_theme.dart';
+import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
@@ -22,13 +23,13 @@ class RecommendationsScreen extends ConsumerStatefulWidget {
       _RecommendationsScreenState();
 }
 
-class _RecommendationsScreenState
-    extends ConsumerState<RecommendationsScreen> {
+class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        ref.read(collectionProvider.notifier).loadRecommendations());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => ref.read(collectionProvider.notifier).loadRecommendations(),
+    );
   }
 
   @override
@@ -51,16 +52,17 @@ class _RecommendationsScreenState
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: AppColors.textPrimary,
+            ),
             onPressed: () => ref
                 .read(collectionProvider.notifier)
                 .loadRecommendations(force: true),
           ),
         ],
       ),
-      body: SafeArea(
-        child: _body(state, l10n),
-      ),
+      body: SafeArea(child: _body(state, l10n)),
     );
   }
 
@@ -85,8 +87,11 @@ class _RecommendationsScreenState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.cloud_off,
-                    color: AppColors.textMuted, size: 40),
+                const Icon(
+                  Icons.cloud_off,
+                  color: AppColors.textMuted,
+                  size: 40,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   state.recsError!,
@@ -123,48 +128,49 @@ class _RecommendationsScreenState
     }
 
     final recs = state.recommendations;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
-      children: [
-        SectionHeader(
-          title: l10n.featuredTitle,
-          subtitle: l10n.featuredSubtitle,
-          icon: Icons.auto_awesome_rounded,
-        ),
-        SizedBox(
-          height: 320,
-          child: _Carousel(games: recs),
-        ),
-        SectionHeader(
-          title: l10n.allPicks,
-          icon: Icons.grid_view_rounded,
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: recs.length,
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 0.68,
-            ),
-            itemBuilder: (_, i) {
-              final game = recs[i];
-              return GameCoverCard(
-                game: game,
-                dense: true,
-                onAddPressed: () => _toggle(context, game),
-              )
-                  .animate()
-                  .fadeIn(duration: 350.ms, delay: (30 * i).ms)
-                  .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: (30 * i).ms);
-            },
+    return ResponsiveCenter(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
+        children: [
+          SectionHeader(
+            title: l10n.featuredTitle,
+            subtitle: l10n.featuredSubtitle,
+            icon: Icons.auto_awesome_rounded,
           ),
-        ),
-      ],
+          SizedBox(height: 320, child: _Carousel(games: recs)),
+          SectionHeader(title: l10n.allPicks, icon: Icons.grid_view_rounded),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: recs.length,
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: context.coverExtent,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                childAspectRatio: 0.68,
+              ),
+              itemBuilder: (_, i) {
+                final game = recs[i];
+                return GameCoverCard(
+                      game: game,
+                      dense: true,
+                      onAddPressed: () => _toggle(context, game),
+                    )
+                    .animate()
+                    .fadeIn(duration: 350.ms, delay: (30 * i).ms)
+                    .slideY(
+                      begin: 0.1,
+                      end: 0,
+                      duration: 400.ms,
+                      delay: (30 * i).ms,
+                    );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
