@@ -13,6 +13,7 @@ import 'l10n/app_localizations.dart';
 import 'l10n/l10n.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
+import 'providers/services.dart';
 import 'services/analytics_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
@@ -38,11 +39,16 @@ Future<void> main() async {
     statusBarIconBrightness: Brightness.light,
   ));
 
-  final analytics = AnalyticsService();
+  final analytics = await AnalyticsService.create();
   await analytics.logAppOpen();
 
   runZonedGuarded(
-    () => runApp(ProviderScope(child: const BoxedApp())),
+    () => runApp(ProviderScope(
+      overrides: [
+        analyticsServiceProvider.overrideWithValue(analytics),
+      ],
+      child: BoxedApp(analytics: analytics),
+    )),
     (error, stack) {
       analytics.logError(
         context: 'main_zone_uncaught',
@@ -54,7 +60,8 @@ Future<void> main() async {
 }
 
 class BoxedApp extends StatelessWidget {
-  const BoxedApp({super.key});
+  final AnalyticsService analytics;
+  const BoxedApp({super.key, required this.analytics});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +76,7 @@ class BoxedApp extends StatelessWidget {
       builder: (context, child) {
         return GradientBackground(child: child ?? const SizedBox());
       },
-      home: const _AppBootstrap(),
+      home: _AppBootstrap(analytics: analytics),
     );
   }
 }
@@ -78,7 +85,8 @@ class BoxedApp extends StatelessWidget {
 /// home screen. We keep it visible for a brief minimum time so the brand
 /// moment reads even on a cold start.
 class _AppBootstrap extends StatefulWidget {
-  const _AppBootstrap();
+  final AnalyticsService analytics;
+  const _AppBootstrap({required this.analytics});
 
   @override
   State<_AppBootstrap> createState() => _AppBootstrapState();
@@ -91,14 +99,14 @@ class _AppBootstrapState extends State<_AppBootstrap> {
   @override
   void initState() {
     super.initState();
-    AnalyticsService().logScreenView(screenName: 'splash');
+    widget.analytics.logScreenView(screenName: 'splash');
     _bootstrap();
   }
 
   Future<void> _bootstrap() async {
     await Future<void>.delayed(_minSplash);
     if (!mounted) return;
-    AnalyticsService().logScreenView(screenName: 'home');
+    widget.analytics.logScreenView(screenName: 'home');
     setState(() => _ready = true);
   }
 

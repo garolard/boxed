@@ -15,5 +15,8 @@ final igdbServiceProvider =
           analytics: ref.read(analyticsServiceProvider),
         ));
 
-final analyticsServiceProvider =
-    Provider<AnalyticsService>((ref) => AnalyticsService());
+final analyticsServiceProvider = Provider<AnalyticsService>((ref) {
+  throw UnsupportedError(
+    'Override analyticsServiceProvider with an initialized instance in main.dart',
+  );
+});

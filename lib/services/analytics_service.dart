@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Typed parameter bundle for a search event.
 class SearchEventParams {
@@ -79,12 +80,27 @@ class IgdbErrorParams {
 class AnalyticsService {
   final FirebaseAnalytics _analytics;
   final FirebaseCrashlytics _crashlytics;
+  final String _appVersion;
 
-  AnalyticsService({
+  AnalyticsService._({
+    required this._appVersion,
     FirebaseAnalytics? analytics,
     FirebaseCrashlytics? crashlytics,
   })  : _analytics = analytics ?? FirebaseAnalytics.instance,
-        _crashlytics = crashlytics ?? FirebaseCrashlytics.instance;
+        _crashlytics = crashlytics ?? FirebaseCrashlytics.instance {
+    // Attach the app version to every analytics event automatically.
+    _analytics.setDefaultEventParameters({'app_version': _appVersion});
+    // Also attach it to every Crashlytics report as a custom key.
+    _crashlytics.setCustomKey('app_version', _appVersion);
+  }
+
+  /// Async factory that reads the real app version before constructing the
+  /// service. Call this in `main()` before `runApp()`.
+  static Future<AnalyticsService> create() async {
+    final info = await PackageInfo.fromPlatform();
+    final version = '${info.version}+${info.buildNumber}';
+    return AnalyticsService._(appVersion: version);
+  }
 
   // ------------------------------------------------------------------
   //  Screen tracking
