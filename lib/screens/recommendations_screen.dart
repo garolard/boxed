@@ -6,6 +6,7 @@ import '../models/game.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
+import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
@@ -27,6 +28,7 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
   @override
   void initState() {
     super.initState();
+    ref.read(analyticsServiceProvider).logScreenView(screenName: 'recommendations');
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => ref.read(collectionProvider.notifier).loadRecommendations(),
     );

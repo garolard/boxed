@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../models/shared_collection.dart';
 import '../l10n/l10n.dart';
+import '../providers/services.dart';
 import '../providers/shared_collections_provider.dart';
 import '../services/qr_payload_codec.dart';
 import '../services/qr_scan_service.dart';
@@ -32,6 +33,7 @@ class _SharedCollectionsScreenState
 
   Future<void> _scan({required bool fromCamera}) async {
     final notifier = ref.read(sharedCollectionsProvider.notifier);
+    final analytics = ref.read(analyticsServiceProvider);
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
@@ -58,16 +60,27 @@ class _SharedCollectionsScreenState
         return;
       }
       final saved = await notifier.importFromPayload(payload);
+      await analytics.logSharedCollectionCreated(gameCount: saved.games.length);
       if (!mounted) return;
       navigator.push(
         MaterialPageRoute(
           builder: (_) => SharedCollectionDetailScreen(collection: saved),
         ),
       );
-    } on FormatException {
+    } on FormatException catch (e) {
       _toast(messenger, l10n.qrDamaged);
+      await analytics.logError(
+        context: 'shared_collection_scan',
+        error: e,
+        extra: 'fromCamera=$fromCamera',
+      );
     } catch (e) {
       _toast(messenger, l10n.importFailed('$e'));
+      await analytics.logError(
+        context: 'shared_collection_scan',
+        error: e,
+        extra: 'fromCamera=$fromCamera',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -107,6 +120,14 @@ class _SharedCollectionsScreenState
       ),
     );
     if (ok == true) await notifier.delete(c.id);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(analyticsServiceProvider).logScreenView(
+          screenName: 'shared_collections',
+        );
   }
 
   @override

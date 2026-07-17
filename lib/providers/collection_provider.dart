@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
+import '../services/analytics_service.dart';
 import '../services/collection_repository.dart';
 import '../services/igdb_service.dart';
 import 'services.dart';
@@ -71,12 +72,14 @@ final collectionProvider =
 class CollectionNotifier extends Notifier<CollectionState> {
   late final CollectionRepository _repo;
   late final IgdbService _igdb;
+  late final AnalyticsService _analytics;
   bool _recsStale = true;
 
   @override
   CollectionState build() {
     _repo = ref.read(collectionRepositoryProvider);
     _igdb = ref.read(igdbServiceProvider);
+    _analytics = ref.read(analyticsServiceProvider);
     _load();
     return const CollectionState();
   }
@@ -84,6 +87,7 @@ class CollectionNotifier extends Notifier<CollectionState> {
   Future<void> _load() async {
     final games = await _repo.getAll();
     state = state.copyWith(games: games, loaded: true);
+    _analytics.setCrashlyticsKey('collection_size', games.length);
   }
 
   Future<void> add(Game game, {int? platformId, String? platformName}) async {
@@ -95,12 +99,28 @@ class CollectionNotifier extends Notifier<CollectionState> {
     await _repo.add(entry);
     _recsStale = true;
     await _load();
+    await _analytics.logGameAdded(GameAddedParams(
+      gameId: game.id,
+      gameName: game.name,
+      platformName: platformName,
+      genreCount: game.genres.length,
+      releaseYear: game.releaseYear,
+      rating: game.rating,
+      collectionSizeAfter: state.games.length,
+    ));
   }
 
   Future<void> remove(int gameId) async {
+    final removed = state.games.firstWhere((g) => g.id == gameId);
     await _repo.remove(gameId);
     _recsStale = true;
     await _load();
+    await _analytics.logGameRemoved(GameRemovedParams(
+      gameId: gameId,
+      gameName: removed.name,
+      platformName: removed.ownedPlatformName,
+      collectionSizeAfter: state.games.length,
+    ));
   }
 
   Future<String> exportCollection() => _repo.exportToFile(state.games);
@@ -137,8 +157,21 @@ class CollectionNotifier extends Notifier<CollectionState> {
       });
       _recsStale = false;
       state = state.copyWith(recommendations: fetched, recsLoading: false);
+      await _analytics.logRecommendationsLoaded(
+        recCount: fetched.length,
+        collectionSize: state.games.length,
+        hasError: false,
+        forced: force,
+      );
     } catch (e) {
       state = state.copyWith(recsLoading: false, recsError: e.toString());
+      await _analytics.logRecommendationsLoaded(
+        recCount: 0,
+        collectionSize: state.games.length,
+        hasError: true,
+        errorMessage: '$e',
+        forced: force,
+      );
     }
   }
 }

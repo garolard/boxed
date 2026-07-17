@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/shared_collection.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
+import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
@@ -19,6 +20,10 @@ class SharedCollectionDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(analyticsServiceProvider).logSharedCollectionViewed(
+          collectionId: collection.id,
+          gameCount: collection.games.length,
+        );
     final own = ref.watch(collectionProvider);
     final l10n = context.l10n;
     final ownedCount = collection.games.where((g) => own.contains(g.id)).length;

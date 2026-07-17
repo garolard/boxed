@@ -1,23 +1,56 @@
+import 'dart:async';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/l10n.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
+import 'services/analytics_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
+
+  // Initialise Firebase before anything else that might throw.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Pass all uncaught async errors to Crashlytics.
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  runApp(const ProviderScope(child: BoxedApp()));
+
+  final analytics = AnalyticsService();
+  await analytics.logAppOpen();
+
+  runZonedGuarded(
+    () => runApp(ProviderScope(child: const BoxedApp())),
+    (error, stack) {
+      analytics.logError(
+        context: 'main_zone_uncaught',
+        error: error,
+        stackTrace: stack,
+      );
+    },
+  );
 }
 
 class BoxedApp extends StatelessWidget {
@@ -58,12 +91,14 @@ class _AppBootstrapState extends State<_AppBootstrap> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService().logScreenView(screenName: 'splash');
     _bootstrap();
   }
 
   Future<void> _bootstrap() async {
     await Future<void>.delayed(_minSplash);
     if (!mounted) return;
+    AnalyticsService().logScreenView(screenName: 'home');
     setState(() => _ready = true);
   }
 

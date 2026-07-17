@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
 import '../providers/services.dart';
+import '../services/analytics_service.dart';
 import '../services/igdb_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
@@ -49,6 +50,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     super.initState();
     _focusNode.addListener(() => setState(() {}));
     _loadGenres();
+    ref.read(analyticsServiceProvider).logScreenView(screenName: 'search');
     final q = widget.initialQuery;
     if (q != null && q.isNotEmpty) {
       _controller.text = q;
@@ -78,13 +80,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _loading = true;
       _error = null;
     });
+    final platformName = _platformId == null
+        ? null
+        : kPlatforms.firstWhere((p) => p.id == _platformId).shortName;
+    final genreName = _genreId == null
+        ? null
+        : _genres.firstWhere((g) => g.id == _genreId).name;
     try {
       final results = await ref
           .read(igdbServiceProvider)
           .searchGames(query, platformId: _platformId, genreId: _genreId);
       if (mounted) setState(() => _results = results);
+      await ref.read(analyticsServiceProvider).logSearch(SearchEventParams(
+            query: query,
+            platformFilter: platformName,
+            genreFilter: genreName,
+            resultCount: results.length,
+          ));
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
+      await ref.read(analyticsServiceProvider).logSearch(SearchEventParams(
+            query: query,
+            platformFilter: platformName,
+            genreFilter: genreName,
+            resultCount: 0,
+            hasError: true,
+            errorMessage: '$e',
+          ));
     } finally {
       if (mounted) {
         setState(() {

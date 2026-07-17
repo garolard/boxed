@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
 import '../models/title_candidate.dart';
+import '../providers/services.dart';
 import '../services/cover_scan_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
@@ -12,19 +14,25 @@ import 'search_screen.dart';
 
 /// Take a picture of a game cover, OCR the text on it and let the user
 /// pick which detected title to search for.
-class ScanScreen extends StatefulWidget {
+class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
 
   @override
-  State<ScanScreen> createState() => _ScanScreenState();
+  ConsumerState<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen> {
+class _ScanScreenState extends ConsumerState<ScanScreen> {
   final _scanner = CoverScanService();
   List<TitleCandidate> _candidates = [];
   bool _scanning = false;
   bool _scanned = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(analyticsServiceProvider).logScreenView(screenName: 'scan');
+  }
 
   Future<void> _scan({required bool fromCamera}) async {
     setState(() {
@@ -39,8 +47,19 @@ class _ScanScreenState extends State<ScanScreen> {
           _scanned = true;
         });
       }
+      await ref.read(analyticsServiceProvider).logScanPerformed(
+            source: fromCamera ? 'camera' : 'gallery',
+            candidateCount: candidates.length,
+            hasError: false,
+          );
     } catch (e) {
       if (mounted) setState(() => _error = context.l10n.scanFailed('$e'));
+      await ref.read(analyticsServiceProvider).logScanPerformed(
+            source: fromCamera ? 'camera' : 'gallery',
+            candidateCount: 0,
+            hasError: true,
+            errorMessage: '$e',
+          );
     } finally {
       if (mounted) setState(() => _scanning = false);
     }

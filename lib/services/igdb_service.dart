@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/game.dart';
+import 'analytics_service.dart';
 
 class IgdbGenre {
   final int id;
@@ -30,9 +31,11 @@ class IgdbService {
       'similar_games;';
 
   final http.Client _client;
+  final AnalyticsService? _analytics;
   List<IgdbGenre>? _genresCache;
 
-  IgdbService({http.Client? client}) : _client = client ?? http.Client();
+  IgdbService({http.Client? client, this._analytics})
+      : _client = client ?? http.Client();
 
   String get _clientId => dotenv.env['IGDB_CLIENT_ID'] ?? '';
   String get _clientSecret => dotenv.env['IGDB_SECRET_ID'] ?? '';
@@ -53,8 +56,15 @@ class IgdbService {
       'grant_type': 'client_credentials',
     });
     if (res.statusCode != 200) {
-      throw IgdbException('IGDB auth failed (${res.statusCode}). '
-          'Check IGDB_CLIENT_ID / IGDB_SECRET_ID in .env');
+      final message =
+          'IGDB auth failed (${res.statusCode}). Check IGDB_CLIENT_ID / IGDB_SECRET_ID in .env';
+      _analytics?.logIgdbError(IgdbErrorParams(
+        endpoint: 'oauth2/token',
+        statusCode: res.statusCode,
+        errorMessage: message,
+        isAuthError: true,
+      ));
+      throw IgdbException(message);
     }
     final json = jsonDecode(res.body) as Map<String, dynamic>;
     final newToken = json['access_token'] as String;
@@ -75,7 +85,14 @@ class IgdbService {
       res = await _post(endpoint, body, token);
     }
     if (res.statusCode != 200) {
-      throw IgdbException('IGDB request failed (${res.statusCode}): ${res.body}');
+      final message = 'IGDB request failed (${res.statusCode}): ${res.body}';
+      _analytics?.logIgdbError(IgdbErrorParams(
+        endpoint: endpoint,
+        statusCode: res.statusCode,
+        errorMessage: message,
+        isAuthError: res.statusCode == 401,
+      ));
+      throw IgdbException(message);
     }
     return jsonDecode(res.body) as List<dynamic>;
   }

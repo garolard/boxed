@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../models/game.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
+import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
@@ -25,19 +26,22 @@ import 'scan_screen.dart';
 import 'search_screen.dart';
 import 'shared_collections_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _tab = 0;
+
+  static const _tabNames = ['shelf', 'search', 'scan', 'recs'];
 
   void _setTab(int i) {
     if (!mounted) return;
     setState(() => _tab = i);
+    ref.read(analyticsServiceProvider).logTabChanged(tabName: _tabNames[i]);
   }
 
   @override
@@ -241,6 +245,8 @@ class _SummaryTab extends ConsumerWidget {
   Future<void> _export(BuildContext context, WidgetRef ref) async {
     final subject = context.l10n.shareSubject;
     final path = await ref.read(collectionProvider.notifier).exportCollection();
+    final count = ref.read(collectionProvider).games.length;
+    await ref.read(analyticsServiceProvider).logCollectionExported(gameCount: count);
     await SharePlus.instance.share(
       ShareParams(files: [XFile(path)], subject: subject),
     );
@@ -249,6 +255,7 @@ class _SummaryTab extends ConsumerWidget {
   Future<void> _import(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
+    final analytics = ref.read(analyticsServiceProvider);
     final jsonGroup = XTypeGroup(
       label: l10n.fileLabelJson,
       extensions: const ['json'],
@@ -262,12 +269,23 @@ class _SummaryTab extends ConsumerWidget {
       final result = await ref
           .read(collectionProvider.notifier)
           .importCollection(path);
+      await analytics.logCollectionImported(
+        importedCount: result.imported,
+        skippedCount: result.skipped,
+        hasError: false,
+      );
       messenger.showSnackBar(
         SnackBar(
           content: Text(l10n.importResult(result.imported, result.skipped)),
         ),
       );
     } catch (e) {
+      await analytics.logCollectionImported(
+        importedCount: 0,
+        skippedCount: 0,
+        hasError: true,
+        errorMessage: '$e',
+      );
       messenger.showSnackBar(SnackBar(content: Text(l10n.importFailed('$e'))));
     }
   }
@@ -302,12 +320,17 @@ class _SummaryTab extends ConsumerWidget {
                   color: AppColors.textPrimary,
                 ),
                 tooltip: l10n.sharedCollectionsTooltip,
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const SharedCollectionsScreen(),
-                  ),
-                ),
+                onPressed: () {
+                  ref.read(analyticsServiceProvider).logScreenView(
+                    screenName: 'shared_collections',
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SharedCollectionsScreen(),
+                    ),
+                  );
+                },
               ),
               PopupMenuButton<String>(
                 icon: const Icon(
@@ -317,7 +340,13 @@ class _SummaryTab extends ConsumerWidget {
                 onSelected: (v) => switch (v) {
                   'export' => _export(context, ref),
                   'import' => _import(context, ref),
-                  _ => showShareQrSheet(context),
+                  _ => () {
+                      final count = ref.read(collectionProvider).games.length;
+                      ref.read(analyticsServiceProvider).logShareQrGenerated(
+                        gameCount: count,
+                      );
+                      showShareQrSheet(context);
+                    }(),
                 },
                 itemBuilder: (_) => [
                   PopupMenuItem(

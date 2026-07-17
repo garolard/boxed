@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/game.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
+import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import 'platform_badge.dart';
 
@@ -16,6 +17,10 @@ Future<void> addGameFlow(
   String? platformName;
 
   if (game.platformNames.length > 1) {
+    ref.read(analyticsServiceProvider).logPlatformPickerShown(
+          gameId: game.id,
+          platformCount: game.platformNames.length,
+        );
     final choice = await showModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,

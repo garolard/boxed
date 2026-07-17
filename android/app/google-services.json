@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "317062526233",
+    "project_id": "boxed-bc996",
+    "storage_bucket": "boxed-bc996.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317062526233:android:344481d7440b94c20a4188",
+        "android_client_info": {
+          "package_name": "com.apps4fun.boxed"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6mwwcklEo0NE59wXcHbp0JJb7tVGPQmc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

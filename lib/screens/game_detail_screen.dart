@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/game.dart';
 import '../l10n/l10n.dart';
 import '../providers/collection_provider.dart';
+import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
@@ -24,6 +25,11 @@ class GameDetailScreen extends ConsumerWidget {
     final owned = ref.watch(
       collectionProvider.select((s) => s.contains(game.id)),
     );
+    ref.read(analyticsServiceProvider).logGameDetailView(
+          gameId: game.id,
+          gameName: game.name,
+          isOwned: owned,
+        );
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
