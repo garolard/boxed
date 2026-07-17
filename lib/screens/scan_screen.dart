@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../l10n/l10n.dart';
+import '../models/title_candidate.dart';
 import '../services/cover_scan_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
@@ -20,7 +21,7 @@ class ScanScreen extends StatefulWidget {
 
 class _ScanScreenState extends State<ScanScreen> {
   final _scanner = CoverScanService();
-  List<String> _candidates = [];
+  List<TitleCandidate> _candidates = [];
   bool _scanning = false;
   bool _scanned = false;
   String? _error;
@@ -190,8 +191,8 @@ class _ScanScreenState extends State<ScanScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: _CandidateTile(
-                      text: _candidates[i],
-                      onTap: () => _searchFor(_candidates[i]),
+                      candidate: _candidates[i],
+                      onTap: () => _searchFor(_candidates[i].title),
                       index: i,
                     ),
                   ),
@@ -264,11 +265,11 @@ class _ScanIntro extends StatelessWidget {
 }
 
 class _CandidateTile extends StatelessWidget {
-  final String text;
+  final TitleCandidate candidate;
   final VoidCallback onTap;
   final int index;
   const _CandidateTile({
-    required this.text,
+    required this.candidate,
     required this.onTap,
     required this.index,
   });
@@ -305,7 +306,7 @@ class _CandidateTile extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      text,
+                      candidate.title,
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.w700,
@@ -313,6 +314,9 @@ class _CandidateTile extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  _ConfidenceBadge(percent: candidate.confidencePercent),
+                  const SizedBox(width: 8),
                   const Icon(
                     Icons.arrow_forward_rounded,
                     color: AppColors.textMuted,
@@ -325,5 +329,37 @@ class _CandidateTile extends StatelessWidget {
         .animate()
         .fadeIn(duration: 300.ms, delay: (60 * index).ms)
         .slideX(begin: 0.1, end: 0, duration: 350.ms, delay: (60 * index).ms);
+  }
+}
+
+/// Small pill showing how confident the model is about a candidate title.
+class _ConfidenceBadge extends StatelessWidget {
+  final int percent;
+  const _ConfidenceBadge({required this.percent});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = percent >= 75
+        ? AppColors.accent
+        : percent >= 45
+            ? AppColors.textSecondary
+            : AppColors.textMuted;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Text(
+        '$percent%',
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
   }
 }
