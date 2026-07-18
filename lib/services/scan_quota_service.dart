@@ -51,6 +51,7 @@ class ScanQuotaService {
   final bool _isPremiumOverride;
 
   ScanQuota? _cachedQuota;
+  Stream<ScanQuota>? _quotaStream;
 
   ScanQuotaService({
     required FirebaseFirestore firestore,
@@ -75,7 +76,10 @@ class ScanQuotaService {
 
   /// Live stream of the quota doc. Re-emits on every Firestore change.
   /// Fail-closed: any read error emits [ScanQuota.readFailed == true].
+  /// Cached as a singleton to prevent N+1 Firestore listeners.
   Stream<ScanQuota> quotaStream() {
+    if (_quotaStream != null) return _quotaStream!;
+
     final doc = _doc;
     if (doc == null) {
       return Stream.value(
@@ -108,7 +112,9 @@ class ScanQuotaService {
       cancelOnError: false,
     );
     ctrl.onCancel = () => sub.cancel();
-    return ctrl.stream;
+
+    _quotaStream = ctrl.stream;
+    return _quotaStream!;
   }
 
   /// Whether the user may start a new scan right now.

@@ -134,27 +134,33 @@ class _AppBootstrapState extends State<_AppBootstrap> {
       } catch (_) {}
     }
 
+    // Provision the quota doc in parallel with the splash delay.
+    // Uses a transaction to make the existence check + conditional write
+    // a single round-trip instead of two sequential Firestore calls.
+    Future<void> provisionQuotaDoc() async {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
+      await FirebaseFirestore.instance.runTransaction((tx) async {
+        final snap = await tx.get(docRef);
+        if (!snap.exists) {
+          tx.set(docRef, {
+            'scansUsed': 0,
+            'isPremium': false,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      });
+    }
+
     await Future.wait([
-      signIn(),
+      signIn().then((_) => provisionQuotaDoc()),
       Future<void>.delayed(_minSplash),
     ]);
 
     if (!mounted) return;
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final docRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid);
-      final snap = await docRef.get();
-      if (!snap.exists) {
-        await docRef.set({
-          'scansUsed': 0,
-          'isPremium': false,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-      }
-    }
 
     widget.analytics.logScreenView(screenName: 'home');
     setState(() => _ready = true);
