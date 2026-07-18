@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_theme.dart';
 
@@ -39,9 +38,10 @@ class SplashScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 36),
                   Center(
-                    child: Text(
+                    child:                     Text(
                       'BOXED',
-                      style: GoogleFonts.bungee(
+                      style: const TextStyle(
+                        fontFamily: 'Bungee',
                         fontSize: 38,
                         letterSpacing: 6,
                         color: AppColors.textPrimary,
@@ -53,9 +53,10 @@ class SplashScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Center(
-                    child: Text(
+                    child:                     Text(
                       'YOUR GAMES, ORGANIZED',
-                      style: GoogleFonts.bungee(
+                      style: const TextStyle(
+                        fontFamily: 'Bungee',
                         fontSize: 11,
                         letterSpacing: 4,
                         color: AppColors.textMuted,
