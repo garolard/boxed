@@ -278,6 +278,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unknownPlatform => 'Inconnu';
 
   @override
+  String get paywallTitle => 'Débloquez les scans illimités';
+
+  @override
+  String get paywallSubtitle =>
+      'Scannez autant de jaquettes que vous voulez avec un abonnement premium.';
+
+  @override
+  String get paywallFeature1 => 'Scans de jaquettes illimités';
+
+  @override
+  String get paywallFeature2 => 'Précision de reconnaissance avancée';
+
+  @override
+  String get paywallFeature3 => 'Accès prioritaire à OpenAI Vision';
+
+  @override
+  String get paywallCta => 'S\'abonner';
+
+  @override
+  String get paywallRestore => 'Restaurer les achats';
+
+  @override
+  String get paywallComingSoon => 'Bientôt disponible — restez à l\'écoute !';
+
+  @override
+  String freeScansRemaining(int left, int total) {
+    return '$left sur $total scans gratuits restants';
+  }
+
+  @override
   String get owned => 'À VOUS';
 
   @override

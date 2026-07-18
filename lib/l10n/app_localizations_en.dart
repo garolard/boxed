@@ -277,6 +277,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unknownPlatform => 'Unknown';
 
   @override
+  String get paywallTitle => 'Unlock Unlimited Scans';
+
+  @override
+  String get paywallSubtitle =>
+      'Scan as many game covers as you want with a premium subscription.';
+
+  @override
+  String get paywallFeature1 => 'Unlimited cover scans';
+
+  @override
+  String get paywallFeature2 => 'Advanced recognition accuracy';
+
+  @override
+  String get paywallFeature3 => 'Priority OpenAI vision access';
+
+  @override
+  String get paywallCta => 'Subscribe';
+
+  @override
+  String get paywallRestore => 'Restore purchases';
+
+  @override
+  String get paywallComingSoon => 'Coming soon — stay tuned!';
+
+  @override
+  String freeScansRemaining(int left, int total) {
+    return '$left of $total free scans left';
+  }
+
+  @override
   String get owned => 'OWNED';
 
   @override

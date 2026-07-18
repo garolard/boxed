@@ -562,6 +562,60 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get unknownPlatform;
 
+  /// No description provided for @paywallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Unlimited Scans'**
+  String get paywallTitle;
+
+  /// No description provided for @paywallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan as many game covers as you want with a premium subscription.'**
+  String get paywallSubtitle;
+
+  /// No description provided for @paywallFeature1.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited cover scans'**
+  String get paywallFeature1;
+
+  /// No description provided for @paywallFeature2.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced recognition accuracy'**
+  String get paywallFeature2;
+
+  /// No description provided for @paywallFeature3.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority OpenAI vision access'**
+  String get paywallFeature3;
+
+  /// No description provided for @paywallCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get paywallCta;
+
+  /// No description provided for @paywallRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get paywallRestore;
+
+  /// No description provided for @paywallComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon — stay tuned!'**
+  String get paywallComingSoon;
+
+  /// No description provided for @freeScansRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{left} of {total} free scans left'**
+  String freeScansRemaining(int left, int total);
+
   /// No description provided for @owned.
   ///
   /// In en, this message translates to:
