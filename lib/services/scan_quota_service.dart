@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -81,24 +83,31 @@ class ScanQuotaService {
       );
     }
 
-    return doc.snapshots().map((snap) {
-      if (!snap.exists) {
-        return const ScanQuota();
-      }
-      final data = snap.data()!;
-      final quota = ScanQuota(
-        scansUsed: (data['scansUsed'] as num?)?.toInt() ?? 0,
-        isPremium: data['isPremium'] == true || _isPremiumOverride,
-      );
-      _cachedQuota = quota;
-      return quota;
-    }).handleError((Object _) {
-      return ScanQuota(
-        scansUsed: kFreeScanLimit,
-        isPremium: _isPremiumOverride,
-        readFailed: true,
-      );
-    });
+    final ctrl = StreamController<ScanQuota>.broadcast();
+    doc.snapshots().listen(
+      (snap) {
+        if (!snap.exists) {
+          ctrl.add(const ScanQuota());
+          return;
+        }
+        final data = snap.data()!;
+        final quota = ScanQuota(
+          scansUsed: (data['scansUsed'] as num?)?.toInt() ?? 0,
+          isPremium: data['isPremium'] == true || _isPremiumOverride,
+        );
+        _cachedQuota = quota;
+        ctrl.add(quota);
+      },
+      onError: (_) {
+        ctrl.add(ScanQuota(
+          scansUsed: kFreeScanLimit,
+          isPremium: _isPremiumOverride,
+          readFailed: true,
+        ));
+      },
+      cancelOnError: false,
+    );
+    return ctrl.stream;
   }
 
   /// Whether the user may start a new scan right now.
