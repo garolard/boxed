@@ -84,7 +84,7 @@ class ScanQuotaService {
     }
 
     final ctrl = StreamController<ScanQuota>.broadcast();
-    doc.snapshots().listen(
+    final sub = doc.snapshots().listen(
       (snap) {
         if (!snap.exists) {
           ctrl.add(const ScanQuota());
@@ -107,6 +107,7 @@ class ScanQuotaService {
       },
       cancelOnError: false,
     );
+    ctrl.onCancel = () => sub.cancel();
     return ctrl.stream;
   }
 
