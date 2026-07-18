@@ -371,7 +371,7 @@ import 'services/scan_quota_service.dart';
 
 *(Non-testable step — standard format, no RED/GREEN needed because the widget is not yet integrated into any page)*
 
-- [ ] Create `lib/screens/paywall_screen.dart`:
+- [x] Create `lib/screens/paywall_screen.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -478,8 +478,8 @@ class _FeatureRow extends StatelessWidget {
 ##### Step 4 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — clean
-- [ ] `flutter build apk --debug` — succeeds
+- [x] `flutter analyze` — clean
+- [x] `flutter build apk --debug` — succeeds
 
 *(No Human checks — widget is not yet rendered in the app. Browser verifications deferred to Step 5 where it is first integrated.)*
 
