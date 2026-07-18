@@ -278,7 +278,7 @@ final scanQuotaServiceProvider = Provider<ScanQuotaService>((ref) {
 
 *(Non-testable step — standard format, no RED/GREEN needed because this is config/bootstrap orchestration)*
 
-- [ ] Add the following imports at the top of `lib/main.dart`:
+- [x] Add the following imports at the top of `lib/main.dart`:
 
 ```dart
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -286,7 +286,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'services/scan_quota_service.dart';
 ```
 
-- [ ] Replace the body of `_AppBootstrapState._bootstrap` (`lib/main.dart:106`) with:
+- [x] Replace the body of `_AppBootstrapState._bootstrap` (`lib/main.dart:106`) with:
 
 ```dart
   Future<void> _bootstrap() async {
@@ -319,7 +319,7 @@ import 'services/scan_quota_service.dart';
   }
 ```
 
-- [ ] Resolve the `isPremiumOverride` bool once in `main()`, just before `runZonedGuarded`, and add the provider override. Replace the existing `runZonedGuarded` block in `lib/main.dart` (`lines 45–59`) with:
+- [x] Resolve the `isPremiumOverride` bool once in `main()`, just before `runZonedGuarded`, and add the provider override. Replace the existing `runZonedGuarded` block in `lib/main.dart` (`lines 45–59`) with:
 
 ```dart
   final isPremiumOverride =
@@ -352,12 +352,12 @@ import 'services/scan_quota_service.dart';
 ##### Step 3 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — clean
-- [ ] `flutter build apk --debug` — succeeds
+- [x] `flutter analyze` — clean
+- [x] `flutter build apk --debug` — succeeds
 
 **Human (verify in browser before committing):**
-- [ ] Cold-start the app with network on: splash shows for at least 1500ms, then crossfades to home
-- [ ] Cold-start the app with airplane mode on: splash stays until auth resolves (or fails), then home appears; no crash
+- [x] Cold-start the app with network on: splash shows for at least 1500ms, then crossfades to home
+- [x] Cold-start the app with airplane mode on: splash stays until auth resolves (or fails), then home appears; no crash
 
 #### Step 3 STOP & COMMIT
 
@@ -1202,3 +1202,15 @@ class _FakeUser implements User {
 **sai-4-apply:** Run all Automated checks above and confirm they pass before stopping.
 
 **STOP & COMMIT:** Stage and commit after Automated checks pass. No browser verification required at this step.
+
+## Appendix: Plan vs Final Implementation
+
+This section documents deviations between the original plan and the code that was actually merged.
+
+### Step 3 — Auth timeout for offline resilience
+
+**Plan:** The `_bootstrap` method used `FirebaseAuth.instance.signInAnonymously()` directly in `Future.wait` with no timeout.
+
+**Final:** Wrapped `signInAnonymously()` in a local `signIn()` helper with `.timeout(const Duration(seconds: 5))` and a catch-all. When auth fails or times out, `currentUser` is null and the Firestore document creation is skipped entirely, so the app gracefully transitions to home without quota tracking.
+
+**Reason:** On airplane mode, Firebase Auth blocks indefinitely (trying to resolve google APIs), keeping the splash screen on screen forever. Without the timeout the app is unusable offline. The graceful fallback (no auth → no quota doc → service streams `readFailed`) is the cleanest way to preserve the "no login required" UX while avoiding a hang.

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +17,7 @@ import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'providers/services.dart';
 import 'services/analytics_service.dart';
+import 'services/scan_quota_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
 
@@ -42,10 +45,20 @@ Future<void> main() async {
   final analytics = await AnalyticsService.create();
   await analytics.logAppOpen();
 
+  final isPremiumOverride =
+      (dotenv.env['IS_PREMIUM'] ?? '').trim().toLowerCase() == 'true';
+
+  final scanQuotaService = ScanQuotaService(
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+    isPremiumOverride: isPremiumOverride,
+  );
+
   runZonedGuarded(
     () => runApp(ProviderScope(
       overrides: [
         analyticsServiceProvider.overrideWithValue(analytics),
+        scanQuotaServiceProvider.overrideWithValue(scanQuotaService),
       ],
       child: BoxedApp(analytics: analytics),
     )),
@@ -104,8 +117,42 @@ class _AppBootstrapState extends State<_AppBootstrap> {
   }
 
   Future<void> _bootstrap() async {
-    await Future<void>.delayed(_minSplash);
+    // Run anonymous auth in parallel with the existing minimum splash delay.
+    //
+    // Trade-off: on Android, uninstalling the app rotates SSAID and the next
+    // install gets a fresh anonymous uid + a fresh counter, so the quota can
+    // be reset. iOS is unaffected because the Firebase Anonymous Auth uid is
+    // stored in the iOS Keychain, which survives uninstall. This is the
+    // documented, accepted trade-off for the "no login required" stance.
+    //
+    // A 5-second timeout on auth ensures that on airplane mode the splash
+    // screen eventually transitions to home rather than hanging forever.
+    Future<void> signIn() async {
+      try {
+        await FirebaseAuth.instance.signInAnonymously()
+            .timeout(const Duration(seconds: 5));
+      } catch (_) {}
+    }
+
+    await Future.wait([
+      signIn(),
+      Future<void>.delayed(_minSplash),
+    ]);
+
     if (!mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({
+          'scansUsed': 0,
+          'isPremium': false,
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+    }
+
     widget.analytics.logScreenView(screenName: 'home');
     setState(() => _ready = true);
   }
