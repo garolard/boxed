@@ -62,8 +62,18 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     try {
       final candidates = await _scanner.scan(fromCamera: fromCamera);
       if (candidates.isNotEmpty) {
-        recorded = true;
-        await ref.read(scanQuotaServiceProvider).recordScan();
+        final ok = await ref.read(scanQuotaServiceProvider).tryRecordScan();
+        if (!ok && mounted) {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (_) => const PaywallScreen(),
+            ),
+          );
+          return;
+        }
+        recorded = ok;
       }
       if (mounted) {
         setState(() {

@@ -126,6 +126,21 @@ class ScanQuotaService {
     await doc.set({'scansUsed': FieldValue.increment(1)}, SetOptions(merge: true));
   }
 
+  /// Atomically checks quota and increments in a single Firestore transaction.
+  /// Returns `true` if the scan was recorded, `false` if the quota is exhausted.
+  Future<bool> tryRecordScan() async {
+    if (_effectivePremium) return true;
+    final doc = _doc;
+    if (doc == null) return false;
+    return await _firestore.runTransaction((tx) async {
+      final snap = await tx.get(doc);
+      final current = (snap.data()?['scansUsed'] as num?)?.toInt() ?? 0;
+      if (current >= kFreeScanLimit) return false;
+      tx.update(doc, {'scansUsed': current + 1});
+      return true;
+    });
+  }
+
   /// Atomically decrement [scansUsed] by 1, clamped at 0. No-op if premium.
   Future<void> decrementScan() async {
     if (_effectivePremium) return;
