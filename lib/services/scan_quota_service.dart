@@ -88,14 +88,14 @@ class ScanQuotaService {
       final data = snap.data()!;
       final quota = ScanQuota(
         scansUsed: (data['scansUsed'] as num?)?.toInt() ?? 0,
-        isPremium: data['isPremium'] == true,
+        isPremium: data['isPremium'] == true || _isPremiumOverride,
       );
       _cachedQuota = quota;
       return quota;
     }).handleError((Object _) {
-      return const ScanQuota(
+      return ScanQuota(
         scansUsed: kFreeScanLimit,
-        isPremium: false,
+        isPremium: _isPremiumOverride,
         readFailed: true,
       );
     });

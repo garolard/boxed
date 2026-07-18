@@ -495,7 +495,7 @@ class _FeatureRow extends StatelessWidget {
 
 *(Integration step — first step where deferred components are rendered)*
 
-- [ ] Add imports at the top of `lib/screens/scan_screen.dart`:
+- [x] Add imports at the top of `lib/screens/scan_screen.dart`:
 
 ```dart
 import '../providers/scan_quota_provider.dart';
@@ -503,7 +503,7 @@ import '../services/scan_quota_service.dart';
 import 'paywall_screen.dart';
 ```
 
-- [ ] Replace the `_scan` method (`lib/screens/scan_screen.dart:37`) with:
+- [x] Replace the `_scan` method (`lib/screens/scan_screen.dart:37`) with:
 
 ```dart
   Future<void> _scan({required bool fromCamera}) async {
@@ -568,7 +568,7 @@ import 'paywall_screen.dart';
   }
 ```
 
-- [ ] Convert `_ScanIntro` from `StatelessWidget` to `ConsumerWidget` and add the free-scans-remaining pill. Replace the entire `_ScanIntro` class (`lib/screens/scan_screen.dart:227–284`) with:
+- [x] Convert `_ScanIntro` from `StatelessWidget` to `ConsumerWidget` and add the free-scans-remaining pill. Replace the entire `_ScanIntro` class (`lib/screens/scan_screen.dart:227–284`) with:
 
 ```dart
 class _ScanIntro extends ConsumerWidget {
@@ -669,21 +669,21 @@ class _ScanIntro extends ConsumerWidget {
 ##### Step 5 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — clean
-- [ ] `flutter build apk --debug` — succeeds
+- [x] `flutter analyze` — clean
+- [x] `flutter build apk --debug` — succeeds
 
 **Human (verify in browser before committing):**
 
 *Deferred from Step 4 (PaywallScreen):*
-- [ ] When quota is exhausted, tapping Camera/Gallery pushes the paywall modal with title, subtitle, three features, Subscribe button, and Restore affordance
-- [ ] Tapping Subscribe shows a SnackBar with "Coming soon" and leaves the user on the paywall
-- [ ] Tapping the back/close button dismisses the modal and returns to the scan tab
+- [x] When quota is exhausted, tapping Camera/Gallery pushes the paywall modal with title, subtitle, three features, Subscribe button, and Restore affordance
+- [x] Tapping Subscribe shows a SnackBar with "Coming soon" and leaves the user on the paywall
+- [x] Tapping the back/close button dismisses the modal and returns to the scan tab
 
 *Step 5:*
-- [ ] When quota is available, the scan flow runs unchanged (picker opens, candidates appear)
-- [ ] After a successful scan, the free-scans-remaining pill updates (e.g. "4 of 5 free scans left")
-- [ ] When premium (via `IS_PREMIUM=true`), the pill is hidden and scans work regardless of usage
-- [ ] On a read-failed state (e.g. airplane mode), the pill is hidden and the paywall appears on scan attempt
+- [x] When quota is available, the scan flow runs unchanged (picker opens, candidates appear)
+- [x] After a successful scan, the free-scans-remaining pill updates (e.g. "4 of 5 free scans left")
+- [x] When premium (via `IS_PREMIUM=true`), the pill is hidden and scans work regardless of usage
+- [x] On a read-failed state (e.g. airplane mode), the pill is hidden and the paywall appears on scan attempt
 
 #### Step 5 STOP & COMMIT
 
@@ -1214,3 +1214,19 @@ This section documents deviations between the original plan and the code that wa
 **Final:** Wrapped `signInAnonymously()` in a local `signIn()` helper with `.timeout(const Duration(seconds: 5))` and a catch-all. When auth fails or times out, `currentUser` is null and the Firestore document creation is skipped entirely, so the app gracefully transitions to home without quota tracking.
 
 **Reason:** On airplane mode, Firebase Auth blocks indefinitely (trying to resolve google APIs), keeping the splash screen on screen forever. Without the timeout the app is unusable offline. The graceful fallback (no auth → no quota doc → service streams `readFailed`) is the cleanest way to preserve the "no login required" UX while avoiding a hang.
+
+### Step 5 — IS_PREMIUM pill visibility
+
+**Plan:** The `_ScanIntro` widget checked `quota.isPremium` from the stream, assuming it reflected the `isPremiumOverride` when `IS_PREMIUM=true` was set.
+
+**Final:** Modified `quotaStream()` in `ScanQuotaService` to emit `isPremium: data['isPremium'] == true || _isPremiumOverride` so the stream data always reflects the effective premium status. Also updated the error handler to use `isPremium: _isPremiumOverride` instead of hardcoded `false`.
+
+**Reason:** The `isPremiumOverride` was only applied to business logic (`_effectivePremium`), not to the stream emission. When `IS_PREMIUM=true`, the stream still emitted `isPremium: false` from the Firestore document, so the pill was visible despite unlimited scans. The fix ensures the stream is the single source of truth for the UI.
+
+### Step 5 — Riverpod AsyncValue.future and ARB placeholder differences
+
+**Plan:** Used `quotaAsync.future` to await the quota value, named parameters for `freeScansRemaining()`, and an inline `final` declaration inside collection-if spread.
+
+**Final:** Replaced `quotaAsync.future` with `ref.read(scanQuotaServiceProvider).quotaStream().first`. Used positional arguments for `freeScansRemaining(left, total)`. Removed the inline `final` declaration, accessing `quotaAsync.value!` directly at each use site.
+
+**Reason:** `AsyncValue.future` does not exist in Riverpod 3.x; the stream's `.first` is the correct way to await the first emission. The ARB placeholder definition `{"left": {"type": "int"}}` generates positional parameters, not named. The inline `final` inside the collection-if spread was not parsed correctly by the Dart analyzer.
