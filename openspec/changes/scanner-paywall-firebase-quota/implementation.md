@@ -91,7 +91,7 @@ Add a server-side scan quota backed by Firestore and anonymous Firebase Auth, wi
 
 *(Non-testable step — standard format, no RED/GREEN needed because the service is not yet instantiated or referenced by any widget)*
 
-- [ ] Create `lib/services/scan_quota_service.dart`:
+- [x] Create `lib/services/scan_quota_service.dart`:
 
 ```dart
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -228,7 +228,7 @@ class ScanQuotaService {
 }
 ```
 
-- [ ] Create `lib/providers/scan_quota_provider.dart`:
+- [x] Create `lib/providers/scan_quota_provider.dart`:
 
 ```dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -242,7 +242,7 @@ final scanQuotaProvider = StreamProvider<ScanQuota>((ref) {
 });
 ```
 
-- [ ] Add `scanQuotaServiceProvider` to `lib/providers/services.dart`:
+- [x] Add `scanQuotaServiceProvider` to `lib/providers/services.dart`:
 
 ```dart
 import '../services/scan_quota_service.dart';
@@ -261,8 +261,8 @@ final scanQuotaServiceProvider = Provider<ScanQuotaService>((ref) {
 ##### Step 2 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — clean
-- [ ] `flutter build apk --debug` — succeeds (or `flutter build ios --debug` on macOS)
+- [x] `flutter analyze` — clean
+- [x] `flutter build apk --debug` — succeeds (or `flutter build ios --debug` on macOS)
 
 *(No Human checks — providers are not yet wired into any widget.)*
 
