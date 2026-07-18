@@ -143,14 +143,17 @@ class _AppBootstrapState extends State<_AppBootstrap> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance
+      final docRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
-          .set({
+          .doc(user.uid);
+      final snap = await docRef.get();
+      if (!snap.exists) {
+        await docRef.set({
           'scansUsed': 0,
           'isPremium': false,
           'createdAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+        });
+      }
     }
 
     widget.analytics.logScreenView(screenName: 'home');

@@ -123,7 +123,7 @@ class ScanQuotaService {
     if (_effectivePremium) return;
     final doc = _doc;
     if (doc == null) return;
-    await doc.update({'scansUsed': FieldValue.increment(1)});
+    await doc.set({'scansUsed': FieldValue.increment(1)}, SetOptions(merge: true));
   }
 
   /// Atomically decrement [scansUsed] by 1, clamped at 0. No-op if premium.
