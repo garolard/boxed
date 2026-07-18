@@ -20,14 +20,14 @@ Add a server-side scan quota backed by Firestore and anonymous Firebase Auth, wi
 
 *(Non-testable step — standard format, no RED/GREEN needed because no source code references the new keys yet)*
 
-- [ ] Add `firebase_auth` and `cloud_firestore` to `pubspec.yaml` under `dependencies:` (pinned to versions compatible with `firebase_core: ^3.13.0`):
+- [x] Add `firebase_auth` and `cloud_firestore` to `pubspec.yaml` under `dependencies:` (pinned to versions compatible with `firebase_core: ^3.13.0`):
 
 ```yaml
   firebase_auth: ^5.5.2
   cloud_firestore: ^5.6.6
 ```
 
-- [ ] Append eight new keys to `lib/l10n/app_en.arb` (the template locale), including the `@freeScansRemaining` metadata block:
+- [x] Append eight new keys to `lib/l10n/app_en.arb` (the template locale), including the `@freeScansRemaining` metadata block:
 
 ```json
   "paywallTitle": "Unlock Unlimited Scans",
@@ -42,7 +42,7 @@ Add a server-side scan quota backed by Firestore and anonymous Firebase Auth, wi
   "@freeScansRemaining": {"placeholders": {"left": {"type": "int"}, "total": {"type": "int"}}},
 ```
 
-- [ ] Append the same eight string keys (without `@key` metadata blocks) to `lib/l10n/app_es.arb`:
+- [x] Append the same eight string keys (without `@key` metadata blocks) to `lib/l10n/app_es.arb`:
 
 ```json
   "paywallTitle": "Desbloquea escaneos ilimitados",
@@ -56,7 +56,7 @@ Add a server-side scan quota backed by Firestore and anonymous Firebase Auth, wi
   "freeScansRemaining": "{left} de {total} escaneos gratis restantes",
 ```
 
-- [ ] Append the same eight string keys (without `@key` metadata blocks) to `lib/l10n/app_fr.arb`:
+- [x] Append the same eight string keys (without `@key` metadata blocks) to `lib/l10n/app_fr.arb`:
 
 ```json
   "paywallTitle": "Débloquez les scans illimités",
@@ -73,9 +73,9 @@ Add a server-side scan quota backed by Firestore and anonymous Firebase Auth, wi
 ##### Step 1 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter pub get` — succeeds without version conflicts
-- [ ] `flutter gen-l10n` — succeeds and generates `AppLocalizations` with all eight keys across `en`/`es`/`fr`
-- [ ] `flutter analyze` — clean (no errors, no unused-import warnings related to this step)
+- [x] `flutter pub get` — succeeds without version conflicts
+- [x] `flutter gen-l10n` — succeeds and generates `AppLocalizations` with all eight keys across `en`/`es`/`fr`
+- [x] `flutter analyze` — clean (no errors, no unused-import warnings related to this step)
 
 *(No Human checks — no UI references these keys yet.)*
 

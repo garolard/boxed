@@ -95,6 +95,16 @@
   "topSystems": "SISTEMAS TOP",
   "unknownPlatform": "Desconocido",
 
+  "paywallTitle": "Desbloquea escaneos ilimitados",
+  "paywallSubtitle": "Escanea todas las portadas que quieras con una suscripción premium.",
+  "paywallFeature1": "Escaneos de portadas ilimitados",
+  "paywallFeature2": "Mayor precisión de reconocimiento",
+  "paywallFeature3": "Acceso prioritario a OpenAI Vision",
+  "paywallCta": "Suscribirse",
+  "paywallRestore": "Restaurar compras",
+  "paywallComingSoon": "Próximamente — ¡mantente atento!",
+  "freeScansRemaining": "{left} de {total} escaneos gratis restantes",
+
   "owned": "TUYO",
   "addToShelfShort": "Añadir",
   "removeShort": "Quitar"
