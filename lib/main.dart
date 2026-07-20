@@ -131,7 +131,13 @@ class _AppBootstrapState extends State<_AppBootstrap> {
       try {
         await FirebaseAuth.instance.signInAnonymously()
             .timeout(const Duration(seconds: 5));
-      } catch (_) {}
+      } catch (e, st) {
+        widget.analytics.logError(
+          context: 'anonymous_auth_failed',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
 
     // Provision the quota doc in parallel with the splash delay.

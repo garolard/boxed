@@ -83,7 +83,11 @@ class ScanQuotaService {
     final doc = _doc;
     if (doc == null) {
       return Stream.value(
-        const ScanQuota(scansUsed: kFreeScanLimit, readFailed: true),
+        ScanQuota(
+          scansUsed: kFreeScanLimit,
+          isPremium: _isPremiumOverride,
+          readFailed: true,
+        ),
       );
     }
 

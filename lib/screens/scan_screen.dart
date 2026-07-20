@@ -38,9 +38,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   }
 
   Future<void> _scan({required bool fromCamera}) async {
-    final quota = await ref.read(scanQuotaServiceProvider).quotaStream().first;
+    final quota = await ref.read(scanQuotaProvider.future);
 
-    if (quota.readFailed || (!quota.isPremium && quota.scansUsed >= kFreeScanLimit)) {
+    if (!quota.isPremium && (quota.readFailed || quota.scansUsed >= kFreeScanLimit)) {
       if (mounted) {
         await Navigator.push(
           context,
