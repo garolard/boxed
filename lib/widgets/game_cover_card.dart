@@ -30,8 +30,10 @@ class GameCoverCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final owned = ref.watch(
-        collectionProvider.select((s) => s.contains(game.id)));
-    final platformKey = game.ownedPlatformName ??
+      collectionProvider.select((s) => s.contains(game.id)),
+    );
+    final platformKey =
+        game.ownedPlatformName ??
         (game.platformNames.isNotEmpty ? game.platformNames.first : null);
 
     return Material(
@@ -40,9 +42,7 @@ class GameCoverCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => GameDetailScreen(game: game),
-          ),
+          MaterialPageRoute(builder: (_) => GameDetailScreen(game: game)),
         ),
         child: Container(
           decoration: BoxDecoration(
@@ -124,22 +124,22 @@ class _CoverLayer extends StatelessWidget {
       return Container(
         color: AppColors.surfaceHi,
         child: const Center(
-          child: Icon(Icons.videogame_asset,
-              color: AppColors.textMuted, size: 64),
+          child: Icon(
+            Icons.videogame_asset,
+            color: AppColors.textMuted,
+            size: 64,
+          ),
         ),
       );
     }
-    return Hero(
-      tag: 'cover-${game.id}',
-      child: CachedNetworkImage(
-        imageUrl: url,
-        fit: BoxFit.cover,
-        placeholder: (_, _) => const ShimmerBox(),
-        errorWidget: (_, _, _) => Container(
-          color: AppColors.surfaceHi,
-          child: const Center(
-            child: Icon(Icons.broken_image, color: AppColors.textMuted),
-          ),
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.cover,
+      placeholder: (_, _) => const ShimmerBox(),
+      errorWidget: (_, _, _) => Container(
+        color: AppColors.surfaceHi,
+        child: const Center(
+          child: Icon(Icons.broken_image, color: AppColors.textMuted),
         ),
       ),
     );
@@ -244,9 +244,7 @@ class _Info extends StatelessWidget {
             fontWeight: FontWeight.w800,
             fontSize: 14,
             height: 1.2,
-            shadows: [
-              Shadow(blurRadius: 6, color: Colors.black87),
-            ],
+            shadows: [Shadow(blurRadius: 6, color: Colors.black87)],
           ),
         ),
         const SizedBox(height: 4),
@@ -265,9 +263,7 @@ class _Info extends StatelessWidget {
                   color: AppColors.textSecondary,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  shadows: [
-                    Shadow(blurRadius: 4, color: Colors.black87),
-                  ],
+                  shadows: [Shadow(blurRadius: 4, color: Colors.black87)],
                 ),
               ),
             ),

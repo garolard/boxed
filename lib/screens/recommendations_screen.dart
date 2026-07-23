@@ -28,7 +28,9 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(analyticsServiceProvider).logScreenView(screenName: 'recommendations');
+    ref
+        .read(analyticsServiceProvider)
+        .logScreenView(screenName: 'recommendations');
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => ref.read(collectionProvider.notifier).loadRecommendations(),
     );
@@ -206,7 +208,7 @@ class _CarouselState extends ConsumerState<_Carousel> {
   @override
   void initState() {
     super.initState();
-    _controller = PageController(viewportFraction: 0.78);
+    _controller = PageController(viewportFraction: 0.55);
     _controller.addListener(() {
       setState(() => _page = _controller.page ?? 0);
     });
