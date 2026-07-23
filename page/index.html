@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track your physical video game collection. Scan covers, no typing. 100% private.">
+  <meta name="theme-color" content="#A78BFA">
+  <title>Boxed — Track Your Game Collection</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="../web/favicon.png">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo">Box<span>e</span>d</div>
+      <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Now available on iOS & Android
+      </div>
+      <h1>Your Games,<br>Organized.</h1>
+      <p>Track your physical video game collection. Scan covers, no typing. 100% private.</p>
+      <div class="cta-group">
+        <a href="#download" class="btn btn-primary">Get the App</a>
+        <a href="#features" class="btn btn-secondary">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="container">
+      <h2 style="text-align:center; margin-bottom:8px;">Everything you need</h2>
+      <p style="text-align:center; margin:0 auto 0;">A simple, powerful collection manager built for gamers.</p>
+
+      <div class="features-grid">
+        <div class="card">
+          <div class="card-icon">📷</div>
+          <h3>Scan Covers</h3>
+          <p>Point your camera at any game cover and AI-powered vision analysis identifies the title instantly. No typing required.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3>Search IGDB</h3>
+          <p>Browse the entire IGDB catalog. Filter by system or genre to discover and add games in seconds.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📚</div>
+          <h3>Track Your Shelf</h3>
+          <p>Keep a clean record of every physical game you own. Stats, platforms, and genres at a glance.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔗</div>
+          <h3>Share via QR</h3>
+          <p>Generate a QR code from your collection and let friends scan it to browse your shelf instantly.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💡</div>
+          <h3>Recommendations</h3>
+          <p>Get personalized picks based on the games you already love. Discover your next favorite title.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>100% Private</h3>
+          <p>Your collection lives on your device only. No backend, no cloud storage. We only use Firebase for anonymous login and crash reporting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="section" style="background: var(--surface);">
+    <div class="container">
+      <h2 style="text-align:center; margin-bottom:8px;">How it works</h2>
+      <p style="text-align:center; margin:0 auto 0;">From shelf to screen in three simple steps.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Scan or Search</h3>
+            <p>Use your camera to scan a game cover, or search the IGDB database by title. Pick the exact version you own.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Build Your Shelf</h3>
+            <p>Games are saved to your personal shelf with cover art, platform, genre, and release details. All stored locally.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Share & Discover</h3>
+            <p>Share your collection with friends via QR code, or get smart recommendations based on what you already own.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="section">
+    <div class="container" style="text-align:center;">
+      <h2 style="margin-bottom:16px;">Ready to box your collection?</h2>
+      <p style="margin:0 auto 32px;">Download Boxed today and start tracking your physical games the effortless way.</p>
+      <div class="cta-group">
+        <a href="#" class="btn btn-primary" onclick="alert('Coming soon to the App Store!')">App Store</a>
+        <a href="#" class="btn btn-secondary" onclick="alert('Coming soon to Google Play!')">Google Play</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="logo" style="font-size:1.2rem;">Box<span>e</span>d</div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="mailto:support@boxed.app">Contact</a>
+      </div>
+      <p class="copyright">© <span id="year"></span> Boxed. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
