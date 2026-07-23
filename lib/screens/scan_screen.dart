@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
 import '../models/title_candidate.dart';
+import '../providers/scan_quota_provider.dart';
 import '../providers/services.dart';
 import '../services/cover_scan_service.dart';
+import '../services/scan_quota_service.dart';
+import 'paywall_screen.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/glass_card.dart';
@@ -35,12 +38,43 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   }
 
   Future<void> _scan({required bool fromCamera}) async {
+    final quota = await ref.read(scanQuotaProvider.future);
+
+    if (!quota.isPremium && (quota.readFailed || quota.scansUsed >= kFreeScanLimit)) {
+      if (mounted) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => const PaywallScreen(),
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() {
       _scanning = true;
       _error = null;
     });
+
+    bool recorded = false;
     try {
       final candidates = await _scanner.scan(fromCamera: fromCamera);
+      if (candidates.isNotEmpty) {
+        final ok = await ref.read(scanQuotaServiceProvider).tryRecordScan();
+        if (!ok && mounted) {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (_) => const PaywallScreen(),
+            ),
+          );
+          return;
+        }
+        recorded = ok;
+      }
       if (mounted) {
         setState(() {
           _candidates = candidates;
@@ -53,6 +87,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             hasError: false,
           );
     } catch (e) {
+      if (recorded) {
+        await ref.read(scanQuotaServiceProvider).decrementScan();
+      }
       if (mounted) setState(() => _error = context.l10n.scanFailed('$e'));
       await ref.read(analyticsServiceProvider).logScanPerformed(
             source: fromCamera ? 'camera' : 'gallery',
@@ -224,59 +261,93 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   }
 }
 
-class _ScanIntro extends StatelessWidget {
+class _ScanIntro extends ConsumerWidget {
   const _ScanIntro();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final quotaAsync = ref.watch(scanQuotaProvider);
+
     return GlassCard(
       padding: const EdgeInsets.all(16),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.4),
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.document_scanner_rounded,
+                  color: AppColors.accent,
+                  size: 24,
+                ),
               ),
-            ),
-            child: const Icon(
-              Icons.document_scanner_rounded,
-              color: AppColors.accent,
-              size: 24,
-            ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.scanIntroTitle,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.scanIntro,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.scanIntroTitle,
+          if (quotaAsync.hasValue) ...[
+            if (!quotaAsync.value!.isPremium && !quotaAsync.value!.readFailed) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.4),
+                  ),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: Text(
+                  l10n.freeScansRemaining(
+                    (kFreeScanLimit - quotaAsync.value!.scansUsed).clamp(0, kFreeScanLimit),
+                    kFreeScanLimit,
+                  ),
                   style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 15,
+                    color: AppColors.accent,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
+                    letterSpacing: 1.2,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.scanIntro,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            ],
+          ],
         ],
       ),
     );

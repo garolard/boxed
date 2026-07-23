@@ -107,6 +107,17 @@
   "topSystems": "TOP SYSTEMS",
   "unknownPlatform": "Unknown",
 
+  "paywallTitle": "Unlock Unlimited Scans",
+  "paywallSubtitle": "Scan as many game covers as you want with a premium subscription.",
+  "paywallFeature1": "Unlimited cover scans",
+  "paywallFeature2": "Advanced recognition accuracy",
+  "paywallFeature3": "Priority OpenAI vision access",
+  "paywallCta": "Subscribe",
+  "paywallRestore": "Restore purchases",
+  "paywallComingSoon": "Coming soon — stay tuned!",
+  "freeScansRemaining": "{left} of {total} free scans left",
+  "@freeScansRemaining": {"placeholders": {"left": {"type": "int"}, "total": {"type": "int"}}},
+
   "owned": "OWNED",
   "addToShelfShort": "Add to shelf",
   "removeShort": "Remove"

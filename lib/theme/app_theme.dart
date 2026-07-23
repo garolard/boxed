@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// Calm, premium dark theme. Single accent color (violet) for primary
 /// actions; everything else lives in a restrained neutral palette. Brand
@@ -48,22 +47,69 @@ class AppTheme {
       onError: Colors.white,
     );
 
-    final display = GoogleFonts.bungeeTextTheme();
-    final body = GoogleFonts.interTextTheme();
-    final text = body.copyWith(
-      displayLarge: display.displayLarge?.copyWith(color: scheme.onSurface),
-      displayMedium: display.displayMedium?.copyWith(color: scheme.onSurface),
-      displaySmall: display.displaySmall?.copyWith(color: scheme.onSurface),
-      headlineLarge: display.headlineLarge?.copyWith(color: scheme.onSurface),
-      headlineMedium: display.headlineMedium?.copyWith(color: scheme.onSurface),
-      headlineSmall: display.headlineSmall?.copyWith(color: scheme.onSurface),
-      titleLarge: body.titleLarge?.copyWith(
+    final base = ThemeData.dark().textTheme;
+    final text = base.copyWith(
+      displayLarge: base.displayLarge?.copyWith(
+        fontFamily: 'Bungee',
+        color: scheme.onSurface,
+      ),
+      displayMedium: base.displayMedium?.copyWith(
+        fontFamily: 'Bungee',
+        color: scheme.onSurface,
+      ),
+      displaySmall: base.displaySmall?.copyWith(
+        fontFamily: 'Bungee',
+        color: scheme.onSurface,
+      ),
+      headlineLarge: base.headlineLarge?.copyWith(
+        fontFamily: 'Bungee',
+        color: scheme.onSurface,
+      ),
+      headlineMedium: base.headlineMedium?.copyWith(
+        fontFamily: 'Bungee',
+        color: scheme.onSurface,
+      ),
+      headlineSmall: base.headlineSmall?.copyWith(
+        fontFamily: 'Bungee',
+        color: scheme.onSurface,
+      ),
+      titleLarge: base.titleLarge?.copyWith(
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w700,
         color: scheme.onSurface,
       ),
-      bodyLarge: body.bodyLarge?.copyWith(color: scheme.onSurface),
-      bodyMedium: body.bodyMedium?.copyWith(color: scheme.onSurface),
-      bodySmall: body.bodySmall?.copyWith(color: AppColors.textSecondary),
+      titleMedium: base.titleMedium?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
+      titleSmall: base.titleSmall?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
+      bodyLarge: base.bodyLarge?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
+      bodyMedium: base.bodyMedium?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
+      bodySmall: base.bodySmall?.copyWith(
+        fontFamily: 'Inter',
+        color: AppColors.textSecondary,
+      ),
+      labelLarge: base.labelLarge?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
+      labelMedium: base.labelMedium?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
+      labelSmall: base.labelSmall?.copyWith(
+        fontFamily: 'Inter',
+        color: scheme.onSurface,
+      ),
     );
 
     return ThemeData(
@@ -79,7 +125,8 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: false,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        titleTextStyle: GoogleFonts.bungee(
+        titleTextStyle: const TextStyle(
+          fontFamily: 'Bungee',
           fontSize: 20,
           letterSpacing: 1.2,
           color: AppColors.textPrimary,
@@ -109,7 +156,11 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(99),
           ),
-          textStyle: GoogleFonts.bungee(fontSize: 14, letterSpacing: 1.2),
+          textStyle: const TextStyle(
+            fontFamily: 'Bungee',
+            fontSize: 14,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -118,7 +169,11 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(99),
           ),
-          textStyle: GoogleFonts.bungee(fontSize: 14, letterSpacing: 1.2),
+          textStyle: const TextStyle(
+            fontFamily: 'Bungee',
+            fontSize: 14,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

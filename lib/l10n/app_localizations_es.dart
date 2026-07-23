@@ -279,6 +279,36 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unknownPlatform => 'Desconocido';
 
   @override
+  String get paywallTitle => 'Desbloquea escaneos ilimitados';
+
+  @override
+  String get paywallSubtitle =>
+      'Escanea todas las portadas que quieras con una suscripción premium.';
+
+  @override
+  String get paywallFeature1 => 'Escaneos de portadas ilimitados';
+
+  @override
+  String get paywallFeature2 => 'Mayor precisión de reconocimiento';
+
+  @override
+  String get paywallFeature3 => 'Acceso prioritario a OpenAI Vision';
+
+  @override
+  String get paywallCta => 'Suscribirse';
+
+  @override
+  String get paywallRestore => 'Restaurar compras';
+
+  @override
+  String get paywallComingSoon => 'Próximamente — ¡mantente atento!';
+
+  @override
+  String freeScansRemaining(int left, int total) {
+    return '$left de $total escaneos gratis restantes';
+  }
+
+  @override
   String get owned => 'TUYO';
 
   @override

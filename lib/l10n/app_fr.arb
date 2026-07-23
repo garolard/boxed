@@ -95,6 +95,16 @@
   "topSystems": "SYSTÈMES TOP",
   "unknownPlatform": "Inconnu",
 
+  "paywallTitle": "Débloquez les scans illimités",
+  "paywallSubtitle": "Scannez autant de jaquettes que vous voulez avec un abonnement premium.",
+  "paywallFeature1": "Scans de jaquettes illimités",
+  "paywallFeature2": "Précision de reconnaissance avancée",
+  "paywallFeature3": "Accès prioritaire à OpenAI Vision",
+  "paywallCta": "S'abonner",
+  "paywallRestore": "Restaurer les achats",
+  "paywallComingSoon": "Bientôt disponible — restez à l'écoute !",
+  "freeScansRemaining": "{left} sur {total} scans gratuits restants",
+
   "owned": "À VOUS",
   "addToShelfShort": "Ajouter",
   "removeShort": "Retirer"

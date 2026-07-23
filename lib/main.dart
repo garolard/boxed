@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +17,7 @@ import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'providers/services.dart';
 import 'services/analytics_service.dart';
+import 'services/scan_quota_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
 
@@ -42,10 +45,20 @@ Future<void> main() async {
   final analytics = await AnalyticsService.create();
   await analytics.logAppOpen();
 
+  final isPremiumOverride =
+      (dotenv.env['IS_PREMIUM'] ?? '').trim().toLowerCase() == 'true';
+
+  final scanQuotaService = ScanQuotaService(
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+    isPremiumOverride: isPremiumOverride,
+  );
+
   runZonedGuarded(
     () => runApp(ProviderScope(
       overrides: [
         analyticsServiceProvider.overrideWithValue(analytics),
+        scanQuotaServiceProvider.overrideWithValue(scanQuotaService),
       ],
       child: BoxedApp(analytics: analytics),
     )),
@@ -104,8 +117,57 @@ class _AppBootstrapState extends State<_AppBootstrap> {
   }
 
   Future<void> _bootstrap() async {
-    await Future<void>.delayed(_minSplash);
+    // Run anonymous auth in parallel with the existing minimum splash delay.
+    //
+    // Trade-off: on Android, uninstalling the app rotates SSAID and the next
+    // install gets a fresh anonymous uid + a fresh counter, so the quota can
+    // be reset. iOS is unaffected because the Firebase Anonymous Auth uid is
+    // stored in the iOS Keychain, which survives uninstall. This is the
+    // documented, accepted trade-off for the "no login required" stance.
+    //
+    // A 5-second timeout on auth ensures that on airplane mode the splash
+    // screen eventually transitions to home rather than hanging forever.
+    Future<void> signIn() async {
+      try {
+        await FirebaseAuth.instance.signInAnonymously()
+            .timeout(const Duration(seconds: 5));
+      } catch (e, st) {
+        widget.analytics.logError(
+          context: 'anonymous_auth_failed',
+          error: e,
+          stackTrace: st,
+        );
+      }
+    }
+
+    // Provision the quota doc in parallel with the splash delay.
+    // Uses a transaction to make the existence check + conditional write
+    // a single round-trip instead of two sequential Firestore calls.
+    Future<void> provisionQuotaDoc() async {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
+      await FirebaseFirestore.instance.runTransaction((tx) async {
+        final snap = await tx.get(docRef);
+        if (!snap.exists) {
+          tx.set(docRef, {
+            'scansUsed': 0,
+            'isPremium': false,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      });
+    }
+
+    await Future.wait([
+      signIn().then((_) => provisionQuotaDoc()),
+      Future<void>.delayed(_minSplash),
+    ]);
+
     if (!mounted) return;
+
     widget.analytics.logScreenView(screenName: 'home');
     setState(() => _ready = true);
   }
