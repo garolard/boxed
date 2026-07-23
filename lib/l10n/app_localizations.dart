@@ -481,13 +481,13 @@ abstract class AppLocalizations {
   /// No description provided for @scanACode.
   ///
   /// In en, this message translates to:
-  /// **'Scan a code'**
+  /// **'Scan'**
   String get scanACode;
 
   /// No description provided for @fromGallery.
   ///
   /// In en, this message translates to:
-  /// **'From gallery'**
+  /// **'Gallery'**
   String get fromGallery;
 
   /// No description provided for @nothingSharedTitle.

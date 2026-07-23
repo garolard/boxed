@@ -132,14 +132,16 @@ class _CoverLayer extends StatelessWidget {
         ),
       );
     }
-    return CachedNetworkImage(
-      imageUrl: url,
-      fit: BoxFit.cover,
-      placeholder: (_, _) => const ShimmerBox(),
-      errorWidget: (_, _, _) => Container(
-        color: AppColors.surfaceHi,
-        child: const Center(
-          child: Icon(Icons.broken_image, color: AppColors.textMuted),
+    return SizedBox.expand(
+      child: CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        placeholder: (_, _) => const ShimmerBox(),
+        errorWidget: (_, _, _) => Container(
+          color: AppColors.surfaceHi,
+          child: const Center(
+            child: Icon(Icons.broken_image, color: AppColors.textMuted),
+          ),
         ),
       ),
     );

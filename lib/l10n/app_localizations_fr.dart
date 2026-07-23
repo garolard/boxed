@@ -221,10 +221,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sharedCollectionsTitle => 'Collections partagées';
 
   @override
-  String get scanACode => 'Scanner un code';
+  String get scanACode => 'Scanner';
 
   @override
-  String get fromGallery => 'Depuis la galerie';
+  String get fromGallery => 'Galerie';
 
   @override
   String get nothingSharedTitle => 'Rien de partagé pour l\'instant';

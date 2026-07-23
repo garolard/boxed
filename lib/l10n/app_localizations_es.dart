@@ -222,10 +222,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sharedCollectionsTitle => 'Colecciones compartidas';
 
   @override
-  String get scanACode => 'Escanear un código';
+  String get scanACode => 'Escanear';
 
   @override
-  String get fromGallery => 'Desde la galería';
+  String get fromGallery => 'Galería';
 
   @override
   String get nothingSharedTitle => 'Aún no hay nada compartido';
