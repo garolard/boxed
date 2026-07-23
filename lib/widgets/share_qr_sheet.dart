@@ -35,6 +35,7 @@ class _ShareQrSheetState extends ConsumerState<_ShareQrSheet> {
   @override
   void initState() {
     super.initState();
+    _nameController.text = context.l10n.defaultShelfName;
   }
 
   @override
@@ -54,8 +55,6 @@ class _ShareQrSheetState extends ConsumerState<_ShareQrSheet> {
         entries: [for (final g in capped) QrEntry(g.id, g.ownedPlatformId)],
       ),
     );
-
-    _nameController.text = l10n.defaultShelfName;
 
     return Padding(
       padding: EdgeInsets.only(
