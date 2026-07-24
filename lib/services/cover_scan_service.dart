@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
@@ -33,8 +32,8 @@ class CoverScanService {
       : _picker = picker ?? ImagePicker(),
         _client = client ?? http.Client();
 
-  String get _apiKey => dotenv.env['OPENAI_API_KEY'] ?? '';
-  String get _orgId => dotenv.env['OPENAI_ORG_ID'] ?? '';
+  String get _apiKey => const String.fromEnvironment('OPENAI_API_KEY');
+  String get _orgId => const String.fromEnvironment('OPENAI_ORG_ID');
 
   /// Picks an image, asks the model to recognise it and returns candidate
   /// titles ordered by the model's confidence (highest first). Returns an

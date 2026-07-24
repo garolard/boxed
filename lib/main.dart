@@ -7,7 +7,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
@@ -23,7 +22,6 @@ import 'widgets/gradient_background.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
 
   // Initialise Firebase before anything else that might throw.
   await Firebase.initializeApp(
@@ -46,7 +44,7 @@ Future<void> main() async {
   await analytics.logAppOpen();
 
   final isPremiumOverride =
-      (dotenv.env['IS_PREMIUM'] ?? '').trim().toLowerCase() == 'true';
+      const String.fromEnvironment('IS_PREMIUM').trim().toLowerCase() == 'true';
 
   final scanQuotaService = ScanQuotaService(
     firestore: FirebaseFirestore.instance,

@@ -1,6 +1,7 @@
 # Custom
 .env
 upload-keystore.jks
+/branding/
 
 # Created by https://www.toptal.com/developers/gitignore/api/flutter
 # Edit at https://www.toptal.com/developers/gitignore?templates=flutter

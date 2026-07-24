@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,8 +36,8 @@ class IgdbService {
   IgdbService({http.Client? client, this._analytics})
       : _client = client ?? http.Client();
 
-  String get _clientId => dotenv.env['IGDB_CLIENT_ID'] ?? '';
-  String get _clientSecret => dotenv.env['IGDB_SECRET_ID'] ?? '';
+  String get _clientId => const String.fromEnvironment('IGDB_CLIENT_ID');
+  String get _clientSecret => const String.fromEnvironment('IGDB_SECRET_ID');
 
   Future<String> _getToken({bool forceRefresh = false}) async {
     final prefs = await SharedPreferences.getInstance();
