@@ -259,7 +259,7 @@ class RevenueCatPurchaseService implements PurchaseService {
 
 *(Non-testable step — standard format; behavioral coverage deferred to Step 7 bridge test)*
 
-- [ ] Create `lib/services/purchase/premium_bridge.dart`:
+- [x] Create `lib/services/purchase/premium_bridge.dart`:
 
 ```dart
 import 'dart:async';
@@ -312,8 +312,8 @@ class PremiumBridge {
 ##### Step 4 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — zero issues in `lib/services/purchase/premium_bridge.dart`
-- [ ] Confirm `PremiumBridge` imports no `purchases_flutter` symbol and `ScanQuotaService` is the only app service it couples to
+- [x] `flutter analyze` — zero issues in `lib/services/purchase/premium_bridge.dart`
+- [x] Confirm `PremiumBridge` imports no `purchases_flutter` symbol and `ScanQuotaService` is the only app service it couples to
 
 **Human (verify in browser before committing):**
 *(No Human checks — bridge has no visible UI yet.)*
