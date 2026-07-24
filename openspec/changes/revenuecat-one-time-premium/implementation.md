@@ -226,7 +226,7 @@ class RevenueCatPurchaseService implements PurchaseService {
 
 *(Non-testable step — standard format; behavioral coverage deferred to Step 7 bridge test)*
 
-- [ ] Add `markPremium()` to `lib/services/scan_quota_service.dart` after the existing `decrementScan()` method:
+- [x] Add `markPremium()` to `lib/services/scan_quota_service.dart` after the existing `decrementScan()` method:
 
 ```dart
   /// Promote the current user to premium with a merge write.
@@ -241,8 +241,8 @@ class RevenueCatPurchaseService implements PurchaseService {
 ##### Step 3 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — zero issues in `lib/services/scan_quota_service.dart`
-- [ ] Confirm `_effectivePremium` seam, `quotaStream()`, `IS_PREMIUM` override, and all existing methods are untouched except the additive `markPremium()`
+- [x] `flutter analyze` — zero issues in `lib/services/scan_quota_service.dart`
+- [x] Confirm `_effectivePremium` seam, `quotaStream()`, `IS_PREMIUM` override, and all existing methods are untouched except the additive `markPremium()`
 
 **Human (verify in browser before committing):**
 *(No Human checks — no visible UI change.)*

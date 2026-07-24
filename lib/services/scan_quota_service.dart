@@ -164,4 +164,12 @@ class ScanQuotaService {
       tx.update(doc, {'scansUsed': next});
     });
   }
+
+  /// Promote the current user to premium with a merge write.
+  /// No-op when there is no authenticated uid.
+  Future<void> markPremium() async {
+    final doc = _doc;
+    if (doc == null) return;
+    await doc.set({'isPremium': true}, SetOptions(merge: true));
+  }
 }
