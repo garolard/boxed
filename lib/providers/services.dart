@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/analytics_service.dart';
 import '../services/collection_repository.dart';
 import '../services/igdb_service.dart';
+import '../services/purchase/purchase_service.dart';
 import '../services/scan_quota_service.dart';
 
 /// Shared singletons. The repository, IGDB client and analytics service are
@@ -25,5 +26,11 @@ final analyticsServiceProvider = Provider<AnalyticsService>((ref) {
 final scanQuotaServiceProvider = Provider<ScanQuotaService>((ref) {
   throw UnsupportedError(
     'Override scanQuotaServiceProvider with an initialized instance in main.dart',
+  );
+});
+
+final purchaseServiceProvider = Provider<PurchaseService>((ref) {
+  throw UnsupportedError(
+    'Override purchaseServiceProvider with an initialized instance in main.dart',
   );
 });

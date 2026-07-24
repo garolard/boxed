@@ -330,7 +330,7 @@ class PremiumBridge {
 
 *(Non-testable step — standard format)*
 
-- [ ] Add `purchaseServiceProvider` to `lib/providers/services.dart`:
+- [x] Add `purchaseServiceProvider` to `lib/providers/services.dart`:
 
 ```dart
 final purchaseServiceProvider = Provider<PurchaseService>((ref) {
@@ -346,7 +346,7 @@ Also add the import at the top of `lib/providers/services.dart`:
 import '../services/purchase/purchase_service.dart';
 ```
 
-- [ ] Modify `lib/main.dart` as follows:
+- [x] Modify `lib/main.dart` as follows:
 
 Add import:
 
@@ -443,9 +443,9 @@ Update the `Future.wait` call:
 ##### Step 5 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — zero issues across `lib/providers/services.dart` and `lib/main.dart`
-- [ ] Verify that `main.dart` calls `PurchaseService.initialize()` before `runApp`
-- [ ] Verify that `_AppBootstrap._bootstrap` calls `identify` and `PremiumBridge.start()` after sign-in and quota provisioning, and that neither call is `await`ed on the splash-critical path
+- [x] `flutter analyze` — zero issues across `lib/providers/services.dart` and `lib/main.dart`
+- [x] Verify that `main.dart` calls `PurchaseService.initialize()` before `runApp`
+- [x] Verify that `_AppBootstrap._bootstrap` calls `identify` and `PremiumBridge.start()` after sign-in and quota provisioning, and that neither call is `await`ed on the splash-critical path
 
 **Human (verify in browser before committing):**
 *(No Human checks — wiring is not yet visible in UI.)*

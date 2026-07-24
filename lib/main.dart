@@ -16,6 +16,9 @@ import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'providers/services.dart';
 import 'services/analytics_service.dart';
+import 'services/purchase/purchase_service.dart';
+import 'services/purchase/revenuecat_purchase_service.dart';
+import 'services/purchase/premium_bridge.dart';
 import 'services/scan_quota_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
@@ -43,6 +46,9 @@ Future<void> main() async {
   final analytics = await AnalyticsService.create();
   await analytics.logAppOpen();
 
+  final purchaseService = RevenueCatPurchaseService();
+  await purchaseService.initialize();
+
   final isPremiumOverride =
       const String.fromEnvironment('IS_PREMIUM').trim().toLowerCase() == 'true';
 
@@ -57,8 +63,13 @@ Future<void> main() async {
       overrides: [
         analyticsServiceProvider.overrideWithValue(analytics),
         scanQuotaServiceProvider.overrideWithValue(scanQuotaService),
+        purchaseServiceProvider.overrideWithValue(purchaseService),
       ],
-      child: BoxedApp(analytics: analytics),
+      child: BoxedApp(
+        analytics: analytics,
+        purchaseService: purchaseService,
+        scanQuotaService: scanQuotaService,
+      ),
     )),
     (error, stack) {
       analytics.logError(
@@ -72,7 +83,15 @@ Future<void> main() async {
 
 class BoxedApp extends StatelessWidget {
   final AnalyticsService analytics;
-  const BoxedApp({super.key, required this.analytics});
+  final PurchaseService purchaseService;
+  final ScanQuotaService scanQuotaService;
+
+  const BoxedApp({
+    super.key,
+    required this.analytics,
+    required this.purchaseService,
+    required this.scanQuotaService,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +106,11 @@ class BoxedApp extends StatelessWidget {
       builder: (context, child) {
         return GradientBackground(child: child ?? const SizedBox());
       },
-      home: _AppBootstrap(analytics: analytics),
+      home: _AppBootstrap(
+        analytics: analytics,
+        purchaseService: purchaseService,
+        scanQuotaService: scanQuotaService,
+      ),
     );
   }
 }
@@ -97,7 +120,14 @@ class BoxedApp extends StatelessWidget {
 /// moment reads even on a cold start.
 class _AppBootstrap extends StatefulWidget {
   final AnalyticsService analytics;
-  const _AppBootstrap({required this.analytics});
+  final PurchaseService purchaseService;
+  final ScanQuotaService scanQuotaService;
+
+  const _AppBootstrap({
+    required this.analytics,
+    required this.purchaseService,
+    required this.scanQuotaService,
+  });
 
   @override
   State<_AppBootstrap> createState() => _AppBootstrapState();
@@ -159,8 +189,21 @@ class _AppBootstrapState extends State<_AppBootstrap> {
       });
     }
 
+    void startPurchaseBridge() {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      widget.purchaseService.identify(user.uid).catchError((_) {});
+      PremiumBridge(
+        purchaseService: widget.purchaseService,
+        scanQuotaService: widget.scanQuotaService,
+      ).start();
+    }
+
     await Future.wait([
-      signIn().then((_) => provisionQuotaDoc()),
+      signIn().then((_) {
+        provisionQuotaDoc();
+        startPurchaseBridge();
+      }),
       Future<void>.delayed(_minSplash),
     ]);
 
