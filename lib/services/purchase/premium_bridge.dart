@@ -10,10 +10,9 @@ class PremiumBridge {
   bool _restoreAttempted = false;
 
   PremiumBridge({
-    required PurchaseService purchaseService,
-    required ScanQuotaService scanQuotaService,
-  })  : _purchaseService = purchaseService,
-        _scanQuotaService = scanQuotaService;
+    required this._purchaseService,
+    required this._scanQuotaService,
+  });
 
   void start() {
     _premiumSub = _purchaseService.premiumUpdates().listen((isPremium) {

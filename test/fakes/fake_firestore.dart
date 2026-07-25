@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Test fakes must subtype the platform interfaces to stand in for real
+// Firestore objects; the platform interfaces are sealed, which is intentional.
+// ignore_for_file: subtype_of_sealed_class
+
 class FakeDoc {
   Map<String, dynamic> data = {};
 }
@@ -157,7 +161,7 @@ class _FakeSnapshot implements DocumentSnapshot<Map<String, dynamic>> {
 
   @override
   Map<String, dynamic>? data() =>
-      _data == null ? null : Map.unmodifiable(_data!);
+      _data == null ? null : Map.unmodifiable(_data);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

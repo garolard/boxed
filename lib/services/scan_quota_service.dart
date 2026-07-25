@@ -54,12 +54,10 @@ class ScanQuotaService {
   Stream<ScanQuota>? _quotaStream;
 
   ScanQuotaService({
-    required FirebaseFirestore firestore,
-    required FirebaseAuth auth,
-    required bool isPremiumOverride,
-  }) : _firestore = firestore,
-       _auth = auth,
-       _isPremiumOverride = isPremiumOverride;
+    required this._firestore,
+    required this._auth,
+    required this._isPremiumOverride,
+  });
 
   /// Centralised "is this user premium?" check.
   /// When RevenueCat is wired in later, this is the single seam to swap.
