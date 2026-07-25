@@ -622,6 +622,12 @@ abstract class AppLocalizations {
   /// **'Unlock Premium'**
   String get paywallCtaFallback;
 
+  /// No description provided for @paywallCtaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporarily unavailable'**
+  String get paywallCtaUnavailable;
+
   /// No description provided for @paywallPurchaseError.
   ///
   /// In en, this message translates to:

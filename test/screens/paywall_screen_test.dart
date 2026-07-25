@@ -30,6 +30,7 @@ void main() {
 
   testWidgets('CTA success dismisses the paywall', (tester) async {
     final fake = FakePurchaseService();
+    fake.product = const PurchaseProduct(id: 'premium', priceString: r'$4.99');
     fake.purchaseOutcome = const PurchaseSuccess();
 
     await tester.pumpWidget(
@@ -92,6 +93,7 @@ void main() {
 
   testWidgets('cancel leaves paywall open with no error', (tester) async {
     final fake = FakePurchaseService();
+    fake.product = const PurchaseProduct(id: 'premium', priceString: r'$4.99');
     fake.purchaseOutcome = const PurchaseCancelled();
 
     await tester.pumpWidget(

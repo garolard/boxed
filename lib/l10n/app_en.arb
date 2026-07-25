@@ -118,6 +118,7 @@
   "paywallCtaPrice": "Unlock for {price}",
   "@paywallCtaPrice": {"placeholders": {"price": {"type": "String"}}},
   "paywallCtaFallback": "Unlock Premium",
+  "paywallCtaUnavailable": "Temporarily unavailable",
   "paywallPurchaseError": "Purchase failed. Please try again.",
   "paywallNothingToRestore": "No purchases to restore.",
   "paywallRestoreError": "Restore failed. Please try again.",

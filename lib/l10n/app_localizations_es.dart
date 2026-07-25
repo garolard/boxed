@@ -312,6 +312,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallCtaFallback => 'Desbloquear Premium';
 
   @override
+  String get paywallCtaUnavailable => 'No disponible temporalmente';
+
+  @override
   String get paywallPurchaseError => 'Error de compra. Inténtalo de nuevo.';
 
   @override

@@ -60,30 +60,40 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               const SizedBox(height: 12),
               _FeatureRow(icon: Icons.check_circle_outline, text: l10n.paywallFeature3),
               const Spacer(),
-              FilledButton(
-                onPressed: () => _handlePurchase(context),
-                child: FutureBuilder<PurchaseProduct?>(
-                  future: _productFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      );
-                    }
-                    final product = snapshot.data;
-                    if (product != null) {
-                      return Text(l10n.paywallCtaPrice(product.priceString));
-                    }
-                    return Text(l10n.paywallCtaFallback);
-                  },
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => _handleRestore(context),
-                child: Text(l10n.paywallRestore),
+              FutureBuilder<PurchaseProduct?>(
+                future: _productFuture,
+                builder: (context, snapshot) {
+                  final product = snapshot.data;
+                  final isReady = snapshot.connectionState == ConnectionState.done;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FilledButton(
+                        onPressed: isReady && product != null
+                            ? () => _handlePurchase(context)
+                            : null,
+                        child: () {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          }
+                          if (product != null) {
+                            return Text(l10n.paywallCtaPrice(product.priceString));
+                          }
+                          return Text(l10n.paywallCtaUnavailable);
+                        }(),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => _handleRestore(context),
+                        child: Text(l10n.paywallRestore),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),

@@ -106,6 +106,7 @@
   "paywallCtaPrice": "Débloquer pour {price}",
   "@paywallCtaPrice": {"placeholders": {"price": {"type": "String"}}},
   "paywallCtaFallback": "Débloquer Premium",
+  "paywallCtaUnavailable": "Temporairement indisponible",
   "paywallPurchaseError": "Échec de l'achat. Veuillez réessayer.",
   "paywallNothingToRestore": "Aucun achat à restaurer.",
   "paywallRestoreError": "Échec de la restauration. Veuillez réessayer.",

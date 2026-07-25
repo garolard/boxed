@@ -7,6 +7,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'purchase_service.dart';
 
 class RevenueCatPurchaseService implements PurchaseService {
+  static const _kOfferingId = 'boxed_premium';
   final _premiumController = StreamController<bool>.broadcast();
   void Function(CustomerInfo)? _listener;
 
@@ -44,7 +45,7 @@ class RevenueCatPurchaseService implements PurchaseService {
   Future<PurchaseProduct?> premiumProduct() async {
     try {
       final offerings = await Purchases.getOfferings();
-      final package = offerings.current?.getPackage('premium');
+      final package = offerings.all[_kOfferingId]?.getPackage('premium');
       if (package == null) return null;
       final storeProduct = package.storeProduct;
       return PurchaseProduct(
@@ -60,7 +61,7 @@ class RevenueCatPurchaseService implements PurchaseService {
   Future<PurchaseOutcome> purchasePremium() async {
     try {
       final offerings = await Purchases.getOfferings();
-      final package = offerings.current?.getPackage('premium');
+      final package = offerings.all[_kOfferingId]?.getPackage('premium');
       if (package == null) {
         return const PurchaseError('Product not available');
       }
