@@ -11,9 +11,11 @@ class FakeFirestore implements FirebaseFirestore {
   final _controllers = <String, StreamController<Map<String, dynamic>?>>{};
   bool shouldThrowOnGet = false;
 
+  @override
   DocumentReference<Map<String, dynamic>> doc(String path) =>
       _FakeDocumentRef(this, path);
 
+  @override
   CollectionReference<Map<String, dynamic>> collection(String name) =>
       _FakeCollectionRef(this, name);
 
@@ -30,6 +32,7 @@ class FakeFirestore implements FirebaseFirestore {
     }
   }
 
+  @override
   Future<T> runTransaction<T>(TransactionHandler<T> transactionHandler,
       {Duration timeout = const Duration(seconds: 5),
       int maxAttempts = 5}) async {
