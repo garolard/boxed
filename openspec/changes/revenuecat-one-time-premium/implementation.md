@@ -663,7 +663,7 @@ flutter gen-l10n
 
 *(Testable step — standard format; writing tests and test infrastructure)*
 
-- [ ] Extract shared fake infrastructure from `test/services/scan_quota_service_test.dart` into two new files, then update the original test to import them.
+- [x] Extract shared fake infrastructure from `test/services/scan_quota_service_test.dart` into two new files, then update the original test to import them.
 
 Create `test/fakes/fake_firestore.dart`:
 
@@ -907,7 +907,7 @@ import '../fakes/fake_firestore.dart';
 
 Remove the old inline `FakeFirestore`, `_FakeDoc`, `_FakeCollectionRef`, `_FakeDocumentRef`, `_FakeSnapshot`, `_FakeTransaction`, `_FakeFirebaseAuth`, and `_FakeUser` class definitions. Keep `void main()` and all tests unchanged.
 
-- [ ] Create `test/services/purchase/fake_purchase_service.dart`:
+- [x] Create `test/services/purchase/fake_purchase_service.dart`:
 
 ```dart
 import 'dart:async';
@@ -968,7 +968,7 @@ class FakePurchaseService implements PurchaseService {
 }
 ```
 
-- [ ] Create `test/screens/paywall_screen_test.dart`:
+- [x] Create `test/screens/paywall_screen_test.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -1088,7 +1088,7 @@ void main() {
 }
 ```
 
-- [ ] Create `test/services/purchase/premium_bridge_test.dart`:
+- [x] Create `test/services/purchase/premium_bridge_test.dart`:
 
 ```dart
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -1182,12 +1182,12 @@ void main() {
 ##### Step 7 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter test test/services/scan_quota_service_test.dart` — all existing tests still pass after fake extraction
-- [ ] `flutter test test/services/purchase/premium_bridge_test.dart` — passes
-- [ ] `flutter test test/screens/paywall_screen_test.dart` — passes
-- [ ] `flutter analyze` — zero issues across all new and modified test files
-- [ ] Verify `FakePurchaseService` imports no `purchases_flutter` symbol
-- [ ] Verify `RevenueCatPurchaseService` imports no Firestore symbol
+- [x] `flutter test test/services/scan_quota_service_test.dart` — all existing tests still pass after fake extraction
+- [x] `flutter test test/services/purchase/premium_bridge_test.dart` — passes
+- [x] `flutter test test/screens/paywall_screen_test.dart` — passes
+- [x] `flutter analyze` — zero issues across all new and modified test files
+- [x] Verify `FakePurchaseService` imports no `purchases_flutter` symbol
+- [x] Verify `RevenueCatPurchaseService` imports no Firestore symbol
 
 **Human (verify in browser before committing):**
 *(No new deferred checks — all UI behavior was already verified in Step 6.)*
@@ -1213,6 +1213,44 @@ The following decisions from `design.md` meet all three ADR/DDR criteria (hard t
 The project does not currently maintain an `docs/adr/` or `docs/ddr/` directory. If you want these decisions preserved, run `/sai-3-implement` again after creating the directory and approving ADR creation.
 
 ## Appendix: Plan vs Final Implementation
+
+### Step 7 — Fake infrastructure compilation fixes
+
+**Plan:** Shared `FakeUser` uses `final String uid` field + `String get uid` getter.
+
+**Final:** Field renamed to `_uid` to avoid declaration conflict with the overriding getter.
+
+**Reason:** Dart doesn't allow a field and getter with the same name in the same class when both are declared in the class.
+
+**Plan:** `_FakeTransaction.update` parameter typed `Map<String, dynamic>`.
+
+**Final:** Changed to `Map<Object, Object?>` to match the overridden `Transaction.update` signature, with explicit `data.cast<String, dynamic>()` for the internal map.
+
+**Reason:** Parent interface (`cloud_firestore` 6.7.1) declares the parameter with `Map<Object, Object?>`.
+
+**Plan:** `set` with merge does a simple spread (`...data`) — no FieldValue resolution.
+
+**Final:** `set` with merge iterates entries and resolves `FieldValue.increment` the same way `update` does.
+
+**Reason:** `recordScan` calls `doc.set({'scansUsed': FieldValue.increment(1)}, SetOptions(merge: true))`. Without FieldValue resolution, the Firestore fake stores the `FieldValue` object itself, which crashes when `quotaStream` casts `data['scansUsed'] as num?`.
+
+**Plan:** `_FakeTransaction.commit` has `@override` annotation.
+
+**Final:** Removed `@override`.
+
+**Reason:** `Transaction` (cloud_firestore 6.7.1) does not define a `commit()` method. It's an internal method of the fake.
+
+**Plan:** Paywall test uses `find.text(r'$4.99')`.
+
+**Final:** Uses `find.textContaining(r'$4.99')`.
+
+**Reason:** The rendered CTA text is `"Unlock for $4.99"` (localized prefix), not just the price string.
+
+**Plan:** Bridge test relies on transitive import of `PurchaseSuccess` from `fake_purchase_service.dart`.
+
+**Final:** Added explicit `import 'package:vgcollection/services/purchase/purchase_service.dart'`.
+
+**Reason:** Dart does not transitively expose imports from other files. `fake_purchase_service.dart` imports `purchase_service.dart` but doesn't re-export it, so `PurchaseSuccess` is not visible in the bridge test without a direct import.
 
 ### Step 2 — API differences in purchases_flutter 8.11.0
 
