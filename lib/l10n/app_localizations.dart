@@ -571,7 +571,7 @@ abstract class AppLocalizations {
   /// No description provided for @paywallSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Scan as many game covers as you want with a premium subscription.'**
+  /// **'Scan as many game covers as you want with a one-time purchase.'**
   String get paywallSubtitle;
 
   /// No description provided for @paywallFeature1.
@@ -595,7 +595,7 @@ abstract class AppLocalizations {
   /// No description provided for @paywallCta.
   ///
   /// In en, this message translates to:
-  /// **'Subscribe'**
+  /// **'Unlock'**
   String get paywallCta;
 
   /// No description provided for @paywallRestore.
@@ -609,6 +609,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coming soon — stay tuned!'**
   String get paywallComingSoon;
+
+  /// No description provided for @paywallCtaPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock for {price}'**
+  String paywallCtaPrice(String price);
+
+  /// No description provided for @paywallCtaFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Premium'**
+  String get paywallCtaFallback;
+
+  /// No description provided for @paywallPurchaseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed. Please try again.'**
+  String get paywallPurchaseError;
+
+  /// No description provided for @paywallNothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No purchases to restore.'**
+  String get paywallNothingToRestore;
+
+  /// No description provided for @paywallRestoreError.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed. Please try again.'**
+  String get paywallRestoreError;
 
   /// No description provided for @freeScansRemaining.
   ///

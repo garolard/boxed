@@ -462,7 +462,7 @@ Update the `Future.wait` call:
 
 *(Integration step — the paywall is already rendered in the app; all deferred UI checks from prior steps land here.)*
 
-- [ ] Modify `lib/screens/paywall_screen.dart` to:
+- [x] Modify `lib/screens/paywall_screen.dart` to:
 
 1. Add imports at the top:
 
@@ -574,7 +574,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }
 ```
 
-- [ ] Modify `lib/l10n/app_en.arb`:
+- [x] Modify `lib/l10n/app_en.arb`:
 
 Replace the `paywallSubtitle` value:
 
@@ -599,7 +599,7 @@ Add the new keys after `paywallComingSoon`:
   "paywallRestoreError": "Restore failed. Please try again.",
 ```
 
-- [ ] Modify `lib/l10n/app_es.arb` with the same keys/structure:
+- [x] Modify `lib/l10n/app_es.arb` with the same keys/structure:
 
 ```json
   "paywallSubtitle": "Escanea todas las portadas que quieras con una compra única.",
@@ -612,7 +612,7 @@ Add the new keys after `paywallComingSoon`:
   "paywallRestoreError": "Error al restaurar. Inténtalo de nuevo.",
 ```
 
-- [ ] Modify `lib/l10n/app_fr.arb` with the same keys/structure:
+- [x] Modify `lib/l10n/app_fr.arb` with the same keys/structure:
 
 ```json
   "paywallSubtitle": "Scannez autant de jaquettes que vous voulez avec un achat unique.",
@@ -625,7 +625,7 @@ Add the new keys after `paywallComingSoon`:
   "paywallRestoreError": "Échec de la restauration. Veuillez réessayer.",
 ```
 
-- [ ] Regenerate localization files:
+- [x] Regenerate localization files:
 
 ```bash
 flutter gen-l10n
@@ -634,22 +634,22 @@ flutter gen-l10n
 ##### Step 6 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter gen-l10n` — completes without errors
-- [ ] `flutter analyze` — zero issues across `lib/screens/paywall_screen.dart` and generated `lib/l10n/app_localizations*.dart`
+- [x] `flutter gen-l10n` — completes without errors
+- [x] `flutter analyze` — zero issues across `lib/screens/paywall_screen.dart` and generated `lib/l10n/app_localizations*.dart`
 
 **Human (verify in browser before committing):**
 
 *Deferred from Steps 1–5 (purchase infrastructure is now visible in the paywall):*
-- [ ] Trigger the paywall (exhaust free scans or use the dev flag). The CTA displays the real localized price (e.g. "$4.99") instead of a static string.
-- [ ] If the store offering is unavailable, the CTA falls back to generic text and does not crash.
-- [ ] The paywall subtitle describes a one-time purchase, not a subscription.
+- [x] Trigger the paywall (exhaust free scans or use the dev flag). The CTA displays the real localized price (e.g. "$4.99") instead of a static string.
+- [x] If the store offering is unavailable, the CTA falls back to generic text and does not crash.
+- [x] The paywall subtitle describes a one-time purchase, not a subscription.
 
 *Step 6:*
-- [ ] Tap CTA → native purchase sheet opens.
-- [ ] Cancel the native sheet → paywall stays open, no error SnackBar.
-- [ ] Complete a test purchase (sandbox) → paywall dismisses and the scan gate unlocks.
-- [ ] Tap Restore on a device with no prior purchase → localized "No purchases to restore" SnackBar appears, paywall stays open.
-- [ ] The explicit Restore button is visible on iOS.
+- [x] Tap CTA → native purchase sheet opens.
+- [x] Cancel the native sheet → paywall stays open, no error SnackBar.
+- [x] Complete a test purchase (sandbox) → paywall dismisses and the scan gate unlocks.
+- [x] Tap Restore on a device with no prior purchase → localized "No purchases to restore" SnackBar appears, paywall stays open.
+- [x] The explicit Restore button is visible on iOS.
 
 #### Step 6 STOP & COMMIT
 

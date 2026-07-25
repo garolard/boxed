@@ -282,7 +282,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get paywallSubtitle =>
-      'Scannez autant de jaquettes que vous voulez avec un abonnement premium.';
+      'Scannez autant de jaquettes que vous voulez avec un achat unique.';
 
   @override
   String get paywallFeature1 => 'Scans de jaquettes illimités';
@@ -294,13 +294,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get paywallFeature3 => 'Accès prioritaire à OpenAI Vision';
 
   @override
-  String get paywallCta => 'S\'abonner';
+  String get paywallCta => 'Débloquer';
 
   @override
   String get paywallRestore => 'Restaurer les achats';
 
   @override
   String get paywallComingSoon => 'Bientôt disponible — restez à l\'écoute !';
+
+  @override
+  String paywallCtaPrice(String price) {
+    return 'Débloquer pour $price';
+  }
+
+  @override
+  String get paywallCtaFallback => 'Débloquer Premium';
+
+  @override
+  String get paywallPurchaseError => 'Échec de l\'achat. Veuillez réessayer.';
+
+  @override
+  String get paywallNothingToRestore => 'Aucun achat à restaurer.';
+
+  @override
+  String get paywallRestoreError =>
+      'Échec de la restauration. Veuillez réessayer.';
 
   @override
   String freeScansRemaining(int left, int total) {
