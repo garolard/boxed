@@ -41,11 +41,24 @@ class RevenueCatPurchaseService implements PurchaseService {
   @override
   Stream<bool> premiumUpdates() => _premiumController.stream;
 
+  /// Resolves the single premium package from the explicit `boxed_premium`
+  /// offering. The package identifier depends on its RC package *type*
+  /// (a Lifetime package is `$rc_lifetime`, not the entitlement id), so we take
+  /// the offering's lifetime package if present, else its first available one.
+  Package? _premiumPackage(Offerings offerings) {
+    final offering = offerings.all[_kOfferingId];
+    if (offering == null) return null;
+    return offering.lifetime ??
+        (offering.availablePackages.isNotEmpty
+            ? offering.availablePackages.first
+            : null);
+  }
+
   @override
   Future<PurchaseProduct?> premiumProduct() async {
     try {
       final offerings = await Purchases.getOfferings();
-      final package = offerings.all[_kOfferingId]?.getPackage('premium');
+      final package = _premiumPackage(offerings);
       if (package == null) return null;
       final storeProduct = package.storeProduct;
       return PurchaseProduct(
@@ -61,7 +74,7 @@ class RevenueCatPurchaseService implements PurchaseService {
   Future<PurchaseOutcome> purchasePremium() async {
     try {
       final offerings = await Purchases.getOfferings();
-      final package = offerings.all[_kOfferingId]?.getPackage('premium');
+      final package = _premiumPackage(offerings);
       if (package == null) {
         return const PurchaseError('Product not available');
       }
