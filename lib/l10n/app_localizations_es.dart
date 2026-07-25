@@ -283,7 +283,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get paywallSubtitle =>
-      'Escanea todas las portadas que quieras con una suscripción premium.';
+      'Escanea todas las portadas que quieras con una compra única.';
 
   @override
   String get paywallFeature1 => 'Escaneos de portadas ilimitados';
@@ -295,13 +295,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallFeature3 => 'Acceso prioritario a OpenAI Vision';
 
   @override
-  String get paywallCta => 'Suscribirse';
+  String get paywallCta => 'Desbloquear';
 
   @override
   String get paywallRestore => 'Restaurar compras';
 
   @override
   String get paywallComingSoon => 'Próximamente — ¡mantente atento!';
+
+  @override
+  String paywallCtaPrice(String price) {
+    return 'Desbloquear por $price';
+  }
+
+  @override
+  String get paywallCtaFallback => 'Desbloquear Premium';
+
+  @override
+  String get paywallCtaUnavailable => 'No disponible temporalmente';
+
+  @override
+  String get paywallPurchaseError => 'Error de compra. Inténtalo de nuevo.';
+
+  @override
+  String get paywallNothingToRestore => 'No hay compras para restaurar.';
+
+  @override
+  String get paywallRestoreError => 'Error al restaurar. Inténtalo de nuevo.';
 
   @override
   String freeScansRemaining(int left, int total) {

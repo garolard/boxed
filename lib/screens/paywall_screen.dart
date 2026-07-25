@@ -2,16 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
+import '../providers/services.dart';
+import '../services/purchase/purchase_service.dart';
 
-/// Full-screen modal shown when the user has exhausted their free scans.
-///
-/// Pushed via [MaterialPageRoute] with [fullscreenDialog: true] so the scan
-/// tab remains visible behind the modal.
-class PaywallScreen extends ConsumerWidget {
+class PaywallScreen extends ConsumerStatefulWidget {
   const PaywallScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
+}
+
+class _PaywallScreenState extends ConsumerState<PaywallScreen> {
+  late final Future<PurchaseProduct?> _productFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _productFuture = ref.read(purchaseServiceProvider).premiumProduct();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
@@ -49,29 +60,81 @@ class PaywallScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _FeatureRow(icon: Icons.check_circle_outline, text: l10n.paywallFeature3),
               const Spacer(),
-              FilledButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.paywallComingSoon)),
+              FutureBuilder<PurchaseProduct?>(
+                future: _productFuture,
+                builder: (context, snapshot) {
+                  final product = snapshot.data;
+                  final isReady = snapshot.connectionState == ConnectionState.done;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FilledButton(
+                        onPressed: isReady && product != null
+                            ? () => _handlePurchase(context)
+                            : null,
+                        child: () {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          }
+                          if (product != null) {
+                            return Text(l10n.paywallCtaPrice(product.priceString));
+                          }
+                          return Text(l10n.paywallCtaUnavailable);
+                        }(),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => _handleRestore(context),
+                        child: Text(l10n.paywallRestore),
+                      ),
+                    ],
                   );
                 },
-                child: Text(l10n.paywallCta),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.paywallComingSoon)),
-                  );
-                },
-                child: Text(l10n.paywallRestore),
-              ),
-              const SizedBox(height: 16),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _handlePurchase(BuildContext context) async {
+    final outcome = await ref.read(purchaseServiceProvider).purchasePremium();
+    if (!context.mounted) return;
+    switch (outcome) {
+      case PurchaseSuccess():
+        Navigator.of(context).pop();
+      case PurchaseCancelled():
+        break;
+      case PurchaseError():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.paywallPurchaseError)),
+        );
+    }
+  }
+
+  Future<void> _handleRestore(BuildContext context) async {
+    final outcome = await ref.read(purchaseServiceProvider).restore();
+    if (!context.mounted) return;
+    switch (outcome) {
+      case PurchaseSuccess():
+        Navigator.of(context).pop();
+      case PurchaseError(:final message):
+        final l10n = context.l10n;
+        final text = message.toLowerCase().contains('no purchases') ||
+                message.toLowerCase().contains('nothing')
+            ? l10n.paywallNothingToRestore
+            : l10n.paywallRestoreError;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(text)),
+        );
+      case PurchaseCancelled():
+        break;
+    }
   }
 }
 

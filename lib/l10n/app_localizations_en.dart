@@ -281,7 +281,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paywallSubtitle =>
-      'Scan as many game covers as you want with a premium subscription.';
+      'Scan as many game covers as you want with a one-time purchase.';
 
   @override
   String get paywallFeature1 => 'Unlimited cover scans';
@@ -293,13 +293,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywallFeature3 => 'Priority OpenAI vision access';
 
   @override
-  String get paywallCta => 'Subscribe';
+  String get paywallCta => 'Unlock';
 
   @override
   String get paywallRestore => 'Restore purchases';
 
   @override
   String get paywallComingSoon => 'Coming soon — stay tuned!';
+
+  @override
+  String paywallCtaPrice(String price) {
+    return 'Unlock for $price';
+  }
+
+  @override
+  String get paywallCtaFallback => 'Unlock Premium';
+
+  @override
+  String get paywallCtaUnavailable => 'Temporarily unavailable';
+
+  @override
+  String get paywallPurchaseError => 'Purchase failed. Please try again.';
+
+  @override
+  String get paywallNothingToRestore => 'No purchases to restore.';
+
+  @override
+  String get paywallRestoreError => 'Restore failed. Please try again.';
 
   @override
   String freeScansRemaining(int left, int total) {

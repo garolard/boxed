@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-const int kFreeScanLimit = 5;
+const int kFreeScanLimit = 50;
 
 /// Immutable snapshot of the user's current scan quota.
 class ScanQuota {
@@ -54,12 +54,10 @@ class ScanQuotaService {
   Stream<ScanQuota>? _quotaStream;
 
   ScanQuotaService({
-    required FirebaseFirestore firestore,
-    required FirebaseAuth auth,
-    required bool isPremiumOverride,
-  })  : _firestore = firestore,
-        _auth = auth,
-        _isPremiumOverride = isPremiumOverride;
+    required this._firestore,
+    required this._auth,
+    required this._isPremiumOverride,
+  });
 
   /// Centralised "is this user premium?" check.
   /// When RevenueCat is wired in later, this is the single seam to swap.
@@ -107,11 +105,13 @@ class ScanQuotaService {
         ctrl.add(quota);
       },
       onError: (_) {
-        ctrl.add(ScanQuota(
-          scansUsed: kFreeScanLimit,
-          isPremium: _isPremiumOverride,
-          readFailed: true,
-        ));
+        ctrl.add(
+          ScanQuota(
+            scansUsed: kFreeScanLimit,
+            isPremium: _isPremiumOverride,
+            readFailed: true,
+          ),
+        );
       },
       cancelOnError: false,
     );
@@ -134,7 +134,9 @@ class ScanQuotaService {
     if (_effectivePremium) return;
     final doc = _doc;
     if (doc == null) return;
-    await doc.set({'scansUsed': FieldValue.increment(1)}, SetOptions(merge: true));
+    await doc.set({
+      'scansUsed': FieldValue.increment(1),
+    }, SetOptions(merge: true));
   }
 
   /// Atomically checks quota and increments in a single Firestore transaction.
@@ -163,5 +165,13 @@ class ScanQuotaService {
       final next = current > 0 ? current - 1 : 0;
       tx.update(doc, {'scansUsed': next});
     });
+  }
+
+  /// Promote the current user to premium with a merge write.
+  /// No-op when there is no authenticated uid.
+  Future<void> markPremium() async {
+    final doc = _doc;
+    if (doc == null) return;
+    await doc.set({'isPremium': true}, SetOptions(merge: true));
   }
 }
