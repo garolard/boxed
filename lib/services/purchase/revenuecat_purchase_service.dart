@@ -78,9 +78,13 @@ class RevenueCatPurchaseService implements PurchaseService {
       if (package == null) {
         return const PurchaseError('Product not available');
       }
-      final info = await Purchases.purchasePackage(package);
-      final isPremium = info.entitlements.active.containsKey('premium');
-      return isPremium ? const PurchaseSuccess() : const PurchaseError('Premium not activated');
+      final info = await Purchases.purchase(PurchaseParams.package(package));
+      final isPremium = info.customerInfo.entitlements.active.containsKey(
+        'premium',
+      );
+      return isPremium
+          ? const PurchaseSuccess()
+          : const PurchaseError('Premium not activated');
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
