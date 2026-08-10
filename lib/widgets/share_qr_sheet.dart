@@ -30,11 +30,19 @@ class _ShareQrSheet extends ConsumerStatefulWidget {
 }
 
 class _ShareQrSheetState extends ConsumerState<_ShareQrSheet> {
-  late final _nameController = TextEditingController();
+  final _nameController = TextEditingController();
+  bool _seededName = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Seeded here rather than in initState: reading Localizations registers
+    // an inherited-widget dependency, which is not allowed before initState
+    // has returned. Guarded because didChangeDependencies runs again on any
+    // dependency change (locale switch, keyboard insets) and must never
+    // overwrite a name the user has typed.
+    if (_seededName) return;
+    _seededName = true;
     _nameController.text = context.l10n.defaultShelfName;
   }
 

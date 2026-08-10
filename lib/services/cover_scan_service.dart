@@ -25,29 +25,69 @@ class CoverScanService {
   static const _model = 'gpt-5-nano';
   static const _maxCandidates = 6;
 
+  /// Longest edge, in pixels, of the image we upload.
+  ///
+  /// The vision model resizes anything larger to fit a 768px short edge
+  /// before it looks at it, so pixels above this are encoded, uploaded and
+  /// then discarded server-side. Capping here cuts the request body several
+  /// times over, which shortens the upload — and on cellular the radio
+  /// staying in its high-power state is the expensive part of a scan.
+  ///
+  /// Do not lower this much further: game logos are stylised, and once the
+  /// title stops being legible in the upload the model starts guessing.
+  static const _maxImageEdge = 768.0;
+
+  /// JPEG quality for the upload. Cover art is flat, high-contrast artwork,
+  /// which survives this comfortably.
+  static const _imageQuality = 80;
+
   final ImagePicker _picker;
   final http.Client _client;
+  final bool _ownsClient;
+  final String _apiKey;
+  final String _orgId;
 
-  CoverScanService({ImagePicker? picker, http.Client? client})
-      : _picker = picker ?? ImagePicker(),
-        _client = client ?? http.Client();
+  /// Credentials default to the compile-time dart-defines; they are
+  /// constructor parameters so tests can drive the upload path offline.
+  CoverScanService({
+    ImagePicker? picker,
+    http.Client? client,
+    String apiKey = const String.fromEnvironment('OPENAI_API_KEY'),
+    String orgId = const String.fromEnvironment('OPENAI_ORG_ID'),
+  })  : _picker = picker ?? ImagePicker(),
+        _client = client ?? http.Client(),
+        _ownsClient = client == null,
+        // Initializing formals can't be used here: named parameters may not
+        // be private, and these fields are.
+        // ignore: prefer_initializing_formals
+        _apiKey = apiKey,
+        // ignore: prefer_initializing_formals
+        _orgId = orgId;
 
-  String get _apiKey => const String.fromEnvironment('OPENAI_API_KEY');
-  String get _orgId => const String.fromEnvironment('OPENAI_ORG_ID');
+  /// Closes the HTTP client, releasing its keep-alive connection. Only closes
+  /// a client this service created — an injected one stays the caller's.
+  void dispose() {
+    if (_ownsClient) _client.close();
+  }
 
   /// Picks an image, asks the model to recognise it and returns candidate
   /// titles ordered by the model's confidence (highest first). Returns an
   /// empty list if the user cancels the picker.
   Future<List<TitleCandidate>> scan({bool fromCamera = true}) async {
+    // Both bounds are set so the *longest* edge is capped. With maxWidth
+    // alone a portrait photo stayed full-height, which is most of them.
     final photo = await _picker.pickImage(
       source: fromCamera ? ImageSource.camera : ImageSource.gallery,
-      maxWidth: 1024,
-      imageQuality: 85,
+      maxWidth: _maxImageEdge,
+      maxHeight: _maxImageEdge,
+      imageQuality: _imageQuality,
     );
     if (photo == null) return [];
 
     if (_apiKey.isEmpty) {
-      throw CoverScanException('Missing OPENAI_API_KEY in .env');
+      throw CoverScanException(
+        'Missing OPENAI_API_KEY (pass it with --dart-define)',
+      );
     }
 
     final bytes = await photo.readAsBytes();

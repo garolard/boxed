@@ -37,6 +37,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     ref.read(analyticsServiceProvider).logScreenView(screenName: 'scan');
   }
 
+  @override
+  void dispose() {
+    _scanner.dispose();
+    super.dispose();
+  }
+
   Future<void> _scan({required bool fromCamera}) async {
     final quota = await ref.read(scanQuotaProvider.future);
 

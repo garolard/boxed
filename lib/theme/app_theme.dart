@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
 /// Calm, premium dark theme. Single accent color (violet) for primary
@@ -118,6 +119,13 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: Colors.transparent,
       canvasColor: AppColors.bg,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       textTheme: text,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
