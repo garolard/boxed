@@ -226,6 +226,24 @@ abstract class AppLocalizations {
   /// **'\"{name}\" added to collection'**
   String gameAdded(String name);
 
+  /// No description provided for @removeGameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove game?'**
+  String get removeGameTitle;
+
+  /// No description provided for @removeGameMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" will be removed from your shelf.'**
+  String removeGameMessage(String name);
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
   /// No description provided for @availableOn.
   ///
   /// In en, this message translates to:

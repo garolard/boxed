@@ -81,6 +81,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get removeGameTitle => 'Remove game?';
+
+  @override
+  String removeGameMessage(String name) {
+    return '\"$name\" will be removed from your shelf.';
+  }
+
+  @override
+  String get undo => 'Undo';
+
+  @override
   String get availableOn => 'Available on';
 
   @override

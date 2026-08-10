@@ -81,6 +81,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get removeGameTitle => '¿Quitar juego?';
+
+  @override
+  String removeGameMessage(String name) {
+    return '\"$name\" se quitará de tu estantería.';
+  }
+
+  @override
+  String get undo => 'Deshacer';
+
+  @override
   String get availableOn => 'Disponible en';
 
   @override

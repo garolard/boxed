@@ -13,6 +13,7 @@ import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
+import '../widgets/remove_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
 import '../widgets/genre_chip.dart';
@@ -456,28 +457,10 @@ class _SummaryTab extends ConsumerWidget {
     Game game,
     bool add,
   ) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final removedMessage = context.l10n.gameRemoved(game.name);
     if (add) {
       await addGameFlow(context, ref, game);
     } else {
-      await ref.read(collectionProvider.notifier).remove(game.id);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.remove_circle, color: AppColors.danger),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  removedMessage,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      await removeGameFlow(context, ref, game);
     }
   }
 }

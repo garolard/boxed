@@ -29,6 +29,9 @@
 
   "gameRemoved": "\"{name}\" eliminado",
   "gameAdded": "\"{name}\" añadido a la colección",
+  "removeGameTitle": "¿Quitar juego?",
+  "removeGameMessage": "\"{name}\" se quitará de tu estantería.",
+  "undo": "Deshacer",
 
   "availableOn": "Disponible en",
   "about": "Acerca de",

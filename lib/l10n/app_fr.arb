@@ -29,6 +29,9 @@
 
   "gameRemoved": "« {name} » retiré",
   "gameAdded": "« {name} » ajouté à la collection",
+  "removeGameTitle": "Retirer le jeu ?",
+  "removeGameMessage": "« {name} » sera retiré de votre étagère.",
+  "undo": "Annuler",
 
   "availableOn": "Disponible sur",
   "about": "À propos",

@@ -81,6 +81,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get removeGameTitle => 'Retirer le jeu ?';
+
+  @override
+  String removeGameMessage(String name) {
+    return '« $name » sera retiré de votre étagère.';
+  }
+
+  @override
+  String get undo => 'Annuler';
+
+  @override
   String get availableOn => 'Disponible sur';
 
   @override

@@ -10,6 +10,7 @@ import '../providers/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
+import '../widgets/remove_game_flow.dart';
 import '../widgets/genre_chip.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/neon_button.dart';
@@ -255,31 +256,9 @@ class _PrimaryAction extends ConsumerWidget {
                 icon: Icons.delete_outline_rounded,
                 color: AppColors.danger,
                 onPressed: () async {
-                  final messenger = ScaffoldMessenger.of(context);
                   final navigator = Navigator.of(context);
-                  await ref.read(collectionProvider.notifier).remove(game.id);
-                  navigator.pop();
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(
-                            Icons.remove_circle,
-                            color: AppColors.danger,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              l10n.gameRemoved(game.name),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  final removed = await removeGameFlow(context, ref, game);
+                  if (removed) navigator.pop();
                 },
               ),
             ],

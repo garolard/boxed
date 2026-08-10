@@ -123,6 +123,15 @@ class CollectionNotifier extends Notifier<CollectionState> {
     ));
   }
 
+  /// Puts back an entry exactly as it was removed — same owned platform and
+  /// original `addedAt`, so an undo does not reshuffle the shelf ordering.
+  /// Deliberately logs no analytics event: undoing a removal is not a new add.
+  Future<void> restore(Game entry) async {
+    await _repo.add(entry);
+    _recsStale = true;
+    await _load();
+  }
+
   Future<String> exportCollection() => _repo.exportToFile(state.games);
 
   Future<ImportResult> importCollection(String path) async {

@@ -33,6 +33,10 @@
   "@gameRemoved": {"placeholders": {"name": {"type": "String"}}},
   "gameAdded": "\"{name}\" added to collection",
   "@gameAdded": {"placeholders": {"name": {"type": "String"}}},
+  "removeGameTitle": "Remove game?",
+  "removeGameMessage": "\"{name}\" will be removed from your shelf.",
+  "@removeGameMessage": {"placeholders": {"name": {"type": "String"}}},
+  "undo": "Undo",
 
   "availableOn": "Available on",
   "about": "About",

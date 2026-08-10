@@ -15,6 +15,7 @@ import '../services/igdb_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/responsive.dart';
 import '../widgets/add_game_flow.dart';
+import '../widgets/remove_game_flow.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/game_cover_card.dart';
 import '../widgets/genre_chip.dart';
@@ -284,14 +285,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Future<void> _onAdd(BuildContext context, Game game) async {
-    final notifier = ref.read(collectionProvider.notifier);
     if (ref.read(collectionProvider).contains(game.id)) {
-      await notifier.remove(game.id);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.gameRemoved(game.name))),
-        );
-      }
+      await removeGameFlow(context, ref, game);
     } else {
       await addGameFlow(context, ref, game);
     }
