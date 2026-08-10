@@ -29,6 +29,31 @@ class IgdbService {
       'platforms.name,genres.name,first_release_date,total_rating,summary,'
       'similar_games;';
 
+  /// IGDB `game_type` ids we consider a "real" entry a collector can own.
+  /// Excludes mods (5), episodes (6), seasons (7), forks (12), packs (13),
+  /// updates (14) and bundles (3) — bundles are mostly digital season passes
+  /// and their contents already show up on their own.
+  /// See https://api.igdb.com/v4/game_types for the full list.
+  static const _allowedGameTypes = <int>[
+    0, // main game
+    1, // DLC
+    2, // expansion
+    4, // standalone expansion
+    8, // remake
+    9, // remaster
+    10, // expanded game
+    11, // port
+  ];
+
+  /// `status` ids that mean "this actually shipped". Most released games leave
+  /// `status` null, so null has to pass too; the point is to drop alpha (2),
+  /// beta (3), early access (4), cancelled (6) and rumored (7).
+  static const _shippedStatuses = <int>[
+    0, // released
+    5, // offline
+    8, // delisted
+  ];
+
   final http.Client _client;
   final AnalyticsService? _analytics;
   List<IgdbGenre>? _genresCache;
@@ -109,6 +134,21 @@ class IgdbService {
 
   String _escape(String s) => s.replaceAll('\\', '').replaceAll('"', '\\"');
 
+  /// Filters IGDB search down to entries a physical collector could actually
+  /// own: real games plus their DLC/expansions, already released, no mods,
+  /// fan versions or alternate editions of a game we already list.
+  List<String> _legitGameFilters() {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    return [
+      'game_type = (${_allowedGameTypes.join(',')})',
+      // Alternate editions (Limited, Special, GOTY…) point at the base game.
+      'version_parent = null',
+      'first_release_date != null',
+      'first_release_date < $now',
+      '(status = null | status = (${_shippedStatuses.join(',')}))',
+    ];
+  }
+
   /// Search games by title, optionally filtered by platform and/or genre.
   Future<List<Game>> searchGames(
     String query, {
@@ -116,11 +156,10 @@ class IgdbService {
     int? genreId,
     int limit = 40,
   }) async {
-    final where = <String>[];
+    final where = _legitGameFilters();
     if (platformId != null) where.add('platforms = ($platformId)');
     if (genreId != null) where.add('genres = ($genreId)');
-    final whereClause =
-        where.isEmpty ? '' : 'where ${where.join(' & ')};';
+    final whereClause = 'where ${where.join(' & ')};';
     final body =
         'search "${_escape(query)}"; $_gameFields $whereClause limit $limit;';
     final results = await _query('games', body);
