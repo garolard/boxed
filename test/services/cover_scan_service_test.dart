@@ -7,6 +7,8 @@ import 'package:http/testing.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vgcollection/services/cover_scan_service.dart';
 
+const _endpoint = 'https://worker.example/scan';
+
 /// Captures the downscaling arguments the service asks [ImagePicker] for and
 /// hands back a stub photo, so the upload path can run without a device.
 class _RecordingPicker extends ImagePicker {
@@ -36,23 +38,15 @@ class _RecordingPicker extends ImagePicker {
   }
 }
 
-String _completion(Object titles) => jsonEncode({
-      'choices': [
-        {
-          'message': {
-            'content': jsonEncode({'titles': titles}),
-          },
-        },
-      ],
-    });
+String _titles(Object titles) => jsonEncode({'titles': titles});
 
 void main() {
   test('downscales the photo before uploading it', () async {
     final picker = _RecordingPicker();
     final service = CoverScanService(
       picker: picker,
-      apiKey: 'test-key',
-      client: MockClient((_) async => http.Response(_completion([]), 200)),
+      endpoint: _endpoint,
+      client: MockClient((_) async => http.Response(_titles([]), 200)),
     );
 
     await service.scan(fromCamera: true);
@@ -66,14 +60,15 @@ void main() {
   });
 
   test('returns candidates ordered by confidence, de-duplicated', () async {
-    late String body;
+    late http.Request request;
     final service = CoverScanService(
       picker: _RecordingPicker(),
-      apiKey: 'test-key',
+      endpoint: _endpoint,
+      appToken: 'app-token',
       client: MockClient((req) async {
-        body = req.body;
+        request = req;
         return http.Response(
-          _completion([
+          _titles([
             {'title': 'Chrono Trigger', 'confidence': 0.4},
             {'title': 'Secret of Mana', 'confidence': 0.9},
             {'title': 'chrono trigger', 'confidence': 0.2},
@@ -89,15 +84,44 @@ void main() {
       candidates.map((c) => c.title),
       ['Secret of Mana', 'Chrono Trigger'],
     );
-    // The photo is inlined as a base64 data URI on the request.
-    expect(body, contains('data:image/jpeg;base64,'));
+    // The photo goes to the worker as raw bytes, not a base64 data URI.
+    expect(request.url.toString(), _endpoint);
+    expect(request.bodyBytes, [1, 2, 3, 4]);
+    expect(request.headers['Content-Type'], 'image/jpeg');
+    expect(request.headers['X-App-Token'], 'app-token');
   });
 
-  test('surfaces a non-200 from OpenAI as CoverScanException', () async {
+  test('sends no app token when none is configured', () async {
+    late http.Request request;
     final service = CoverScanService(
       picker: _RecordingPicker(),
-      apiKey: 'test-key',
+      endpoint: _endpoint,
+      client: MockClient((req) async {
+        request = req;
+        return http.Response(_titles([]), 200);
+      }),
+    );
+
+    await service.scan();
+
+    expect(request.headers.containsKey('X-App-Token'), isFalse);
+  });
+
+  test('surfaces a non-200 from the worker as CoverScanException', () async {
+    final service = CoverScanService(
+      picker: _RecordingPicker(),
+      endpoint: _endpoint,
       client: MockClient((_) async => http.Response('nope', 500)),
+    );
+
+    expect(service.scan(), throwsA(isA<CoverScanException>()));
+  });
+
+  test('throws when the endpoint is not configured', () async {
+    final service = CoverScanService(
+      picker: _RecordingPicker(),
+      endpoint: '',
+      client: MockClient((_) async => fail('must not call the worker')),
     );
 
     expect(service.scan(), throwsA(isA<CoverScanException>()));
@@ -106,8 +130,8 @@ void main() {
   test('returns an empty list when the user cancels the picker', () async {
     final service = CoverScanService(
       picker: _CancellingPicker(),
-      apiKey: 'test-key',
-      client: MockClient((_) async => fail('must not call OpenAI')),
+      endpoint: _endpoint,
+      client: MockClient((_) async => fail('must not call the worker')),
     );
 
     expect(await service.scan(), isEmpty);

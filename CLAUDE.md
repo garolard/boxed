@@ -23,7 +23,7 @@ Running the app needs compile-time secrets (see below):
 ```bash
 flutter run \
   --dart-define=IGDB_CLIENT_ID=... --dart-define=IGDB_SECRET_ID=... \
-  --dart-define=OPENAI_API_KEY=... --dart-define=OPENAI_ORG_ID=... \
+  --dart-define=COVER_SCAN_ENDPOINT=https://... --dart-define=COVER_SCAN_TOKEN=... \
   --dart-define=REVENUECAT_ANDROID_KEY=... --dart-define=REVENUECAT_IOS_KEY=... \
   --dart-define=IS_PREMIUM=false
 ```
@@ -39,7 +39,7 @@ the repo root is only a place to keep the values; it is not a bundled asset.
 | define | read in |
 | --- | --- |
 | `IGDB_CLIENT_ID`, `IGDB_SECRET_ID` | `lib/services/igdb_service.dart` |
-| `OPENAI_API_KEY`, `OPENAI_ORG_ID` | `lib/services/cover_scan_service.dart` |
+| `COVER_SCAN_ENDPOINT`, `COVER_SCAN_TOKEN` | `lib/services/cover_scan_service.dart` |
 | `REVENUECAT_IOS_KEY`, `REVENUECAT_ANDROID_KEY` | `lib/services/purchase/revenuecat_purchase_service.dart` |
 | `IS_PREMIUM` | `lib/main.dart` (dev-only premium override) |
 
@@ -68,9 +68,11 @@ providers is enough to isolate it.
   - `igdb_service.dart` — Twitch OAuth token (cached in SharedPreferences) + Apicalypse queries.
   - `collection_repository.dart` — sqflite; owned games and scanned "shared collections" are
     separate tables. Each row stores a full IGDB JSON snapshot so the app works offline.
-  - `cover_scan_service.dart` — sends the photo to OpenAI `gpt-5-nano` vision and parses
-    `{title, confidence}` candidates. (This replaced on-device ML Kit OCR; ML Kit is still a
-    dependency but only for **QR barcode** scanning in `qr_scan_service.dart`.)
+  - `cover_scan_service.dart` — POSTs the raw photo bytes to the Cloudflare worker in
+    `worker/`, which calls OpenAI `gpt-5-nano` vision and returns `{title, confidence}`
+    candidates. **No OpenAI key ships in the app**; it lives only in the worker's secrets.
+    (Cover scan replaced on-device ML Kit OCR; ML Kit is still a dependency but only for
+    **QR barcode** scanning in `qr_scan_service.dart`.)
   - `qr_payload_codec.dart` — compact game/platform id encoding for collection sharing.
   - `analytics_service.dart` — the only file touching Firebase Analytics/Crashlytics. Events go
     through typed param classes (`SearchEventParams`, `GameAddedParams`, …), not loose maps.

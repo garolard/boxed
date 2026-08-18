@@ -14,15 +14,16 @@ class CoverScanException implements Exception {
 }
 
 /// Identifies candidate game titles from a photo of a cover/box/cartridge by
-/// sending the image to OpenAI's GPT-5 nano vision model and parsing a
-/// structured list of `{title, confidence}` guesses.
+/// posting the image to the cover-scan worker (`worker/`), which calls OpenAI's
+/// GPT-5 nano vision model and returns a list of `{title, confidence}` guesses.
+///
+/// The app deliberately holds no OpenAI credentials: the key lives only in the
+/// worker's secrets, so it cannot be extracted from the shipped binary.
 ///
 /// This replaces on-device OCR: instead of reading raw text (which struggles
 /// with stylised logos and multi-line titles), the model recognises the game
 /// and returns the canonical title, so the IGDB search has a much better query.
 class CoverScanService {
-  static const _endpoint = 'https://api.openai.com/v1/chat/completions';
-  static const _model = 'gpt-5-nano';
   static const _maxCandidates = 6;
 
   /// Longest edge, in pixels, of the image we upload.
@@ -44,25 +45,25 @@ class CoverScanService {
   final ImagePicker _picker;
   final http.Client _client;
   final bool _ownsClient;
-  final String _apiKey;
-  final String _orgId;
+  final String _endpoint;
+  final String _appToken;
 
-  /// Credentials default to the compile-time dart-defines; they are
+  /// The endpoint and token default to the compile-time dart-defines; they are
   /// constructor parameters so tests can drive the upload path offline.
   CoverScanService({
     ImagePicker? picker,
     http.Client? client,
-    String apiKey = const String.fromEnvironment('OPENAI_API_KEY'),
-    String orgId = const String.fromEnvironment('OPENAI_ORG_ID'),
+    String endpoint = const String.fromEnvironment('COVER_SCAN_ENDPOINT'),
+    String appToken = const String.fromEnvironment('COVER_SCAN_TOKEN'),
   })  : _picker = picker ?? ImagePicker(),
         _client = client ?? http.Client(),
         _ownsClient = client == null,
         // Initializing formals can't be used here: named parameters may not
         // be private, and these fields are.
         // ignore: prefer_initializing_formals
-        _apiKey = apiKey,
+        _endpoint = endpoint,
         // ignore: prefer_initializing_formals
-        _orgId = orgId;
+        _appToken = appToken;
 
   /// Closes the HTTP client, releasing its keep-alive connection. Only closes
   /// a client this service created — an injected one stays the caller's.
@@ -70,9 +71,9 @@ class CoverScanService {
     if (_ownsClient) _client.close();
   }
 
-  /// Picks an image, asks the model to recognise it and returns candidate
-  /// titles ordered by the model's confidence (highest first). Returns an
-  /// empty list if the user cancels the picker.
+  /// Picks an image, asks the worker to recognise it and returns candidate
+  /// titles ordered by confidence (highest first). Returns an empty list if
+  /// the user cancels the picker.
   Future<List<TitleCandidate>> scan({bool fromCamera = true}) async {
     // Both bounds are set so the *longest* edge is capped. With maxWidth
     // alone a portrait photo stayed full-height, which is most of them.
@@ -84,108 +85,42 @@ class CoverScanService {
     );
     if (photo == null) return [];
 
-    if (_apiKey.isEmpty) {
+    if (_endpoint.isEmpty) {
       throw CoverScanException(
-        'Missing OPENAI_API_KEY (pass it with --dart-define)',
+        'Missing COVER_SCAN_ENDPOINT (pass it with --dart-define)',
       );
     }
 
     final bytes = await photo.readAsBytes();
-    final mime = _mimeFor(photo.path);
-    final dataUri = 'data:$mime;base64,${base64Encode(bytes)}';
-
-    return _recognize(dataUri);
+    return _recognize(bytes, _mimeFor(photo.path));
   }
 
-  Future<List<TitleCandidate>> _recognize(String dataUri) async {
+  Future<List<TitleCandidate>> _recognize(List<int> bytes, String mime) async {
+    // The photo goes up as raw bytes rather than a base64 data URI: the worker
+    // does the base64 encoding OpenAI needs, which keeps a third of the weight
+    // off the mobile upload.
     final res = await _client.post(
       Uri.parse(_endpoint),
       headers: {
-        'Authorization': 'Bearer $_apiKey',
-        if (_orgId.isNotEmpty) 'OpenAI-Organization': _orgId,
-        'Content-Type': 'application/json',
+        'Content-Type': mime,
+        if (_appToken.isNotEmpty) 'X-App-Token': _appToken,
       },
-      body: jsonEncode({
-        'model': _model,
-        // Simple extraction task; keep reasoning minimal for a fast response.
-        'reasoning_effort': 'minimal',
-        'max_completion_tokens': 2000,
-        'response_format': {
-          'type': 'json_schema',
-          'json_schema': {
-            'name': 'game_titles',
-            'strict': true,
-            'schema': {
-              'type': 'object',
-              'additionalProperties': false,
-              'properties': {
-                'titles': {
-                  'type': 'array',
-                  'items': {
-                    'type': 'object',
-                    'additionalProperties': false,
-                    'properties': {
-                      'title': {'type': 'string'},
-                      'confidence': {
-                        'type': 'number',
-                        'description': 'Likelihood 0-1 that this is the game.',
-                      },
-                    },
-                    'required': ['title', 'confidence'],
-                  },
-                },
-              },
-              'required': ['titles'],
-            },
-          },
-        },
-        'messages': [
-          {
-            'role': 'system',
-            'content':
-                'You identify videogames from photos of their physical media '
-                '(box art, cover, cartridge or disc). Return up to '
-                '$_maxCandidates candidate official game titles ordered by '
-                'likelihood, each with a confidence between 0 and 1. Use the '
-                'visible logo, artwork, platform and any text. Prefer the '
-                'canonical official title (omit edition/region suffixes unless '
-                'printed prominently). If you cannot identify a specific game, '
-                'return your best guesses from the readable text.',
-          },
-          {
-            'role': 'user',
-            'content': [
-              {
-                'type': 'text',
-                'text': 'What videogame is this? List candidate titles.',
-              },
-              {
-                'type': 'image_url',
-                'image_url': {'url': dataUri, 'detail': 'auto'},
-              },
-            ],
-          },
-        ],
-      }),
+      body: bytes,
     );
 
     if (res.statusCode != 200) {
       throw CoverScanException(
-          'OpenAI request failed (${res.statusCode}): ${res.body}');
+          'Cover scan request failed (${res.statusCode}): ${res.body}');
     }
 
     return _parse(res.body);
   }
 
+  /// The worker already de-duplicates, sorts and truncates, but the same
+  /// normalisation runs here so a malformed response can't reach the UI.
   List<TitleCandidate> _parse(String responseBody) {
     final body = jsonDecode(responseBody) as Map<String, dynamic>;
-    final choices = body['choices'] as List<dynamic>?;
-    final content =
-        (choices?.firstOrNull as Map<String, dynamic>?)?['message']?['content'];
-    if (content is! String || content.isEmpty) return [];
-
-    final parsed = jsonDecode(content) as Map<String, dynamic>;
-    final titles = parsed['titles'] as List<dynamic>? ?? [];
+    final titles = body['titles'] as List<dynamic>? ?? [];
 
     final seen = <String>{};
     final candidates = <TitleCandidate>[];

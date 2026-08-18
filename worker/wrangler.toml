@@ -1,0 +1,11 @@
+name = "boxed-cover-scan"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[observability]
+enabled = true
+
+# Secrets — set with `wrangler secret put <NAME>`, never in this file:
+#   OPENAI_API_KEY     (required)
+#   OPENAI_ORG_ID      (optional)
+#   APP_SHARED_SECRET  (optional; when set the app must send X-App-Token)
