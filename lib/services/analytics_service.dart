@@ -222,6 +222,28 @@ class AnalyticsService {
   }
 
   // ------------------------------------------------------------------
+  //  Review prompt
+  // ------------------------------------------------------------------
+
+  /// Fired when the native review dialog is requested at a collection-size
+  /// milestone. Both stores decide whether the dialog actually appears and
+  /// deliberately report nothing about the outcome (shown / dismissed /
+  /// submitted all look identical to the app), so this measures requests —
+  /// a "review submitted" event is impossible to implement on either store.
+  Future<void> logReviewPromptRequested({
+    required int milestone,
+    required int collectionSize,
+  }) async {
+    await _safe(() => _analytics.logEvent(
+          name: 'review_prompt_requested',
+          parameters: {
+            'milestone': milestone,
+            'collection_size': collectionSize,
+          },
+        ));
+  }
+
+  // ------------------------------------------------------------------
   //  Import / Export
   // ------------------------------------------------------------------
 

@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
@@ -19,6 +20,7 @@ import 'services/analytics_service.dart';
 import 'services/purchase/purchase_service.dart';
 import 'services/purchase/revenuecat_purchase_service.dart';
 import 'services/purchase/premium_bridge.dart';
+import 'services/review_service.dart';
 import 'services/scan_quota_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/gradient_background.dart';
@@ -58,12 +60,19 @@ Future<void> main() async {
     isPremiumOverride: isPremiumOverride,
   );
 
+  final reviewService = ReviewService(
+    gateway: InAppReviewGateway(),
+    prefs: await SharedPreferences.getInstance(),
+    analytics: analytics,
+  );
+
   runZonedGuarded(
     () => runApp(ProviderScope(
       overrides: [
         analyticsServiceProvider.overrideWithValue(analytics),
         scanQuotaServiceProvider.overrideWithValue(scanQuotaService),
         purchaseServiceProvider.overrideWithValue(purchaseService),
+        reviewServiceProvider.overrideWithValue(reviewService),
       ],
       child: BoxedApp(
         analytics: analytics,

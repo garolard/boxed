@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game.dart';
 import '../services/analytics_service.dart';
 import '../services/collection_repository.dart';
 import '../services/igdb_service.dart';
+import '../services/review_service.dart';
 import 'services.dart';
 
 const Object _unset = Object();
@@ -73,6 +76,7 @@ class CollectionNotifier extends Notifier<CollectionState> {
   late final CollectionRepository _repo;
   late final IgdbService _igdb;
   late final AnalyticsService _analytics;
+  late final ReviewService _review;
   bool _recsStale = true;
 
   @override
@@ -80,6 +84,7 @@ class CollectionNotifier extends Notifier<CollectionState> {
     _repo = ref.read(collectionRepositoryProvider);
     _igdb = ref.read(igdbServiceProvider);
     _analytics = ref.read(analyticsServiceProvider);
+    _review = ref.read(reviewServiceProvider);
     _load();
     return const CollectionState();
   }
@@ -108,6 +113,12 @@ class CollectionNotifier extends Notifier<CollectionState> {
       rating: game.rating,
       collectionSizeAfter: state.games.length,
     ));
+    // Fire-and-forget: awaiting this would delay add()'s completion, and the
+    // native prompt lands between the caller's UI transitions (platform-picker
+    // dismiss, confirmation snackbar) — a condition both stores are known to
+    // suppress. Unawaited, the plugin calls run after those transitions
+    // settle. The service swallows its own errors, so nothing escapes.
+    unawaited(_review.maybeRequestReview(state.games.length));
   }
 
   Future<void> remove(int gameId) async {
