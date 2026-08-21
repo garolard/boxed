@@ -862,7 +862,7 @@ class _SelectionBadge extends StatelessWidget {
 
 *(Integration step — first step where deferred UI components are rendered)*
 
-- [ ] Convert `_SummaryTab` in `lib/screens/home_screen.dart` from `ConsumerWidget` to `ConsumerStatefulWidget`:
+- [x] Convert `_SummaryTab` in `lib/screens/home_screen.dart` from `ConsumerWidget` to `ConsumerStatefulWidget`:
 
 Replace:
 ```dart
@@ -973,7 +973,7 @@ class _SummaryTabState extends ConsumerState<_SummaryTab> {
   }
 ```
 
-- [ ] Update the `build()` method of `_SummaryTabState`. Replace the `SliverAppBar` block with:
+- [x] Update the `build()` method of `_SummaryTabState`. Replace the `SliverAppBar` block with:
 
 ```dart
           SliverAppBar(
@@ -1084,7 +1084,7 @@ class _SummaryTabState extends ConsumerState<_SummaryTab> {
           ),
 ```
 
-- [ ] In the `SliverChildBuilderDelegate` inside the `SliverGrid`, replace the `GameCoverCard` invocation with:
+- [x] In the `SliverChildBuilderDelegate` inside the `SliverGrid`, replace the `GameCoverCard` invocation with:
 
 ```dart
                   return GameCoverCard(
@@ -1104,33 +1104,33 @@ class _SummaryTabState extends ConsumerState<_SummaryTab> {
                       )
 ```
 
-- [ ] Ensure `_export`, `_import`, and `_toggleOwnership` are still present in `_SummaryTabState` (moved from the old `ConsumerWidget` body).
+- [x] Ensure `_export`, `_import`, and `_toggleOwnership` are still present in `_SummaryTabState` (moved from the old `ConsumerWidget` body).
 
 ##### Step 6 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — passes
-- [ ] `flutter test test/widgets/game_cover_card_test.dart` — passes (no regression)
-- [ ] `flutter test test/providers/collection_provider_test.dart` — passes (no regression)
-- [ ] `flutter test test/services/collection_repository_test.dart` — passes (no regression)
+- [x] `flutter analyze` — passes
+- [x] `flutter test test/widgets/game_cover_card_test.dart` — passes (no regression)
+- [x] `flutter test test/providers/collection_provider_test.dart` — passes (no regression)
+- [x] `flutter test test/services/collection_repository_test.dart` — passes (no regression)
 
 **Human (verify in browser before committing):**
 
 *Deferred from Step 4 (GameCoverCard selection visuals):*
-- [ ] Enter selection mode on the Shelf; tap a cover — it shows a filled checkmark badge and an accent border
-- [ ] Tap the same cover again — the badge becomes an empty ring and the border disappears
+- [x] Enter selection mode on the Shelf; tap a cover — it shows a filled checkmark badge and an accent border
+- [x] Tap the same cover again — the badge becomes an empty ring and the border disappears
 
 *Step 6:*
-- [ ] The Shelf app bar shows a checklist icon; tapping it enters selection mode and clears any prior selection
-- [ ] In selection mode the app bar title shows "{N} selected"; actions are Close and Delete (disabled at 0)
-- [ ] The overflow menu (Share / Export / Import) is hidden in selection mode
-- [ ] Tapping a cover in selection mode toggles selection; it does NOT open the detail screen
-- [ ] The per-card quick-add/remove button is hidden in selection mode
-- [ ] Tap Delete with N selected → confirmation dialog shows "Remove N games?" and "These games will be removed from your shelf."
-- [ ] Confirming removes all N games and exits selection mode; a snackbar appears with "N games removed" and an Undo action
-- [ ] Tapping Undo restores all N games with their original owned platform and `addedAt`
-- [ ] Cancelling the dialog leaves the selection intact
-- [ ] Tapping Close exits selection mode and clears the selection
+- [x] The Shelf app bar shows a checklist icon; tapping it enters selection mode and clears any prior selection
+- [x] In selection mode the app bar title shows "{N} selected"; actions are Close and Delete (disabled at 0)
+- [x] The overflow menu (Share / Export / Import) is hidden in selection mode
+- [x] Tapping a cover in selection mode toggles selection; it does NOT open the detail screen
+- [x] The per-card quick-add/remove button is hidden in selection mode
+- [x] Tap Delete with N selected → confirmation dialog shows "Remove N games?" and "These games will be removed from your shelf."
+- [x] Confirming removes all N games and exits selection mode; a snackbar appears with "N games removed" and an Undo action
+- [x] Tapping Undo restores all N games with their original owned platform and `addedAt`
+- [x] Cancelling the dialog leaves the selection intact
+- [x] Tapping Close exits selection mode and clears the selection
 
 #### Step 6 STOP & COMMIT
 
@@ -1315,3 +1315,9 @@ This section documents deviations between the original plan and the code that wa
 **Plan:** `test/widgets/game_cover_card_test.dart` pumps `GameCoverCard` inside a bare `ProviderScope` with no overrides.
 **Final:** The `ProviderScope` overrides `collectionProvider` with a `_StubCollection extends CollectionNotifier` whose `build()` returns `const CollectionState(loaded: true)`; the local helper was also renamed `_pumpCard` → `pumpCard`.
 **Reason:** The real notifier's `build()` reads the throwing default `analyticsServiceProvider`/`reviewServiceProvider` (and its `_load()` hits sqflite), so pumping the card raised a Riverpod `ProviderException` in addition to the assertion failure. Stubbing the provider is the established pattern in this repo (`test/widgets/remove_game_flow_test.dart`). The renamed helper avoids `no_leading_underscores_for_local_identifiers`.
+
+### Step 6 — entrance animation chain preserved on Shelf cards
+
+**Plan:** The `GameCoverCard` invocation in the `SliverChildBuilderDelegate` is replaced by a block that ends with a plain `)` — no `.animate()` chain.
+**Final:** The replaced invocation keeps the existing `.animate().fadeIn(...).slideY(...)` chain outside the new `GameCoverCard(...)` call.
+**Reason:** Dropping the entrance animation would be an unplanned visual regression on the Shelf. The plan intended to add selection params, not remove existing animation, so the chain was preserved.
