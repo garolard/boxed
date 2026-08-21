@@ -18,6 +18,9 @@ class GameCoverCard extends ConsumerWidget {
   final String? subtitle;
   final bool dense;
   final VoidCallback? onAddPressed;
+  final bool selectable;
+  final bool selected;
+  final VoidCallback? onToggleSelection;
 
   const GameCoverCard({
     super.key,
@@ -25,6 +28,9 @@ class GameCoverCard extends ConsumerWidget {
     this.subtitle,
     this.dense = false,
     this.onAddPressed,
+    this.selectable = false,
+    this.selected = false,
+    this.onToggleSelection,
   });
 
   @override
@@ -40,15 +46,20 @@ class GameCoverCard extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => GameDetailScreen(game: game)),
-        ),
+        onTap: selectable
+            ? onToggleSelection
+            : () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GameDetailScreen(game: game)),
+                ),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             color: AppColors.surface,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: selected ? AppColors.accent : Colors.white.withValues(alpha: 0.05),
+              width: selected ? 3 : 1,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.4),
@@ -87,7 +98,10 @@ class GameCoverCard extends ConsumerWidget {
                       if (game.rating != null)
                         _RatingPill(rating: game.rating!),
                       const Spacer(),
-                      if (owned) const _OwnedPill(),
+                      if (selectable)
+                        _SelectionBadge(selected: selected)
+                      else if (owned)
+                        const _OwnedPill(),
                     ],
                   ),
                 ),
@@ -322,6 +336,20 @@ class _QuickAddButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SelectionBadge extends StatelessWidget {
+  final bool selected;
+  const _SelectionBadge({required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      selected ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+      color: selected ? AppColors.accent : Colors.white.withValues(alpha: 0.7),
+      size: 26,
     );
   }
 }

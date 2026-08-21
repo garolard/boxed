@@ -523,7 +523,7 @@ void main() {
 
 ##### RED phase
 
-- [ ] Add the new optional params to `lib/widgets/game_cover_card.dart` so the test can compile. The `GameCoverCard` constructor becomes:
+- [x] Add the new optional params to `lib/widgets/game_cover_card.dart` so the test can compile. The `GameCoverCard` constructor becomes:
 
 ```dart
   const GameCoverCard({
@@ -547,7 +547,7 @@ Add the field declarations:
 
 In `build()`, leave the body **unchanged** for RED (the existing `_OwnedPill` and `InkWell.onTap` push behaviour stay as-is, so the test asserts the selection badge is missing and the test fails).
 
-- [ ] Write the test into `test/widgets/game_cover_card_test.dart`:
+- [x] Write the test into `test/widgets/game_cover_card_test.dart`:
 
 - Unselected cover in selectable mode shows empty selection badge (`Icons.check_circle_outline_rounded`) and no accent border
 - Selected cover in selectable mode shows filled selection badge (`Icons.check_circle_rounded`) with accent color and a 3 px accent border
@@ -616,12 +616,12 @@ void main() {
 }
 ```
 
-- [ ] Verify RED: run `flutter test test/widgets/game_cover_card_test.dart` — expected: **assertion failures** (the badge and border are not yet rendered because the RED stub ignores `selectable`/`selected`).
-- [ ] **GATE — DO NOT PROCEED to GREEN until RED is verified.**
+- [x] Verify RED: run `flutter test test/widgets/game_cover_card_test.dart` — expected: **assertion failures** (the badge and border are not yet rendered because the RED stub ignores `selectable`/`selected`).
+- [x] **GATE — DO NOT PROCEED to GREEN until RED is verified.**
 
 ##### GREEN phase (only after RED is verified)
 
-- [ ] Replace the `build()` body in `lib/widgets/game_cover_card.dart` with the full implementation. The complete `build()` method:
+- [x] Replace the `build()` body in `lib/widgets/game_cover_card.dart` with the full implementation. The complete `build()` method:
 
 ```dart
   @override
@@ -718,7 +718,7 @@ void main() {
   }
 ```
 
-- [ ] Add the `_SelectionBadge` widget at the bottom of the file, after `_QuickAddButton`:
+- [x] Add the `_SelectionBadge` widget at the bottom of the file, after `_QuickAddButton`:
 
 ```dart
 class _SelectionBadge extends StatelessWidget {
@@ -736,14 +736,14 @@ class _SelectionBadge extends StatelessWidget {
 }
 ```
 
-- [ ] Verify GREEN: run `flutter test test/widgets/game_cover_card_test.dart` — expected: PASS
+- [x] Verify GREEN: run `flutter test test/widgets/game_cover_card_test.dart` — expected: PASS
 
 ##### Step 4 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] RED verified — `flutter test test/widgets/game_cover_card_test.dart` fails as expected
-- [ ] GREEN verified — `flutter test test/widgets/game_cover_card_test.dart` passes
-- [ ] `flutter analyze` — passes
+- [x] RED verified — `flutter test test/widgets/game_cover_card_test.dart` fails as expected
+- [x] GREEN verified — `flutter test test/widgets/game_cover_card_test.dart` passes
+- [x] `flutter analyze` — passes
 
 **Human (verify in browser before committing):**
 *(Deferred to Step 6 — selectable mode is not yet active in the Shelf)*
@@ -1309,3 +1309,9 @@ This section documents deviations between the original plan and the code that wa
 **Plan:** `_FakeAnalytics` in `test/providers/collection_provider_test.dart` implements only `logBulkGamesRemoved` plus `noSuchMethod`, and nothing else.
 **Final:** Added an explicit no-op override `void setCrashlyticsKey(String key, Object value) {}` to `_FakeAnalytics`.
 **Reason:** `CollectionNotifier.build()` and `_load()` call `_analytics.setCrashlyticsKey('collection_size', len)`, which routed to `Object.noSuchMethod` and threw `NoSuchMethodError`, failing every test before assertions ran.
+
+### Step 4 — widget test needs a stubbed collection provider
+
+**Plan:** `test/widgets/game_cover_card_test.dart` pumps `GameCoverCard` inside a bare `ProviderScope` with no overrides.
+**Final:** The `ProviderScope` overrides `collectionProvider` with a `_StubCollection extends CollectionNotifier` whose `build()` returns `const CollectionState(loaded: true)`; the local helper was also renamed `_pumpCard` → `pumpCard`.
+**Reason:** The real notifier's `build()` reads the throwing default `analyticsServiceProvider`/`reviewServiceProvider` (and its `_load()` hits sqflite), so pumping the card raised a Riverpod `ProviderException` in addition to the assertion failure. Stubbing the provider is the established pattern in this repo (`test/widgets/remove_game_flow_test.dart`). The renamed helper avoids `no_leading_underscores_for_local_identifiers`.
