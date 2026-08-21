@@ -239,9 +239,104 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-class _SummaryTab extends ConsumerWidget {
+class _SummaryTab extends ConsumerStatefulWidget {
   final VoidCallback onJumpToSearch;
   const _SummaryTab({required this.onJumpToSearch});
+
+  @override
+  ConsumerState<_SummaryTab> createState() => _SummaryTabState();
+}
+
+class _SummaryTabState extends ConsumerState<_SummaryTab> {
+  bool _inSelectionMode = false;
+  final Set<int> _selectedIds = {};
+
+  void _enterSelectionMode() {
+    setState(() {
+      _inSelectionMode = true;
+      _selectedIds.clear();
+    });
+  }
+
+  void _exitSelectionMode() {
+    setState(() {
+      _inSelectionMode = false;
+      _selectedIds.clear();
+    });
+  }
+
+  void _toggleSelection(int id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  Future<void> _bulkRemove(BuildContext context) async {
+    if (_selectedIds.isEmpty) return;
+    final l10n = context.l10n;
+    final n = _selectedIds.length;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceHi,
+        title: Text(l10n.removeNGamesTitle(n)),
+        content: Text(l10n.removeNGamesMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.removeShort),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(collectionProvider.notifier);
+
+    final snapshot = await notifier.removeMany(_selectedIds.toList());
+
+    setState(() {
+      _inSelectionMode = false;
+      _selectedIds.clear();
+    });
+
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 5),
+        persist: false,
+        content: Row(
+          children: [
+            const Icon(Icons.remove_circle, color: AppColors.danger),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.gamesRemoved(n),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+        action: SnackBarAction(
+          label: l10n.undo,
+          textColor: AppColors.accent,
+          onPressed: () => notifier.restoreMany(snapshot),
+        ),
+      ),
+    );
+  }
 
   Future<void> _export(BuildContext context, WidgetRef ref) async {
     final subject = context.l10n.shareSubject;
@@ -292,7 +387,7 @@ class _SummaryTab extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(collectionProvider);
     final l10n = context.l10n;
     final games = state.games;
@@ -306,7 +401,9 @@ class _SummaryTab extends ConsumerWidget {
             elevation: 0,
             scrolledUnderElevation: 0,
             title: Text(
-              l10n.shelfTitle,
+              _inSelectionMode
+                  ? l10n.nSelected(_selectedIds.length)
+                  : l10n.shelfTitle,
               style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 22,
@@ -314,66 +411,95 @@ class _SummaryTab extends ConsumerWidget {
                 letterSpacing: 0.4,
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(
-                  Icons.qr_code_scanner_rounded,
-                  color: AppColors.textPrimary,
-                ),
-                tooltip: l10n.sharedCollectionsTooltip,
-                onPressed: () {
-                  ref.read(analyticsServiceProvider).logScreenView(
-                    screenName: 'shared_collections',
-                  );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SharedCollectionsScreen(),
+            actions: _inSelectionMode
+                ? [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.textPrimary,
+                      ),
+                      tooltip: l10n.cancel,
+                      onPressed: _exitSelectionMode,
                     ),
-                  );
-                },
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.more_vert_rounded,
-                  color: AppColors.textPrimary,
-                ),
-                onSelected: (v) => switch (v) {
-                  'export' => _export(context, ref),
-                  'import' => _import(context, ref),
-                  _ => () {
-                      final count = ref.read(collectionProvider).games.length;
-                      ref.read(analyticsServiceProvider).logShareQrGenerated(
-                        gameCount: count,
-                      );
-                      showShareQrSheet(context);
-                    }(),
-                },
-                itemBuilder: (_) => [
-                  PopupMenuItem(
-                    value: 'share_qr',
-                    child: ListTile(
-                      leading: const Icon(Icons.qr_code_rounded),
-                      title: Text(l10n.menuShareQr),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.delete_rounded,
+                        color: AppColors.danger,
+                      ),
+                      tooltip: l10n.removeShort,
+                      onPressed: _selectedIds.isEmpty
+                          ? null
+                          : () => _bulkRemove(context),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'export',
-                    child: ListTile(
-                      leading: const Icon(Icons.upload_file),
-                      title: Text(l10n.menuExport),
+                  ]
+                : [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.checklist_rounded,
+                        color: AppColors.textPrimary,
+                      ),
+                      tooltip: l10n.menuSelectGames,
+                      onPressed: _enterSelectionMode,
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'import',
-                    child: ListTile(
-                      leading: const Icon(Icons.download),
-                      title: Text(l10n.menuImport),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: AppColors.textPrimary,
+                      ),
+                      tooltip: l10n.sharedCollectionsTooltip,
+                      onPressed: () {
+                        ref.read(analyticsServiceProvider).logScreenView(
+                          screenName: 'shared_collections',
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SharedCollectionsScreen(),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    PopupMenuButton<String>(
+                      icon: const Icon(
+                        Icons.more_vert_rounded,
+                        color: AppColors.textPrimary,
+                      ),
+                      onSelected: (v) => switch (v) {
+                        'export' => _export(context, ref),
+                        'import' => _import(context, ref),
+                        _ => () {
+                            final count = ref.read(collectionProvider).games.length;
+                            ref.read(analyticsServiceProvider).logShareQrGenerated(
+                              gameCount: count,
+                            );
+                            showShareQrSheet(context);
+                          }(),
+                      },
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: 'share_qr',
+                          child: ListTile(
+                            leading: const Icon(Icons.qr_code_rounded),
+                            title: Text(l10n.menuShareQr),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'export',
+                          child: ListTile(
+                            leading: const Icon(Icons.upload_file),
+                            title: Text(l10n.menuExport),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'import',
+                          child: ListTile(
+                            leading: const Icon(Icons.download),
+                            title: Text(l10n.menuImport),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -384,7 +510,7 @@ class _SummaryTab extends ConsumerWidget {
                       child: _StatsSkeleton(),
                     )
                   : games.isEmpty
-                  ? _EmptyCollection(onSearch: onJumpToSearch)
+                  ? _EmptyCollection(onSearch: widget.onJumpToSearch)
                   : Column(
                       children: [
                         StatsDashboard(state: state),
@@ -422,12 +548,17 @@ class _SummaryTab extends ConsumerWidget {
                   return GameCoverCard(
                         game: game,
                         dense: true,
-                        onAddPressed: () => _toggleOwnership(
-                          context,
-                          ref,
-                          game,
-                          !state.contains(game.id),
-                        ),
+                        selectable: _inSelectionMode,
+                        selected: _selectedIds.contains(game.id),
+                        onToggleSelection: () => _toggleSelection(game.id),
+                        onAddPressed: _inSelectionMode
+                            ? null
+                            : () => _toggleOwnership(
+                                  context,
+                                  ref,
+                                  game,
+                                  !state.contains(game.id),
+                                ),
                       )
                       .animate()
                       .fadeIn(

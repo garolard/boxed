@@ -117,5 +117,10 @@
 
   "owned": "TUYO",
   "addToShelfShort": "Añadir",
-  "removeShort": "Quitar"
+  "removeShort": "Quitar",
+  "menuSelectGames": "Seleccionar juegos",
+  "nSelected": "{count, plural, =1{1 seleccionado} other{{count} seleccionados}}",
+  "removeNGamesTitle": "{count, plural, =1{¿Quitar 1 juego?} other{¿Quitar {count} juegos?}}",
+  "removeNGamesMessage": "Estos juegos se quitarán de tu estantería.",
+  "gamesRemoved": "{count, plural, =1{1 juego eliminado} other{{count} juegos eliminados}}"
 }

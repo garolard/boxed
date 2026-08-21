@@ -346,6 +346,46 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get removeShort => 'Remover';
+
+  @override
+  String get menuSelectGames => 'Selecionar jogos';
+
+  @override
+  String nSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selecionados',
+      one: '1 selecionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeNGamesTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remover $count jogos?',
+      one: 'Remover 1 jogo?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeNGamesMessage =>
+      'Estes jogos serão removidos da sua prateleira.';
+
+  @override
+  String gamesRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jogos removidos',
+      one: '1 jogo removido',
+    );
+    return '$_temp0';
+  }
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -690,6 +730,46 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get removeShort => 'Remover';
+
+  @override
+  String get menuSelectGames => 'Selecionar jogos';
+
+  @override
+  String nSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selecionados',
+      one: '1 selecionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeNGamesTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remover $count jogos?',
+      one: 'Remover 1 jogo?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeNGamesMessage =>
+      'Estes jogos serão removidos da sua prateleira.';
+
+  @override
+  String gamesRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jogos removidos',
+      one: '1 jogo removido',
+    );
+    return '$_temp0';
+  }
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -1034,4 +1114,44 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get removeShort => 'Remover';
+
+  @override
+  String get menuSelectGames => 'Selecionar jogos';
+
+  @override
+  String nSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selecionados',
+      one: '1 selecionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeNGamesTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remover $count jogos?',
+      one: 'Remover 1 jogo?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeNGamesMessage =>
+      'Estes jogos serão removidos da tua estante.';
+
+  @override
+  String gamesRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jogos removidos',
+      one: '1 jogo removido',
+    );
+    return '$_temp0';
+  }
 }
