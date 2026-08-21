@@ -117,5 +117,10 @@
 
   "owned": "À VOUS",
   "addToShelfShort": "Ajouter",
-  "removeShort": "Retirer"
+  "removeShort": "Retirer",
+  "menuSelectGames": "Sélectionner des jeux",
+  "nSelected": "{count, plural, =1{1 sélectionné} other{{count} sélectionnés}}",
+  "removeNGamesTitle": "{count, plural, =1{Retirer 1 jeu ?} other{Retirer {count} jeux ?}}",
+  "removeNGamesMessage": "Ces jeux seront retirés de votre étagère.",
+  "gamesRemoved": "{count, plural, =1{1 jeu retiré} other{{count} jeux retirés}}"
 }

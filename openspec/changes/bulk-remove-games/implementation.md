@@ -760,7 +760,7 @@ class _SelectionBadge extends StatelessWidget {
 
 *(Non-testable step — standard format, no RED/GREEN needed)*
 
-- [ ] Append the following keys to `lib/l10n/app_en.arb` (before the closing `}`):
+- [x] Append the following keys to `lib/l10n/app_en.arb` (before the closing `}`):
 
 ```json
 ,
@@ -774,7 +774,7 @@ class _SelectionBadge extends StatelessWidget {
   "@gamesRemoved": {"placeholders": {"count": {"type": "int"}}}
 ```
 
-- [ ] Append the following keys to `lib/l10n/app_es.arb` (values-only, no `@` metadata):
+- [x] Append the following keys to `lib/l10n/app_es.arb` (values-only, no `@` metadata):
 
 ```json
 ,
@@ -785,7 +785,7 @@ class _SelectionBadge extends StatelessWidget {
   "gamesRemoved": "{count, plural, =1{1 juego eliminado} other{{count} juegos eliminados}}"
 ```
 
-- [ ] Append the following keys to `lib/l10n/app_fr.arb` (values-only, no `@` metadata):
+- [x] Append the following keys to `lib/l10n/app_fr.arb` (values-only, no `@` metadata):
 
 ```json
 ,
@@ -796,7 +796,7 @@ class _SelectionBadge extends StatelessWidget {
   "gamesRemoved": "{count, plural, =1{1 jeu retiré} other{{count} jeux retirés}}"
 ```
 
-- [ ] Append the following keys to `lib/l10n/app_pt.arb` (values + `@` metadata, matching existing convention):
+- [x] Append the following keys to `lib/l10n/app_pt.arb` (values + `@` metadata, matching existing convention):
 
 ```json
 ,
@@ -810,7 +810,7 @@ class _SelectionBadge extends StatelessWidget {
   "@gamesRemoved": {"placeholders": {"count": {"type": "int"}}}
 ```
 
-- [ ] Append the following keys to `lib/l10n/app_pt_BR.arb` (values + `@` metadata):
+- [x] Append the following keys to `lib/l10n/app_pt_BR.arb` (values + `@` metadata):
 
 ```json
 ,
@@ -824,7 +824,7 @@ class _SelectionBadge extends StatelessWidget {
   "@gamesRemoved": {"placeholders": {"count": {"type": "int"}}}
 ```
 
-- [ ] Append the following keys to `lib/l10n/app_pt_PT.arb` (values + `@` metadata):
+- [x] Append the following keys to `lib/l10n/app_pt_PT.arb` (values + `@` metadata):
 
 ```json
 ,
@@ -838,14 +838,14 @@ class _SelectionBadge extends StatelessWidget {
   "@gamesRemoved": {"placeholders": {"count": {"type": "int"}}}
 ```
 
-- [ ] Run `flutter gen-l10n` from the project root.
-- [ ] Verify that `lib/l10n/app_localizations*.dart` were regenerated and now contain the five new members (`menuSelectGames`, `nSelected`, `removeNGamesTitle`, `removeNGamesMessage`, `gamesRemoved`).
+- [x] Run `flutter gen-l10n` from the project root.
+- [x] Verify that `lib/l10n/app_localizations*.dart` were regenerated and now contain the five new members (`menuSelectGames`, `nSelected`, `removeNGamesTitle`, `removeNGamesMessage`, `gamesRemoved`).
 
 ##### Step 5 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter gen-l10n` — succeeds without errors
-- [ ] `flutter analyze` — passes (unused public getters are acceptable)
+- [x] `flutter gen-l10n` — succeeds without errors
+- [x] `flutter analyze` — passes (unused public getters are acceptable)
 
 **Human (verify in browser before committing):**
 *(No browser checks — strings are not yet referenced in the UI)*

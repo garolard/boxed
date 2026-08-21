@@ -691,6 +691,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove'**
   String get removeShort;
+
+  /// No description provided for @menuSelectGames.
+  ///
+  /// In en, this message translates to:
+  /// **'Select games'**
+  String get menuSelectGames;
+
+  /// No description provided for @nSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected} other{{count} selected}}'**
+  String nSelected(int count);
+
+  /// No description provided for @removeNGamesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Remove 1 game?} other{Remove {count} games?}}'**
+  String removeNGamesTitle(int count);
+
+  /// No description provided for @removeNGamesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'These games will be removed from your shelf.'**
+  String get removeNGamesMessage;
+
+  /// No description provided for @gamesRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 game removed} other{{count} games removed}}'**
+  String gamesRemoved(int count);
 }
 
 class _AppLocalizationsDelegate

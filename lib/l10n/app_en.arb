@@ -131,5 +131,13 @@
 
   "owned": "OWNED",
   "addToShelfShort": "Add to shelf",
-  "removeShort": "Remove"
+  "removeShort": "Remove",
+  "menuSelectGames": "Select games",
+  "nSelected": "{count, plural, =1{1 selected} other{{count} selected}}",
+  "@nSelected": {"placeholders": {"count": {"type": "int"}}},
+  "removeNGamesTitle": "{count, plural, =1{Remove 1 game?} other{Remove {count} games?}}",
+  "@removeNGamesTitle": {"placeholders": {"count": {"type": "int"}}},
+  "removeNGamesMessage": "These games will be removed from your shelf.",
+  "gamesRemoved": "{count, plural, =1{1 game removed} other{{count} games removed}}",
+  "@gamesRemoved": {"placeholders": {"count": {"type": "int"}}}
 }

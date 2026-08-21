@@ -347,4 +347,43 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get removeShort => 'Retirer';
+
+  @override
+  String get menuSelectGames => 'Sélectionner des jeux';
+
+  @override
+  String nSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sélectionnés',
+      one: '1 sélectionné',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeNGamesTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Retirer $count jeux ?',
+      one: 'Retirer 1 jeu ?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeNGamesMessage => 'Ces jeux seront retirés de votre étagère.';
+
+  @override
+  String gamesRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jeux retirés',
+      one: '1 jeu retiré',
+    );
+    return '$_temp0';
+  }
 }
