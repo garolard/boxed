@@ -42,7 +42,7 @@ class GameCoverCard extends ConsumerWidget {
         game.ownedPlatformName ??
         (game.platformNames.isNotEmpty ? game.platformNames.first : null);
 
-    return Material(
+    final card = Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -124,6 +124,10 @@ class GameCoverCard extends ConsumerWidget {
         ),
       ),
     );
+
+    return selectable
+        ? Semantics(selected: selected, button: true, child: card)
+        : card;
   }
 }
 
@@ -346,10 +350,12 @@ class _SelectionBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      selected ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
-      color: selected ? AppColors.accent : Colors.white.withValues(alpha: 0.7),
-      size: 26,
+    return ExcludeSemantics(
+      child: Icon(
+        selected ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+        color: selected ? AppColors.accent : Colors.white.withValues(alpha: 0.7),
+        size: 26,
+      ),
     );
   }
 }
