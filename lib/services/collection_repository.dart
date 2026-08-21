@@ -18,9 +18,18 @@ class ImportResult {
 /// snapshot of the game so the app works offline.
 class CollectionRepository {
   Database? _db;
+  final Future<Database> Function()? _customOpener;
+
+  CollectionRepository({Future<Database> Function()? opener})
+      : _customOpener = opener;
 
   Future<Database> get _database async {
     if (_db != null) return _db!;
+    final opener = _customOpener;
+    if (opener != null) {
+      _db = await opener();
+      return _db!;
+    }
     final dir = await getDatabasesPath();
     _db = await openDatabase(
       p.join(dir, 'boxed.db'),
@@ -79,6 +88,55 @@ class CollectionRepository {
   Future<void> remove(int gameId) async {
     final db = await _database;
     await db.delete('collection', where: 'id = ?', whereArgs: [gameId]);
+  }
+
+  Future<void> removeMany(List<int> ids) async {
+    if (ids.isEmpty) return;
+    final db = await _database;
+    const chunkSize = 500;
+    if (ids.length <= chunkSize) {
+      final placeholders = List.filled(ids.length, '?').join(',');
+      await db.delete(
+        'collection',
+        where: 'id IN ($placeholders)',
+        whereArgs: ids,
+      );
+    } else {
+      await db.transaction((txn) async {
+        for (var i = 0; i < ids.length; i += chunkSize) {
+          final chunk = ids.sublist(
+            i,
+            i + chunkSize > ids.length ? ids.length : i + chunkSize,
+          );
+          final placeholders = List.filled(chunk.length, '?').join(',');
+          await txn.delete(
+            'collection',
+            where: 'id IN ($placeholders)',
+            whereArgs: chunk,
+          );
+        }
+      });
+    }
+  }
+
+  Future<void> addMany(List<Game> games) async {
+    if (games.isEmpty) return;
+    final db = await _database;
+    final batch = db.batch();
+    for (final game in games) {
+      final entry = game.copyWith(addedAt: game.addedAt ?? DateTime.now());
+      batch.insert(
+        'collection',
+        {
+          'id': entry.id,
+          'name': entry.name,
+          'data': jsonEncode(entry.toJson()),
+          'added_at': entry.addedAt!.millisecondsSinceEpoch,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 
   Future<List<SharedCollection>> getSharedCollections() async {
