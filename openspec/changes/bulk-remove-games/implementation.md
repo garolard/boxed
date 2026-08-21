@@ -1146,7 +1146,7 @@ class _SummaryTabState extends ConsumerState<_SummaryTab> {
 
 ##### RED phase
 
-- [ ] Write the minimal failing test into `test/widgets/bulk_remove_flow_test.dart`:
+- [x] Write the minimal failing test into `test/widgets/bulk_remove_flow_test.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -1257,21 +1257,21 @@ void main() {
 }
 ```
 
-- [ ] Verify RED: run `flutter test test/widgets/bulk_remove_flow_test.dart` — expected: **assertion failures** (the checklist icon or the selection flow is not yet fully wired, causing the test to fail on missing widgets or incorrect state).
-- [ ] **GATE — DO NOT PROCEED to GREEN until RED is verified.**
+- [x] Verify RED: run `flutter test test/widgets/bulk_remove_flow_test.dart` — expected: **assertion failures** (the checklist icon or the selection flow is not yet fully wired, causing the test to fail on missing widgets or incorrect state).
+- [x] **GATE — DO NOT PROCEED to GREEN until RED is verified.**
 
 ##### GREEN phase (only after RED is verified)
 
-- [ ] Since Step 6 already implemented the full production code, the GREEN phase for this step is to ensure the test passes as-is. If the RED test failed for unexpected reasons (e.g., finder issues), adjust the test helpers only — do **not** modify production code.
-- [ ] Verify GREEN: run `flutter test test/widgets/bulk_remove_flow_test.dart` — expected: PASS
+- [x] Since Step 6 already implemented the full production code, the GREEN phase for this step is to ensure the test passes as-is. If the RED test failed for unexpected reasons (e.g., finder issues), adjust the test helpers only — do **not** modify production code.
+- [x] Verify GREEN: run `flutter test test/widgets/bulk_remove_flow_test.dart` — expected: PASS
 
 ##### Step 7 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] RED verified — `flutter test test/widgets/bulk_remove_flow_test.dart` fails as expected
-- [ ] GREEN verified — `flutter test test/widgets/bulk_remove_flow_test.dart` passes
-- [ ] `flutter test` — all tests in the project pass (no regressions)
-- [ ] `flutter analyze` — passes
+- [x] RED verified — `flutter test test/widgets/bulk_remove_flow_test.dart` fails as expected
+- [x] GREEN verified — `flutter test test/widgets/bulk_remove_flow_test.dart` passes
+- [x] `flutter test` — all tests in the project pass (no regressions)
+- [x] `flutter analyze` — passes
 
 **Human (verify in browser before committing):**
 *(All deferred checks were already verified in Step 6)*
@@ -1321,3 +1321,9 @@ This section documents deviations between the original plan and the code that wa
 **Plan:** The `GameCoverCard` invocation in the `SliverChildBuilderDelegate` is replaced by a block that ends with a plain `)` — no `.animate()` chain.
 **Final:** The replaced invocation keeps the existing `.animate().fadeIn(...).slideY(...)` chain outside the new `GameCoverCard(...)` call.
 **Reason:** Dropping the entrance animation would be an unplanned visual regression on the Shelf. The plan intended to add selection params, not remove existing animation, so the chain was preserved.
+
+### Step 7 — RED never produced assertion failures; test helpers adjusted
+
+**Plan:** Step 7's RED run was expected to fail on assertions because "the checklist icon or the selection flow is not yet fully wired".
+**Final:** The first run of the test failed on fixture/setup errors instead, and after the fixtures were fixed it passes outright.
+**Reason:** Step 6 had already shipped the full production code before Step 7 ran, so there was no missing behavior for the RED assertion to catch. The four fixture issues encountered and fixed in the test helpers (per the plan's GREEN clause "adjust the test helpers only") were: (1) `_pumpHome` overrode only `collectionProvider`, but `HomeScreen`'s `IndexedStack` builds all tabs, so the default-throwing `analyticsServiceProvider`/`reviewServiceProvider`/`scanQuotaServiceProvider`/`purchaseServiceProvider` leaked into other screens (fix: override all four, reusing `FakePurchaseService`); (2) the stub's inherited `loadRecommendations` would hit the uninitialized `late` `_igdb` from the Recommendations tab's post-frame callback (fix: no-op override); (3) `noSuchMethod => null` in the fakes raised `_TypeError: type 'Null' is not a subtype of type 'Future<void>'` for `logScreenView` (fix: return `Future.value()`); (4) `pumpAndSettle` timed out because the offstage Search tab's `_SearchHint` runs an infinite `repeat(reverse: true)` animation (fix: bounded `pump(Duration)` steps in a `_pumpInteraction` helper).
