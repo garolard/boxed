@@ -143,6 +143,24 @@ class CollectionNotifier extends Notifier<CollectionState> {
     await _load();
   }
 
+  Future<List<Game>> removeMany(List<int> ids) async {
+    final snapshot = state.games.where((g) => ids.contains(g.id)).toList();
+    await _repo.removeMany(ids);
+    _recsStale = true;
+    await _load();
+    await _analytics.logBulkGamesRemoved(BulkGamesRemovedParams(
+      count: snapshot.length,
+      collectionSizeAfter: state.games.length,
+    ));
+    return snapshot;
+  }
+
+  Future<void> restoreMany(List<Game> snapshot) async {
+    await _repo.addMany(snapshot);
+    _recsStale = true;
+    await _load();
+  }
+
   Future<String> exportCollection() => _repo.exportToFile(state.games);
 
   Future<ImportResult> importCollection(String path) async {

@@ -279,7 +279,7 @@ class BulkGamesRemovedParams {
 
 ##### RED phase
 
-- [ ] Create minimal stubs in `lib/providers/collection_provider.dart`, adding these two methods to `CollectionNotifier` after the existing `restore(Game)` method:
+- [x] Create minimal stubs in `lib/providers/collection_provider.dart`, adding these two methods to `CollectionNotifier` after the existing `restore(Game)` method:
 
 ```dart
   Future<List<Game>> removeMany(List<int> ids) async {
@@ -292,8 +292,8 @@ class BulkGamesRemovedParams {
   }
 ```
 
-- [ ] Create the directory `test/providers/`.
-- [ ] Write the test into `test/providers/collection_provider_test.dart`:
+- [x] Create the directory `test/providers/`.
+- [x] Write the test into `test/providers/collection_provider_test.dart`:
 
 - `removeMany` snapshots the affected games and returns them
 - `removeMany` delegates to the repository with the same ids
@@ -470,12 +470,12 @@ void main() {
 }
 ```
 
-- [ ] Verify RED: run `flutter test test/providers/collection_provider_test.dart` — expected: **assertion failures** (exit ≠ 0, failures attributable to the stubbed `removeMany` returning `[]` and `restoreMany` doing nothing).
-- [ ] **GATE — DO NOT PROCEED to GREEN until RED is verified.**
+- [x] Verify RED: run `flutter test test/providers/collection_provider_test.dart` — expected: **assertion failures** (exit ≠ 0, failures attributable to the stubbed `removeMany` returning `[]` and `restoreMany` doing nothing).
+- [x] **GATE — DO NOT PROCEED to GREEN until RED is verified.**
 
 ##### GREEN phase (only after RED is verified)
 
-- [ ] Replace the RED stubs in `lib/providers/collection_provider.dart` with the full implementation:
+- [x] Replace the RED stubs in `lib/providers/collection_provider.dart` with the full implementation:
 
 ```dart
   Future<List<Game>> removeMany(List<int> ids) async {
@@ -497,14 +497,14 @@ void main() {
   }
 ```
 
-- [ ] Verify GREEN: run `flutter test test/providers/collection_provider_test.dart` — expected: PASS
+- [x] Verify GREEN: run `flutter test test/providers/collection_provider_test.dart` — expected: PASS
 
 ##### Step 3 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] RED verified — `flutter test test/providers/collection_provider_test.dart` fails as expected
-- [ ] GREEN verified — `flutter test test/providers/collection_provider_test.dart` passes
-- [ ] `flutter analyze` — passes
+- [x] RED verified — `flutter test test/providers/collection_provider_test.dart` fails as expected
+- [x] GREEN verified — `flutter test test/providers/collection_provider_test.dart` passes
+- [x] `flutter analyze` — passes
 
 **Human (verify in browser before committing):**
 *(Deferred to Step 6 — notifier methods are not yet wired to the UI)*
@@ -1303,3 +1303,9 @@ This section documents deviations between the original plan and the code that wa
 **Plan:** Test imports both `sqflite` and `sqflite_common_ffi` and names the in-memory opener `_openInMemory`.
 **Final:** Removed the `package:sqflite/sqflite.dart` import and renamed `_openInMemory` to `openInMemory`.
 **Reason:** `flutter analyze` reported `unnecessary_import` (all used symbols come from `sqflite_common_ffi`) and `no_leading_underscores_for_local_identifiers`.
+
+### Step 3 — notifier test fixture missing `setCrashlyticsKey`
+
+**Plan:** `_FakeAnalytics` in `test/providers/collection_provider_test.dart` implements only `logBulkGamesRemoved` plus `noSuchMethod`, and nothing else.
+**Final:** Added an explicit no-op override `void setCrashlyticsKey(String key, Object value) {}` to `_FakeAnalytics`.
+**Reason:** `CollectionNotifier.build()` and `_load()` call `_analytics.setCrashlyticsKey('collection_size', len)`, which routed to `Object.noSuchMethod` and threw `NoSuchMethodError`, failing every test before assertions ran.
