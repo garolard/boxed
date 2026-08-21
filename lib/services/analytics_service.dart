@@ -58,6 +58,17 @@ class GameRemovedParams {
   });
 }
 
+/// Typed parameter bundle for a bulk removal.
+class BulkGamesRemovedParams {
+  final int count;
+  final int collectionSizeAfter;
+
+  const BulkGamesRemovedParams({
+    required this.count,
+    required this.collectionSizeAfter,
+  });
+}
+
 /// Typed parameter bundle for IGDB API errors.
 class IgdbErrorParams {
   final String endpoint;
@@ -184,6 +195,16 @@ class AnalyticsService {
             'game_name': _trim(p.gameName, 100),
             if (p.platformName != null)
               'platform_name': _trim(p.platformName!, 100),
+            'collection_size_after': p.collectionSizeAfter,
+          },
+        ));
+  }
+
+  Future<void> logBulkGamesRemoved(BulkGamesRemovedParams p) async {
+    await _safe(() => _analytics.logEvent(
+          name: 'bulk_games_removed',
+          parameters: {
+            'count': p.count,
             'collection_size_after': p.collectionSizeAfter,
           },
         ));

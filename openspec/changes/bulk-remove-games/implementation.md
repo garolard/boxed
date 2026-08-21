@@ -228,7 +228,7 @@ void main() {
 
 *(Non-testable step — standard format, no RED/GREEN needed because the event is verified indirectly in Step 3)*
 
-- [ ] Copy and paste into `lib/services/analytics_service.dart`, immediately after the existing `GameRemovedParams` class:
+- [x] Copy and paste into `lib/services/analytics_service.dart`, immediately after the existing `GameRemovedParams` class:
 
 ```dart
 /// Typed parameter bundle for a bulk removal.
@@ -243,7 +243,7 @@ class BulkGamesRemovedParams {
 }
 ```
 
-- [ ] Copy and paste the `logBulkGamesRemoved` method into `AnalyticsService`, placing it immediately after `logGameRemoved`:
+- [x] Copy and paste the `logBulkGamesRemoved` method into `AnalyticsService`, placing it immediately after `logGameRemoved`:
 
 ```dart
   Future<void> logBulkGamesRemoved(BulkGamesRemovedParams p) async {
@@ -260,7 +260,7 @@ class BulkGamesRemovedParams {
 ##### Step 2 Verification Checklist
 
 **Automated (agent runs before stopping):**
-- [ ] `flutter analyze` — passes
+- [x] `flutter analyze` — passes
 
 **Human (verify in browser before committing):**
 *(Deferred to Step 6 — analytics event is not yet wired into the UI)*
